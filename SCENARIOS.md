@@ -1,5 +1,7 @@
 # 场景清单与层级
 
+日期输入新增10项：六种非法日期/时间/尾随文本覆盖显式与自动类型、两种年份格式合法闰日偏移、仅日期/时间旧格式往返。run-nJcWDC复现5失败；STRICT+默认ERA及回退完整校验修复后run-O64tLN 1397项/1373通过/24跳过/零失败错误。grantee删除；主仓DATE_INPUT_VALIDATION_20260924.md。GUI错误提示尚未验。
+
 日期格式器补6项：四种Java/JDBC日期值法英月份显示、法语文本往返、NULL。run-LLTM6J复现4失败1解析错误，修复DateTimeFormatter未传Locale后run-5ENTGA 1387项/1363通过/24跳过/零失败错误，grantee删除。主仓DATE_FORMAT_LOCALE_20260924.md；是生产格式器回归，不是GUI菜单翻译验证。
 
 日期时间补2项真库：集中式/分布式分别验证纽约春季跳时、秋季重复01:30对应不同Instant，三会话时区下JDBC微秒往返一致及NULL/wasNull。run-qAhbau 1381项/1357通过/24跳过/零失败错误；隔离schema自动清理，grantee删除。主仓JDBC_DAYLIGHT_SAVING_20260924.md及脱敏报告；不代替GUI日期展示。
