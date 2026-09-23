@@ -1,5 +1,7 @@
 # 场景清单与层级
 
+GUI657–671同步model.sql1858（SHA a4319ab1…b5cd，宿主/容器一致），正常退出后重启。UPDATE ONLY和DELETE FROM ONLY都出现真实确认，分别取消后独立查2行原值/2行，专用schema清理0，截图已存。通用“多行数据/SQL”提示无精确表名为展示限制；未测ONLY确定执行，其他最新插件未同步，不算全新包验收。主仓SQL_SAFETY_GUI_20260924.md。
+
 麒麟GUI639–656补DELETE/DROP：隔离表2行，无WHERE DELETE中文确认取消后2行、重试确认后0行；DROP取消目录仍1表、重试确认后0表。两张截图核验保存，未选不再询问；schema清理目录0、编辑器恢复SELECT。主仓SQL_SAFETY_GUI_20260924.md追加证据，JUnit未增；多语句/手动事务/ONLY新包另验。
 
 麒麟GUI629–638补SQL安全确认：普通账号对隔离表无WHERE UPDATE→中文确认→取消，独立gsql2行原值；重试→确认，2行变更。截图已保存；schema/table删除且目录计数0，编辑器恢复SELECT文本。当前model.sql仍09220932，不代表ONLY修复GUI；JUnit数量未加。其他9条TPDSS质量规则仍待能力核实，不能以解析/执行通过替代告警。
