@@ -293,3 +293,9 @@ run-UKD1MJ完整回归 **897项、882通过、15跳过、零失败错误**；报
 - `realIndexPlanPreservesIndexScanUnderDistributedParent`：专用会话关闭顺序/仅索引/位图扫描，带主键表按id查询非索引label列，实际XML必须包含Index Scan。参数仅作用于本次连接，未修改全局优化器设置。
 - 三项均将真实XML交给生产PostgreExecutionPlan解析，逐节点对比原始XML的类型、成本、估算行数、子节点顺序和父引用；必须有多节点树。仅适配会话接口的mock，不伪造XML。结束检查结果集和语句关闭。
 - run-LuWJmd完整回归 **900项、885通过、15跳过、零失败错误**；报告 `docs/gaussdb/test-results-20260923-plan-operators.json`。随机schema自动清理，临时grantee已删除。尚未验证向量节点、ANALYZE运行时统计与GUI计划展示，不能把这些算作通过。
+
+### EXPLAIN ANALYZE运行时统计
+
+`realAnalyzePlanPreservesActualRowsTimingAndLoops` 使用生产配置ANALYZE/TIMING生成计划SQL，执行专用只读递归查询。真实XML必须存在Actual-Rows、Actual-Total-Time、Actual-Loops，再交给生产解析器；逐节点验证实际行数优先于估算行数、显示文本、数值耗时、属性中的循环次数，以及已有树结构断言。未启用ANALYZE的既有计划仍验证估算行数路径。只执行测试SELECT，不执行任何业务DML计划。
+
+run-ta6sGb完整回归 **901项、886通过、15跳过、零失败错误**；报告 `docs/gaussdb/test-results-20260923-plan-analyze.json`。临时grantee已删除。此项关闭递归查询运行时统计的解析验证，不代表分布式多DN运行时统计、BUFFERS或GUI展示已覆盖。
