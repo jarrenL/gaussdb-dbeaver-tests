@@ -1,5 +1,7 @@
 # 场景清单与层级
 
+NIO配置文件管理器新增11项实文件测试：Unicode读写覆盖备份、新旧格式发现及优先级、缺失/清空、写删失败。run-9pOeOF复现删除失败吞异常1项，改deleteIfExists传播后run-Xbw7bd 1487项/1463通过/24跳过/零失败错误；grantee删除。CONFIGURATION_FILE_IO_20260924.md，非Windows/网络盘/断电原子性或GUI验收。
+
 解析器复用补4项：缺失/空/仅用户名凭据重载及损坏后重试，保留同实例Map；run-h8D1sr复现旧密码残留3项，成功读取后替换快照修复，run-p7QrhU 1476项/1452通过/24跳过/零失败错误。grantee删除。标准注册表每次新建解析器，未称普通重启缺陷；CONFIGURATION_READ_FAILURE_20260924.md追加。
 
 配置正向及重试新增5项：明文/加密配置+独立加密凭据恢复文件夹和profile两项、缺失凭据仍加载无密码profile两项、失败后正常重试一项。run-IGPrkG 1472项/1448通过/24跳过/零失败错误；grantee删除，无生产改动。CONFIGURATION_READ_FAILURE_20260924.md追加边界：非完整驱动连接或注册表重载、重试初始化凭据Map不证明缓存保留。
