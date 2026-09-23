@@ -13,7 +13,7 @@
 | 1.3 | OLTP/集群版本选择 | 区分 GaussDB 产品及协议；不将 Zenith、OLAP 路径自动套入本插件 | 待核 |
 | 1.4 | 字符串及标识符转义 | 参数绑定、带引号对象、目录边界转义；补 DDL 生成全链路 | 部分 |
 | 1.5 | 查询首行、结果集、CSV、超时 | 首行/结果集、queryTimeout及Statement.cancel后连接复用已真库验证；CSV生产组件与JDBC写入已有独立验证；完整导入导出向导及终端取消UI待补 | 部分 |
-| 1.6 | 执行器资源、批量、OUT、警告 | OUT/INOUT、预编译批量计数及回滚、Statement关闭关联ResultSet但不关闭连接、关闭对象拒绝使用、警告读取和清除已真库验证；DBeaver执行器各异常路径和任务UI待补 | 部分 |
+| 1.6 | 执行器资源、批量、OUT、警告 | OUT/INOUT、预编译批量计数及回滚、唯一键失败批次SQLSTATE/失败计数/回滚无残留/同一语句清空后复用，Statement关闭关联ResultSet但不关闭连接、关闭对象拒绝使用、警告读取和清除已真库验证；DBeaver执行器各异常路径和任务UI待补 | 部分 |
 | 2.1 | 关键字与语法分类 | 生产 configureDialect 的 GaussDB 关键字大小写、类型/函数分类、YEAR 关键字优先及类型枚举副本已验证；模式差异和编辑器高亮另验，不把拆分当语义检查 | 部分 |
 | 3.1 | 数据库、schema、包、状态 | 既有 DatabaseManager、PackageCompiler；新增建库参数与错误读取场景 | 部分 |
 | 3.2 | 表、DDL、对象刷新 | GaussDBTable 模型、真实 JDBC 元数据；表编辑、DDL 导出、搜索缓存待补 | 部分 |

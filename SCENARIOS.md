@@ -299,3 +299,9 @@ run-UKD1MJ完整回归 **897项、882通过、15跳过、零失败错误**；报
 `realAnalyzePlanPreservesActualRowsTimingAndLoops` 使用生产配置ANALYZE/TIMING生成计划SQL，执行专用只读递归查询。真实XML必须存在Actual-Rows、Actual-Total-Time、Actual-Loops，再交给生产解析器；逐节点验证实际行数优先于估算行数、显示文本、数值耗时、属性中的循环次数，以及已有树结构断言。未启用ANALYZE的既有计划仍验证估算行数路径。只执行测试SELECT，不执行任何业务DML计划。
 
 run-ta6sGb完整回归 **901项、886通过、15跳过、零失败错误**；报告 `docs/gaussdb/test-results-20260923-plan-analyze.json`。临时grantee已删除。此项关闭递归查询运行时统计的解析验证，不代表分布式多DN运行时统计、BUFFERS或GUI展示已覆盖。
+
+### 批量唯一键失败及同一语句恢复
+
+`failedBatchRetainsSqlstateRollsBackAndCanReusePreparedStatement` 在手动事务提交id=1/1/2批次，要求BatchUpdateException及23505；更新计数必须符合JDBC取值且不能整批报告成功。独立连接确认无提交行，显式回滚后本连接和独立连接均0行。同一PreparedStatement clearBatch后插入9/恢复成功，更新计数1，提交后独立观察1行，逐列核对只有新数据。
+
+run-nWIvlp完整回归 **902项、887通过、15跳过、零失败错误**；报告 `docs/gaussdb/test-results-20260923-batch-recovery.json`。随机schema自动清理，临时grantee删除。本项验证真实厂商JDBC，不等同于数据导入向导的自动事务处理或全部批量执行器UI路径。
