@@ -1,5 +1,7 @@
 # 场景清单与层级
 
+最新接收器清理批次：**914项，898通过、16跳过、零失败/错误**，`results/run-e1Mclr`。新增DatabaseConsumerCleanupTest五项直接调用生产DatabaseTransferConsumer.close：回滚→恢复自动提交→关闭会话/独立连接的顺序且重复关闭不重复释放；回滚失败仍释放资源且不启用自动提交；共享连接不关闭且恢复原手动模式；自动提交状态不发回滚；会话关闭失败仍关闭独立连接。反射只用于准备私有运行态，事务/会话为mock，不声称真实连接或完整取消流程。真实GUI错误停止与间隔提交证据另见GUI_PROGRESS 322–347。本次未配置专用GB18030数据库，因此比此前多1跳过，原通过证据保留但不并入本轮通过数。首次run-9mQp5b测试常量引用错误导致编译失败，修为本分支实际构造方式后完整重跑。报告`test-results-20260923-consumer-cleanup.json`。临时grantee已删除。
+
 最新编辑器会话批次：**884项，869通过、15跳过、零失败/错误**，`results/run-f15Gje`，源码c2ed8205e6。未增加JUnit数量。GUI在同一客户端第二次调试复现仍显示旧源码，补充稳定的launch对象作为调试编辑器输入属性，使跨launch时重新加载文档、同一launch单步不反复刷新。已安装debug.ui 202609231021及GaussDB 202609231013实测两次启动：第一次v4，外部改为v3，第二次显示v3且line5正确；F8后line6与caretLine6一致；F9后回滚且独立表不变。证据GUI_PROGRESS 226–253。普通非调试编辑器F5及未保存文本保护仍需独立验证，不能由本场景推导通过。
 
 最新调试源码新鲜度批次：**884项，869通过、15跳过、零失败/错误**，`results/run-9aFLah`，源码98932d5af6。新增debuggerSourceReloadsPersistedBodyInsteadOfCachedCatalogText：预置old_call目录缓存，两次生产调试源码请求必须分别读取new_call/newer_call，并关闭语句、结果和会话。红测run-DSwu6O准确返回old_call而失败；修复仅在调试正文读取时重新查询持久化prosrc，普通DDL缓存策略不改变。报告test-results-20260923-debug-source-freshness.json。GUI尚未安装该批次，不等同已打开编辑器文档刷新通过。
