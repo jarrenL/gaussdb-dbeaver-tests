@@ -1,5 +1,7 @@
 # 场景清单与层级
 
+profile存储隔离新增3项：保存开关两种下嵌套user/password不覆盖主字段、中文特殊字符往返、两profile更新互不干扰。run-Mffnzp 1438项/1414通过/24跳过/零失败错误，grantee删除。AUTH_PROFILE_FIELD_ISOLATION_20260924.md；生产无改动、内存模拟控制器。嵌套自定义秘密仍会保存，不宣称保存主密码开关清除全部secret。
+
 凭据保留字段补5项：数据源/profile保存主密码开关各2、空主字段1；run-Ok3AmB复现扩展user/password覆盖主值或重新引入密码5失败。生产序列化跳过同名扩展键后run-E7bLUX 1435项/1411通过/24跳过/零失败错误；其他token及来源Map保留。grantee删除，CREDENTIAL_RESERVED_FIELDS_20260924.md；全用虚构凭据，非实际加密存储/GUI验收。
 
 整数范围补10项：Byte/Short/Integer/Long上下越界8、端点1、小数保护及整数科学计数1。run-0YyMfe复现6种收窄变号；生产NumberDataFormatter精确BigDecimal→exact转换后run-Gcb4Eb 1430项/1406通过/24跳过/零失败错误。非零小数保留不截断，grantee删除；NUMBER_INTEGER_RANGE_20260924.md。GUI及无类型提示大整数另验。
