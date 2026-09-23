@@ -6,6 +6,8 @@
 
 ## 主清单逐组登记
 
+3.12/3.13/10.3 兼容存储替换：生产saveSecuredCredentials新增5项，旧密码/token移除、子节点/顶层清理、无关范围保护、profile独立key及新存储模式跳过已验；修复错误合并造成秘密残留（run-QICTYu）。内存记录替换不代表真实加密文件/断电/GUI验证。
+
 3.13/10.3 存储接口补充：DBAAuthProfile.persistSecrets/resolveSecrets新增7项已验，修复关闭保存仍向安全存储提交主密码，成功再次保存会替换旧记录（run-cKhsKy）。内存控制器不等于真实加密存储/文件权限；底层落盘、GUI和认证扩展秘密字段仍待验。
 
 3.12/3.13 凭据补充：生产SecureCredentials→saveCredentialsToMap新增11项，数据源/隧道/profile保存选项、集合隔离/只读/自身赋值/空值已验。修复profile忽略保存密码选项、共享Map修改源配置和自身赋值丢内容；run-wG7ema通过。安全存储persistSecrets、既有秘密删除及保留键冲突仍待审计，非完整导出安全验收。
