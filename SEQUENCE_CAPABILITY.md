@@ -1,5 +1,13 @@
 # 序列管理验证边界
 
+## 注释与重命名真库补充
+
+run-UWZjps：1002项，978通过、24跳过、零失败/错误。生产PostgreSequenceManager的额外动作生成COMMENT ON SEQUENCE，真实GaussDB方言处理引号。集中式及分布式分别验证中文、单引号、SQL形态分号文本及换行原样保存；注释操作前后nextval连续1→2，清空注释后obj_description为NULL且nextval为3，未重置序列。两项正向通过。
+
+两实例执行管理器生成的ALTER SEQUENCE RENAME时均返回0A000及“RENAME SEQUENCE is not yet supported”。对应重命名保留OID/号码/注释、旧名失效、重名冲突保护正向流程未能执行，明确跳过，不当作通过。只对该精确能力限制跳过，其他异常失败。客户端目前仍生成重命名命令，能力门控需继续处理；与已修复的RESTART门控不是同一项。
+
+run-Ws9CxZ最初在夹具里嵌套Mockito设定而失败，改为先计算限定名称；run-U5jaFr暴露真实重命名限制。随后拆分注释独立正向场景，避免全部被重命名阻塞。报告docs/gaussdb/test-results-20260923-sequence-comments.json；随机schema已清理、集中式残留0、临时grantee删除。本批不替代注释编辑器保存/重命名GUI测试。
+
 ## 生产入口
 
 GaussDB当前复用PostgreSequence模型和PostgreSequenceManager管理器，并非另有独立序列编辑实现。
