@@ -1,5 +1,7 @@
 # 场景清单与层级
 
+最新导航节点批次：**883项，868通过、15跳过、零失败/错误**，`results/run-di9NkY`。DebugUtils增加源码节点缺失时仅刷新所属容器并重新解析原OID一次的路径，避免沿用刷新前模型实例；使用普通来源事件而非FORCE_REFRESH，不强制丢弃其他编辑器本地修改。新增DebugSourceNavigationTest四场景：刷新后模型实例替换、已存在节点不刷新、取消不刷新、重试仍缺失不循环。报告`test-results-20260923-source-navigator.json`。单元/真库回归通过；GUI新函数热加载仍待重新安装插件后复验，旧父编辑器源码另需修复，不计为完成。
+
 最新厂商目录类型批次：**879项，864通过、15跳过、零失败/错误**，`results/run-8Sf77R`。Linux GUI展开函数树真实报错 `Unsupported vector type: com.huawei.gauss200.jdbc.util.PGobject`。新增 `vendorCatalogVectorsAndArraysUseProductionUnwrapping`，在507创建含numeric/integer参数的函数，读取真实proargtypes对象，调用生产isPGObject/getIdVector/getIntVector；另读取真实bigint[]并验证生产isPGArray/getIdVector与资源释放，普通Object不能误识别。红测`run-PUYwu6`准确失败于厂商PGobject未识别，生产GaussDB server扩展补充gauss200命名空间，保留已有postgresql/gaussdb命名空间。报告`test-results-20260923-vendor-catalog-types.json`。该批次证明真实驱动类型解包，不直接等同完整函数模型或GUI通过；后续界面结果见GUI_PROGRESS。临时权限测试角色已删除。
 
 最新调试缓存批次：**878项，863通过、15跳过、零失败/错误**，`results/run-G0sfud`。GUI外部新建子函数后F7进入两层栈但找不到源码；新增refreshesOnlyTargetRoutineCachesWhenCatalogConfirmsNewFunction，红测Routine42未找到（run-9u44Ml），修复为目录确认OID目标schema存在且第二次缓存查找仍遗漏时，仅重载该schema两类routine缓存一次。回归同时保留跨schema/OID不改变启动配置测试。报告`test-results-20260923-debug-cache-refresh.json`。源码GUI待换新插件复验，已有父编辑器旧文本是另一未闭环问题，不能用单测通过替代。
