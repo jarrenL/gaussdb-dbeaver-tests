@@ -109,3 +109,9 @@ OUT 修复尚需新的产品打包与 GUI 回归，旧发布安装包不包含�
 新增 5 项生产导入器测试：GB18030 中文及扩展字符、无表头 UTF-16LE BOM 去除和前导零保留、maxRows 只计数据行、读取前取消、首行后取消。接收器 fetchEnd/close 断言移入 finally，既有未闭合引号异常路径也验证释放。未声称取消后数据库事务已回滚；接收器仍是 mock。
 
 CSVImporterTest **17 项全部通过**；完整回归 **805 项，792 通过、13 跳过、0 失败/错误**。证据 `docs/gaussdb/test-results-20260923-import-lifecycle.json`，本地运行 `results/run-CA0qP0`。金融字符集覆盖限于本地 CSV 字节解码，不代表数据库连接 client_encoding 或客户金融版本验证。
+
+## JDBC 警告、元数据与生命周期
+
+新增 4 项真实 507 测试全部通过：过程 RAISE WARNING 能通过 Statement.getWarnings 读取和 clearWarnings 清除且继续查询；结果元数据保留中文/空格别名、列序、numeric(18,4) 精度与标度、varchar(37) 长度；ResultSet/Statement 关闭后操作抛 SQLException，但连接 isValid 且能继续查询；参数化插入含分号/引号/DROP 文本/中文/换行/反斜杠，按完整原文取回且表仍在。
+
+历史 JDBC 类 56 项，54 通过、2 能力跳过。完整回归 **809 项，796 通过、13 跳过、0 失败/错误**。证据 `docs/gaussdb/test-results-20260923-jdbc-contracts.json`，运行 `results/run-idizTN`。仅证明所用厂商驱动和 507 的契约，不代表所有驱动版本或 GUI 警告显示已经验证。
