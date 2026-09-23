@@ -1,5 +1,7 @@
 # 场景清单与层级
 
+最新日期时区真库批次：975项，955通过、20跳过、零失败/错误，results/run-evsucb。507 ORA分布式/厂商JDBC新增三项：2024-02-28加一天到闰日保留123456微秒、2023年末加1微秒跨年、闰日date_trunc月首；timestamptz真实入表后UTC/Asia-Shanghai格式化分别15:30/23:30，epoch数值完全一致；to_char/date_trunc/extract对SQL NULL经JDBC读取null且wasNull=true。随机schema清理/连接关闭，无全局时区修改，无产品代码修改。报告test-results-20260923-date-timezone.json，临时grantee删除。不等同客户端本地日期格式、Java时区转换、DST全部边界或结果编辑器验收。
+
 最新事件通知批次：972项，952通过、20跳过、零失败/错误，results/run-uL72tn。QueryHistoryCollectorTest新增失败监听器隔离及移除监听器两项：首个监听器抛异常不影响下个接收和历史入库（此处为内存列表，不是持久化数据库），空周期不重复发送；移除监听器后新事件继续保留但不通知已移除者。实际生产dispatcher单周期，非并发压力/网络消息队列测试；无生产代码修改。报告test-results-20260923-history-listeners.json，临时grantee已删除。
 
 最新收集器保留批次：970项，950通过、20跳过、零失败/错误，results/run-9uGRc1。新增两项生产dispatcher单周期测试：超10000条保留最新记录、连续追加顺序/防御快照；关闭连接缓存清理同时保留重开对象。run-230CQa红测证实待关闭列表直接赋值再清空导致无清理，修复列表快照和关闭判断。报告test-results-20260923-history-retention.json；临时grantee删除，GUI仍1322模型包，不含本次清理修复。无长期并发/内存压测结论。
