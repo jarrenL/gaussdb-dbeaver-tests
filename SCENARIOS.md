@@ -1,5 +1,7 @@
 # 场景清单与层级
 
+最新回滚时间戳批次：968项，948通过、20跳过、零失败/错误，results/run-hHlYz3。生产collector回滚事件红测run-dBCwoc确认timestamp=0，改为回滚对象结束时间后通过；不是改测试预期来绕过异常。测试隔离异步dispatcher，仍执行生产handler/private事件创建、检查eventPool及QMUtils事件时间。报告test-results-20260923-rollback-timestamp.json；临时grantee已删除，新model补丁尚未GUI安装复验。
+
 最新事务历史模型批次：967项，947通过、20跳过、零失败/错误，results/run-SnfyTy。QueryHistoryExecutionTest新增回滚与后续自动提交独立性、提交后新事务、关闭连接回滚三个测试。报告test-results-20260923-history-transactions.json；临时grantee删除。另从GUI异常日期追到collector使用连接closeTime=0生成回滚事件，尚待独立修复，模型绿测不覆盖此路径。
 
 最新历史游标批次：**964项，944通过、20跳过、零失败/错误**，`results/run-2eFOs7`。QueryHistoryCursorTest五项调用生产ListCursorImpl及QMRegistryImpl.DefaultEventBrowser：前/后定位、越界不改变当前位置、空游标；USER/META与query类型、中文大小写文本、自定义排除条件组合后按最新优先读取；无匹配结果为空。run-6gjHIV红测确认scroll只验证参数但不更新位置，定位第三条仍读取第一条；生产补this.position赋值。源QMUtils保持原CRLF。通过模拟collector隔离输入，未验证真实事件收集、UI翻页、日期/状态过滤或跨重启存储；默认当前会话浏览器源码并未实现全部criteria字段，仍待能力核实。报告test-results-20260923-history-cursor.json。临时grantee已删除，新修复未装入GUI/发布包。
