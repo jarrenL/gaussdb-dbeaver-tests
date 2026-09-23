@@ -1,5 +1,7 @@
 # 场景清单与层级
 
+最新网络配置凭据批次：**947项，930通过、17跳过、零失败/错误**，`results/run-2xoh7L`。ConnectionConfigurationHistoricalTest新增三项：复制的DBWHandlerConfiguration及普通/安全属性、用户名/密码、保存标志、启用状态互不影响，删除副本handler保留原对象；savePassword=false时saveToSecret返回空但运行时凭据仍在，切换true时合成凭据正确进入待保存内容；同ID更新仅替换目标handler、删除缺失ID无副作用。全部使用显式合成凭据，不连接真实认证服务；这是生产配置模型及持久化前的内容构造测试，不等于磁盘加密、安全存储后端或UI验收。报告`test-results-20260923-network-secret-copy.json`。临时grantee已删除，无生产代码修改。只读核实507的ssl/证书设置均为postmaster上下文，TLS启用需重启测试CN，本轮未改服务端配置。
+
 最新SSL配置/连接导入批次：**944项，927通过、17跳过、零失败/错误**，`results/run-8w6LXg`。新增PostgreSSLPropertiesTest四项，通过生产getInternalConnectionProperties验证旧证书路径（空格中文）及verify-full、新版证书属性覆盖旧值/verify-ca/工厂、空选项省略、禁用handler不带保存的证书配置。纯配置映射层，假路径不读证书、不宣称TLS握手通过。初始测试使用setHandlers发现新配置不接收handler（run-WhJLse）；用updateHandler隔离后四项通过（run-XcUwup）。另在ConnectionConfigurationHistoricalTest加两项，run-T6wfNy红测确认setHandlers在初始null时忽略输入、自身列表传入时被clear清空；生产修复为new ArrayList复制，验证新建、调用方列表清空不影响配置、自身列表、替换及清空。ConfigImportWizard确实调用此生产入口，但导入向导GUI仍未验收。报告`test-results-20260923-ssl-config-import.json`；临时grantee已删除。GUI副本和发布包暂不含新模型修复；服务端SSL配置未改动。
 
 最新角色权限/SSL批次：**938项，921通过、17跳过、零失败/错误**，`results/run-3ETAvm`。PostgreRoleMetadataTest增加三项：六个权限/登录标志64组合独立生成正/负选项（按一个测试方法统计，不虚增64项）、有效期及角色名内嵌双引号/注释单引号转义、不支持的权限选项即使模型为true仍省略。前一阶段`run-Chgt8T`937项/920通过/17跳过。另新增requiredSslDoesNotSilentlyDowngradeWhenServerSslIsDisabled，507真实厂商JDBC确认SHOW ssl=off后sslmode=require拒绝连接且SQLSTATE=08004，prefer明确允许回退并执行SELECT 1，原连接仍可查询。该场景不是TLS正向、证书校验、客户端SSL配置UI或凭据存储验证；未修改服务端SSL/HBA配置。报告`test-results-20260923-role-flags-ssl-required.json`，临时grantee已删除。无新增生产代码修改。
