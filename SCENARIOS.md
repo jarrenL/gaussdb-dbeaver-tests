@@ -277,3 +277,11 @@ productionConstraintAndCompositeTypeSearchFindNamedCatalogObjects 验证真实�
 - PostgreViewManager改用首个SQL关键字判定完整DDL。`PostgreViewDdlTest`覆盖字符串create、注释create、带前导注释的完整DDL不重复包装。
 - `productionViewManagerWrapsCreateLiteralAndExecutesItsGeneratedDdl`：生产生成器输出经507厂商JDBC执行，真实视图查询返回字符串create且仅一行，生产对象搜索可找到新视图。
 - 最终run-QDNlnL：**896项、881通过、15跳过、零失败错误**；报告 `docs/gaussdb/test-results-20260923-view-lifecycle.json`。随机schema已自动清理，临时grantee已删除。视图编辑器、懒加载、自动补全、批量删除界面仍待验，不计为本轮通过。
+
+### 视图列元数据刷新
+
+`viewColumnMetadataRetainsAliasesPrecisionAndOrderAfterRename`：三列视图改变基表列顺序，使用中文、空格、大写别名。真实JDBC getColumns验证重命名后旧名无列，新名依序为中文Name/VARCHAR长度40、Amount Value/NUMERIC(20,4)、Identifier/INTEGER；删除视图后新名无列。不是仅查询结果元数据，也未冒充导航树UI验证。
+
+run-UKD1MJ完整回归 **897项、882通过、15跳过、零失败错误**；报告 `docs/gaussdb/test-results-20260923-view-metadata.json`。随机schema自动清理，临时grantee已删除。
+
+本次同步核对既有方法 queryTimeoutReportsCancellationAndConnectionRemainsUsable、explicitStatementCancelInterruptsOnlyItsOwnQuery、preparedBatchCountsAndRollbackMatchPersistedRows、statementCloseClosesResultButNotConnection、closedStatementAndResultRejectUseButConnectionRemainsUsable、serverWarningIsAvailableAndCanBeClearedWithoutClosingConnection，修正台账1.5/1.6仍写“待补”的过期表述。这些是既有覆盖，不计为新增测试；执行器UI/生产异常路径仍未全部覆盖。
