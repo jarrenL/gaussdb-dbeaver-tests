@@ -1,5 +1,7 @@
 # 场景清单与层级
 
+INSERT数值/布尔新增10项：真实JDBC处理器，Long边界、38位整数/小数、极小小数、负数末尾零、数值NULL、布尔真/假/NULL完整SQL断言。run-TIGt381217/1193通过/24跳过/零失败错误。主仓DML_GENERATOR_OPTIONS_20260924.md及类型脱敏报告；无生产修改，grantee清理，不算真库类型范围及网格格式验收。
+
 DML选项补6项：INSERT/UPDATE/DELETE完整限定名与多行格式三项；缺失绑定时数字/字符串/时间表达式默认值三项各断言INSERT和UPDATE，避免再次加引号。run-Dg3jMg1207/1183通过/24跳过/零失败错误。主仓DML_GENERATOR_OPTIONS_20260924.md及脱敏报告，grantee清理，无生产修改。限定名由模拟实体提供，不算真实schema名称生成/GUI/默认值元数据验收。
 
 UPDATE生成真库：集中式/分布式507各依次写SQL NULL、字面NULL、引号、中文换行、SQL形状文本；每轮实际生成SQL影响1行，更新/回滚/重试提交后均逐行核对全部7行，其他6行不变，参考表7行。随机schema与grantee清理。run-DXB77F1201/1177通过/24跳过/零失败错误；主仓UPDATE_GENERATOR_20260924.md及脱敏报告，无生产修改，不算GUI菜单验收。
