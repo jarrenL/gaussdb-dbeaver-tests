@@ -1,5 +1,7 @@
 # 场景清单与层级
 
+凭据保留字段补5项：数据源/profile保存主密码开关各2、空主字段1；run-Ok3AmB复现扩展user/password覆盖主值或重新引入密码5失败。生产序列化跳过同名扩展键后run-E7bLUX 1435项/1411通过/24跳过/零失败错误；其他token及来源Map保留。grantee删除，CREDENTIAL_RESERVED_FIELDS_20260924.md；全用虚构凭据，非实际加密存储/GUI验收。
+
 整数范围补10项：Byte/Short/Integer/Long上下越界8、端点1、小数保护及整数科学计数1。run-0YyMfe复现6种收窄变号；生产NumberDataFormatter精确BigDecimal→exact转换后run-Gcb4Eb 1430项/1406通过/24跳过/零失败错误。非零小数保留不截断，grantee删除；NUMBER_INTEGER_RANGE_20260924.md。GUI及无类型提示大整数另验。
 
 数字输入补9项：非法尾随/空/非数字6种，38位BigDecimal、区域分隔符与指数、整数界限及NULL。run-hVQHcM复现4项部分解析；生产NumberDataFormatter增加完整消费校验后run-XbdLQw 1420项/1396通过/24跳过/零失败错误。grantee删除；NUMBER_INPUT_VALIDATION_20260924.md。不是GUI或分组合法性/收窄溢出验收。
