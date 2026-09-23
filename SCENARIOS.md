@@ -325,3 +325,11 @@ run-PzH7V7首次因测试使用需非空上下文的异常构造器失败，修�
 - `simpleProtocolGb18030PreservesChineseSupplementaryCharactersAndNull`：仅此测试显式allowEncodingChanges=true和preferQueryMode=simple，确认SHOW编码GB18030，PreparedStatement写入中文银行、𠀀、引号/反斜杠、NULL；当前连接与独立默认连接逐行核对完全一致，结束恢复原编码。此明确配置路径通过，**不替代上面的扩展协议失败**。
 - run-968iNy及最终命名明确后的run-UHWNQQ：908项、893通过、15跳过、零失败错误；报告 `docs/gaussdb/test-results-20260923-client-encoding.json`。绿报告仅涵盖上述成功配置/限制断言，不能声称GB18030全部支持。临时grantee已删除。
 - 还需验证GB18030服务端数据库配合默认UTF8 JDBC链路、DBeaver驱动属性界面和编码提示；此组仍部分覆盖。
+
+### GB18030数据库配合默认UTF8 JDBC
+
+`utf8JdbcRoundTripsGb18030DatabaseWithoutChangingClientEncoding` 使用环境变量指定专用库，首先断言实际数据库名、存储编码GB18030、客户端编码UTF8；通过默认PreparedStatement写入中文银行、扩展汉字𠀀、引号/反斜杠和NULL，独立连接逐行核对值及wasNull。未启用allowEncodingChanges或simple协议，未切换client_encoding。
+
+本地507新建空测试库dbv_hist_gb18030_20260923（ORA，owner为专用测试账号）。A标记最初被拒，改用目录实际支持的ORA后创建成功。run-YceM4c因该库尚无HBA许可失败；临时增加仅限测试库/账号/Docker网关单IP的sha256规则后，run-zu2lZo完整回归 **909项、894通过、15跳过、零失败错误**。报告 `docs/gaussdb/test-results-20260923-gb18030-database.json`。
+
+结束已移除临时HBA条目、恢复文件原属主1000:1000和600权限并reload；临时grantee删除，新库内随机测试schema计数0。空测试库保留供后续验收；没有更改已有库编码。结论仅为默认UTF8 JDBC连接GB18030库可往返，本轮不修复主动改client_encoding后的扩展协议问题，也不代表驱动属性UI已验。
