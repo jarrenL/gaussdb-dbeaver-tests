@@ -1,5 +1,7 @@
 # 场景清单与层级
 
+XLSX接真实JDBC补2项：集中式/分布式507隔离表写numeric38,18/Long.MIN/中文𠀀引号换行/NULL，getObject先对比输入，原样交生产导出器，XLSX逐格类型/值/表头/行列数验证。run-ECvtcg1317项/1293通过/24跳过/零失败错误，无生产修改；两库xlsx_values残留0/grantee删除。主仓XLSX_EXPORT_20260924.md及jdbc脱敏报告；绑定和site仍模拟，不代表GUI向导或办公软件验收。
+
 XLSX输出失败清理补2项：0/512字节后IOException，要求异常传播、workbook/sheet引用清空、再次dispose不重写。run-cPnfVE两项复现write异常跳过关闭/清理；改try-with-resources与finally。run-hcvL7P1315项/1291通过/24跳过/零失败错误，本类50项，grantee删除。主仓XLSX_EXPORT_20260924.md与output-failure脱敏报告；未模拟真实磁盘满/句柄统计/GUI，不自动删除调用方输出路径。
 
 XLSX内容/资源补5项：真实Reader多块中文读取文件往返、二进制占位不打开流、缺失storage标签、读取/打开异常保留且释放。run-hTYMBb修正spy StringReader锁为空的测试装配问题，无生产修改。run-QfJhtG1313项/1289通过/24跳过/零失败错误，本类48项，grantee删除。主仓XLSX_EXPORT_20260924.md及content脱敏结果；二进制不是原文保存，真实JDBC LOB/磁盘失败/GUI另验。
