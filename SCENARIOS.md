@@ -1,5 +1,7 @@
 # 场景清单与层级
 
+转义规则非零offset12项：5类SQL前缀成功且保留分号，7类标识符后缀/未闭合失败后恢复起点，两种真实扫描器均断言。run-P5TdrH1255/1231通过/24跳过/零失败错误。主仓PREDICATE_SCANNER_20260924.md及非零offset脱敏报告，无生产修改、grantee清理。非完整SQL脚本拆分或GUI验收。
+
 转义字符串失败回退9项：空输入、E/e、未闭合/尾部反斜杠/双引号及非匹配输入，两种扫描器偏移与首字符恢复。run-2JGlEB7项偏移-1失败；改为记录起始offset按实际推进回退。run-KB7Qy41243/1219通过/24跳过/零失败错误。主仓PREDICATE_SCANNER_20260924.md和回退脱敏报告，grantee清理。非零起始位置与完整GUI另验。
 
 转义字符串EOF追加8项：5合法末尾字符串、3分隔符保留。run-X1oQz7五项EOF失败，修复共享PostgreEscapeStringRule闭合引号后EOF被拒；同时校验片段与文档扫描器正确结束偏移。run-rz3aa81234/1210通过/24跳过/零失败错误，主仓PREDICATE_SCANNER_20260924.md和EOF脱敏结果。grantee清理；未闭合失败回退和实际GUI仍待验。
