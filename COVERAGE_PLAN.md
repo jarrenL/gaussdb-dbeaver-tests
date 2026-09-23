@@ -197,6 +197,8 @@
 
 ## 验收证据要求
 
+9.3 可重复运行入口：run-role-access.mjs自动创建随机测试角色/口令，准备成员关系和节点组USAGE，执行真库回归后清理；5项运行器测试覆盖失败清理/重名保护等，独立于JUnit计数。实际run-AhPLgV为1543项/1520通过/23跳过/0失败错误，管理员独立确认随机角色剩余0。说明见ROLE_ACCESS_RUNNER.md；强杀及超时结果不确定不能保证自动清理。
+
 9.3 列级实际访问补验：生产列授权后仅id可SELECT/UPDATE，其他列与SELECT *返回42501；撤销后id读写也被拒绝。所有者确认唯一行id=8、受限列原值不变。初次id为默认分布键被服务端禁止更新，改为独立shard_id hash键隔离权限测试，限制保留记录。run-JjrTL6为1543项/1520通过/23跳过/0失败错误，专用角色及临时授权清理并确认0。非GUI/非集中式全验，详见ROLE_ACCESS_VALIDATION_20260924.md。
 
 9.3/3.10 实际受限角色访问补验：启用GAUSSDB_HISTORY_VERIFY_ROLE_ACCESS=YES及临时随机角色口令；生产授权SQL后SELECT返回7、UPDATE拒绝42501，生产撤销后SELECT/UPDATE均拒绝42501。首次缺少SET ROLE口令、第二次缺少分布式节点组USAGE失败，补齐专用测试角色前置权限后run-oDOwdM为1543项/1520通过/23跳过/0失败错误。节点组授权和成员关系撤销、角色删除并独立确认0。非GUI，不是登录测试；详见主仓ROLE_ACCESS_VALIDATION_20260924.md。
