@@ -253,3 +253,6 @@
 正常退出后更新模型2.0.45.202609231529，hash与主机相同，原工作区-clean重启。管理员创建专用两行safety_only_probe并仅授普通账号SELECT/UPDATE/DELETE。实际客户端执行UPDATE ONLY无WHERE出现警告，取消后独立数据仍10/20；再次执行并确定后两行30。DELETE FROM ONLY取消后仍2行30，确定后独立计数0。未勾不再询问。517文本换成SELECT 1，专用表删除、目录0。
 
 发现提示缺陷：UNKNOWN预览及missing argument。源码confirmAction重载把类型字符串当codeBlockText，剩余参数不足；完整解析失败时类型也UNKNOWN。拦截/数据结果通过不代表文案通过，下一步修复并重验。当前下一队列518，JUnit仍1063/1039通过/24跳过。模型新包同时包含历史模型修复，但此场景不替代历史功能回归。
+# 危险查询提示修复复验（518–529）
+
+SQL编辑器1537更新，模型1529保留，正常退出/备份后-clean启动。UPDATE ONLY及DELETE ONLY弹窗均显示真实SQL预览、“多行数据/SQL”完整中文警告，无UNKNOWN/missing argument；普通UPDATE显示真实表名和UPDATE，三次均取消，独立数据最终10/20不变。专用表及临时grantee删除，529恢复SELECT 1。截图主仓images/sql-safety-20260923/warning-fixed.png已检查非空。回归run-ArZXkO1063/1039通过/24跳过。下一队列530，剩余确认偏好/多语句另验。

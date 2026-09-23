@@ -1,5 +1,7 @@
 # 场景清单与层级
 
+危险查询提示修复：518–529新版SQL编辑器1537真实验证ONLY更新/删除和普通UPDATE，SQL预览、中文目标/类型完整，三次取消数据不变，fixture清理。完整回归run-ArZXkO1063/1039通过/24跳过/零失败错误。上一条UNKNOWN/missing argument缺陷已修，不覆盖偏好开关、多语句或其他静态规则。
+
 ONLY GUI链路：504–517新版模型实际普通账号操作，UPDATE/DELETE取消不改数据、确认执行符合2行更新/0行剩余，独立连接核实，fixture已清理。但弹窗UNKNOWN/missing argument缺陷新发现待修，不能标完整通过。详见主仓SQL_SAFETY_COVERAGE_20260923.md。JUnit数量未变。
 
 ONLY安全检查修复已转绿：run-rAR5u0，1063总数/1039通过/24跳过/零失败错误，安全检查类51项。词法回退识别外层DML/WHERE，保留原执行文本；ONLY注释/子查询/CTE/引用名及非DML负例补齐。507集中式/分布式临时表真实UPDATE ONLY与DELETE FROM ONLY各影响2行，回滚并确认目录0。初次分布式ON COMMIT DROP准备失败已记录，最终统一脚本复跑通过。GUI确认仍待验证，见主仓SQL_SAFETY_COVERAGE_20260923.md。
