@@ -1,5 +1,7 @@
 # 场景清单与层级
 
+最新事务历史模型批次：967项，947通过、20跳过、零失败/错误，results/run-SnfyTy。QueryHistoryExecutionTest新增回滚与后续自动提交独立性、提交后新事务、关闭连接回滚三个测试。报告test-results-20260923-history-transactions.json；临时grantee删除。另从GUI异常日期追到collector使用连接closeTime=0生成回滚事件，尚待独立修复，模型绿测不覆盖此路径。
+
 最新历史游标批次：**964项，944通过、20跳过、零失败/错误**，`results/run-2eFOs7`。QueryHistoryCursorTest五项调用生产ListCursorImpl及QMRegistryImpl.DefaultEventBrowser：前/后定位、越界不改变当前位置、空游标；USER/META与query类型、中文大小写文本、自定义排除条件组合后按最新优先读取；无匹配结果为空。run-6gjHIV红测确认scroll只验证参数但不更新位置，定位第三条仍读取第一条；生产补this.position赋值。源QMUtils保持原CRLF。通过模拟collector隔离输入，未验证真实事件收集、UI翻页、日期/状态过滤或跨重启存储；默认当前会话浏览器源码并未实现全部criteria字段，仍待能力核实。报告test-results-20260923-history-cursor.json。临时grantee已删除，新修复未装入GUI/发布包。
 
 最新SQL日志重配置批次：**959项，939通过、20跳过、零失败/错误**，`results/run-8maXxy`。QueryHistoryFileTest新增三项：切换日志目录关闭旧Writer并真实落盘中文SQL到新文件；目标是普通文件而非目录时打开失败，旧Writer关闭且后续不再写旧目的地；禁用日志关闭旧Writer并忽略后续事件。首轮run-j5KHi7因测试框架不支持静态mock而未进入断言，改用隔离OSGi测试运行时首选项、finally恢复值及默认状态。run-Qwf9jq红测证明启用状态下initLogFile不关闭旧Writer；修复在重配置开始先关闭/置空，失败时不保留旧目的地。报告test-results-20260923-query-log-reconfigure.json。验证生产初始化与文件IO，不等同客户首选项GUI操作或数据库历史分页验收。临时grantee已删除；GUI/发布包未更新。

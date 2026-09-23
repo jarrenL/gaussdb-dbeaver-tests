@@ -2,6 +2,10 @@
 
 ## 实现核对
 
+2026-09-23事务历史补查：416快照有独立“回滚”事件，417还显示后续切换自动提交产生的“提交”事件。新增三个生产模型测试确认回滚后切自动提交不会把旧事务改为提交、提交关闭当前事务并建立独立新事务、关闭连接历史将未完成事务标记回滚。run-SnfyTy：967项/947通过/20跳过/零失败错误；不代表全部事件收集/UI都通过。
+
+**新发现待修复**：回滚事件显示1月1日，源码QMMCollectorImpl.handleTransactionRollback使用sessionInfo.getCloseTime()而不是oldTxn.getCloseTime()构造END事件；连接仍打开时前者为0。QueryLogViewer经QMUtils读取事件timestamp并格式化，因此此模型测试未覆盖的collector路径确实存在日期缺陷。保留未完成状态，后续须补collector回归及修复。
+
 - `QMRegistryImpl.getEventBrowser(true)` 使用 `DefaultEventBrowser`，读取 collector 当前内存事件。
 - `getEventBrowser(false)` 尝试适配 `QMEventBrowser`，没有适配器时回退到同一默认浏览器。本仓 Java 源码检索只找到此实现；这不是所有发行版/外部扩展均不支持持久化的结论。
 - 默认浏览器按对象类型、查询用途、文本和自定义过滤器处理，反向输出最新事件。不能仅因 `QMEventCriteria` 存在日期/状态等字段就声称这些条件在默认路径生效。
