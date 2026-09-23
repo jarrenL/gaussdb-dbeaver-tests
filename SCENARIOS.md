@@ -169,3 +169,11 @@ PostgreAclParsingTest 新增 4 项：含等号及转义双引号的角色名、�
 尝试在 507 创建含等号和双引号的专用角色被服务端以 Invalid name 拒绝，随后以该不存在角色运行的两项权限测试也失败。这不算通过。改用合法 NOLOGIN 测试角色后完整链路通过；特殊角色名仍只有解析器单元证据，不能对当前 507 承诺该名称受支持。
 
 最新回归 **838 项，825 通过、13 跳过、0 失败/错误**。证据 `docs/gaussdb/test-results-20260923-jdbc-acl.json`，运行 `results/run-GD5bCR`。临时合法角色已删除，管理员核对测试角色前缀计数为 0。
+
+## 对象搜索范围、绑定与关闭
+
+PostgreStructureSearchTest 新增 5 项，通过生产 findObjectsByMask 入口验证：含引号/分号的名称 mask 只作绑定值且使用指定 LIKE/上限；SQLException 保留原因并关闭资源；全局 schema 过滤器全部不匹配时不发起不受限查询；部分匹配仅绑定保留 schema 的 OID，注释 mask 与 OID 参数顺序正确；取消时不读结果行并关闭结果集/语句/会话。
+
+红测确认原逻辑将“过滤后没有 schema”转换为“不限制 schema”并打开查询会话。修复在启用过滤器且零匹配时直接返回空结果。这是客户端可见范围过滤，不是数据库访问权限控制。测试使用 mock JDBC 和元数据，不等于搜索 UI/真库搜索验收。
+
+完整回归 **843 项，830 通过、13 跳过、0 失败/错误**。证据 `docs/gaussdb/test-results-20260923-search-scope.json`，运行 `results/run-XIyhgq`。本次仍预建角色执行两项权限真库场景，结束删除并确认计数 0。搜索结果类型与对象解析、schema 搜索过滤、多类型选择、包/同义词支持情况仍需继续核实。
