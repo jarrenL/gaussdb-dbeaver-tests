@@ -1,5 +1,7 @@
 # 场景清单与层级
 
+最新SQL日志重配置批次：**959项，939通过、20跳过、零失败/错误**，`results/run-8maXxy`。QueryHistoryFileTest新增三项：切换日志目录关闭旧Writer并真实落盘中文SQL到新文件；目标是普通文件而非目录时打开失败，旧Writer关闭且后续不再写旧目的地；禁用日志关闭旧Writer并忽略后续事件。首轮run-j5KHi7因测试框架不支持静态mock而未进入断言，改用隔离OSGi测试运行时首选项、finally恢复值及默认状态。run-Qwf9jq红测证明启用状态下initLogFile不关闭旧Writer；修复在重配置开始先关闭/置空，失败时不保留旧目的地。报告test-results-20260923-query-log-reconfigure.json。验证生产初始化与文件IO，不等同客户首选项GUI操作或数据库历史分页验收。临时grantee已删除；GUI/发布包未更新。
+
 最新SQL文件日志批次：**956项，936通过、20跳过、零失败/错误**，`results/run-ojWQ7W`。新增QueryHistoryFileTest四项：生产事件格式化/写入/flush实际临时文件并重新打开追加，中文SQL、SUCCESS与错误消息及两条记录保持；模拟IO异常关闭且第二次事件不再写；保留7天只删除匹配文件名且严格早于边界的日志，保留边界/当日/无关/格式错误文件；dispose幂等关闭且后续不写。run-3GUpxj红测确认dispose未关闭Writer且仍write/flush，生产修复同步关闭、置空并关闭enabled。该测试通过注入Writer/filter隔离全局工作区配置；证明文件日志生产路径，不等同Query Manager数据库历史重启读取、分页、UI清除/收藏或全局首选项初始化。报告test-results-20260923-query-log-files.json；临时grantee已删除，新修复未装入GUI/发布包。
 
 最新网络属性别名批次：**952项，932通过、20跳过、零失败/错误**，`results/run-ETOZBk`。新增普通/安全属性两个测试，各覆盖外部Map复制后修改隔离、自身Map传回、只读视图传回、替换旧键及清空。run-2YYrwA红测确认两类自身Map被clear清空；DBWHandlerConfiguration改为先LinkedHashMap快照再替换。生产解析/网络配置加载会调用这些setter，但未证明当前UI实际传入自身Map，因此只声明API边界缺陷修复及单测，不宣称复现客户UI故障。报告test-results-20260923-network-property-alias.json。当前ssl=off，三项TLS专用环境测试跳过，其此前真库结果分别保留；临时grantee已删除。新模型修复尚未装入GUI/发布包。
