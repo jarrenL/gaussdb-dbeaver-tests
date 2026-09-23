@@ -1,5 +1,7 @@
 # 场景清单与层级
 
+日期时间补2项真库：集中式/分布式分别验证纽约春季跳时、秋季重复01:30对应不同Instant，三会话时区下JDBC微秒往返一致及NULL/wasNull。run-qAhbau 1381项/1357通过/24跳过/零失败错误；隔离schema自动清理，grantee删除。主仓JDBC_DAYLIGHT_SAVING_20260924.md及脱敏报告；不代替GUI日期展示。
+
 编码预编译补6项真库：集中式/分布式各extended+threshold0/1/5，同语句8次INSERT及参数SELECT，中文/𠀀/特殊字符/NULL逐值/wasNull及独立连接8行验证，UTF8会话保持；run-CAtm7A1379项/1355通过/24跳过/零失败错误，grantee删除。当前驱动javap显示扩展参数硬编码Utils.encodeUTF8而会话流可改编码，记录GB18030扩展协议限制，不算修复。主仓JDBC_ENCODING_BOUNDARY_20260924.md及脱敏报告。
 
 麒麟GUI672–683补ONLY多语句：UPDATE确认、DELETE取消，独立查2行original，验证预执行确认未提前写入；再运行首框全部为是，UI Queries=2/Updated Rows=4，独立0行，覆盖ONLY正向执行。两截图已检视保存。schema精确清理目录0，未选不再询问，编辑器恢复SELECT；手动事务/混合DROP另验。主仓SQL_SAFETY_GUI_20260924.md。
