@@ -1,5 +1,7 @@
 # 场景清单与层级
 
+最新LIST分区真库批次：983项，962通过、21跳过、零失败/错误，results/run-47F3F0。507 ORA分布式建立中文LIST键分区，生产readTableDDL取DDL、删除本轮表、原样重建；华北/华南进入p_cn，海外进入p_other；新增西部p_west后写入定位正确；删除p_other只去掉海外行，目录只剩p_cn/p_west。报告test-results-20260923-list-partitions.json；随机schema与临时grantee清理。不是分区管理UI、默认分区/NULL键或全量分区类型验收，无产品代码修改。
+
 最新分区DDL往返批次：982项，961通过、21跳过、零失败/错误，results/run-ZWJQVT。生产PostgreServerGaussDB.readTableDDL通过受控JDBC包装连接真实507读取pg_get_tabledef；限定随机schema的RANGE表删除后原样DDL重建。验证三个分区名、-1归负分区、0/99归中间分区、100/int最大值归MAXVALUE分区，以及pg_partition名称。报告test-results-20260923-partition-ddl.json；随机schema和临时grantee清理。不是UI导出向导、全部分区类型或回退DDL生成路径验收；无产品代码修改。
 
 最新范围分区真库批次：981项，960通过、21跳过、零失败/错误，results/run-hIcoeP。新增HASH分布+RANGE分区真实DDL，id1/9进入p_low，10/19进入p_mid；ADD p_high后20/29进入新分区；pg_partition列出三分区；DROP p_mid后目录仅剩low/high，全表只保留1/9/20/29及对应文本。只操作随机schema且自动清理。报告test-results-20260923-range-partitions.json，临时grantee删除；未验证LIST/HASH/INTERVAL分区变更、移动表空间、分区编辑器或生产DDL导出往返，无产品代码修改。
