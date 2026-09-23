@@ -1,5 +1,7 @@
 # 场景清单与层级
 
+最新验证范围升级：同样 **877项/862通过/15跳过/零失败错误**，`results/run-rDu0i6`。两个序列往返方法现已移除手工填充 AdditionalInfo，改为生产 loadAdditionalInfo 实际 SQL经厂商 JDBC读取序列；生产 getSequenceBody复用加载结果后重建，连续值、边界、步长和缓存值实际比对通过。mock仍用于元数据对象和会话桥接，但目录值不再预置；生产缓存值必须大于0，结果/语句/会话各关闭一次。报告 `docs/gaussdb/test-results-20260923-sequence-live-loader.json`。下文“参数加载由测试完成”仅描述此前批次，最新加载路径已覆盖。未增加方法数量，未计作额外用例。
+
 最新序列批次：**877项，862通过、15跳过、零失败/错误**，`results/run-E6f6jm`。新增真库升序/降序生产 getSequenceBody 重建：真实目录参数输入生成器，重建后连续值分别10/13/16与-2/-5/-8，min/max/increment保持，覆盖负起点/负步长/上界0。参数加载在这两个场景中由测试桥接完成，不冒充生产元数据加载真库联验。
 
 同时新增旧目录/新版视图的生产 loadAdditionalInfo mock 回归。旧目录红测读取 cache_value=64 却得到0（`results/run-6GPe4x`），修复 PostgreSequence 旧分支误用 cache_size，改为 cache_value；新版仍使用 cache_size。两个分支生成 CACHE 64，且重复获取使用缓存、资源仅关闭一次。报告 `docs/gaussdb/test-results-20260923-sequence-roundtrip.json`。序列文件向导、RESTART、所有版本仍未完成；当前 GUI 副本/发布包不含本次修复。临时角色已删除确认0。
