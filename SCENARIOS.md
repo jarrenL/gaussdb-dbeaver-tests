@@ -1,5 +1,7 @@
 # 场景清单与层级
 
+XLSX列分组补6项：单列1/重复值/NULL、-1/0/越界、两列首末分组及组内顺序。run-SJsBa6首列不能选择；改1基编号/0禁用，中英文说明同步。run-smJkv21327项/1303通过/24跳过/零失败错误，本类60+真库2，grantee删除。旧非零任务配置需复核，GUI仍1817未含分组修复；主仓XLSX_EXPORT_20260924.md与grouping脱敏报告。
+
 麒麟GUI619–628空结果补验：SELECT两列WHERE false，界面无数据；实际XLSX向导默认表头导出到独立新文件，XML严格1行2列表头id/label、0数据行，通过。主仓XLSX_EXPORT_20260924.md含截图/哈希。无数据库写入，JUnit计数不变；无表头/追加/取消/失败GUI仍待验。
 
 Linux GUI603–618：隔离客户端原无Office扩展，正常退出备份后加入Office1817与POI/压缩/lang依赖。普通分布式账号SELECT高精度数值/Long.MIN/中文𠀀/NULL→实际XLSX向导SINGLE_QUERY新连接→输出，ZIP/XML独立断言2行4列/值类型全通过。主仓XLSX_EXPORT_20260924.md与截图；JUnit计数不变。扩展汉字界面缺字但文件正确，非客户实机/发布包/全部GUI场景验收；609定位错误610纠正。无数据库写入。
