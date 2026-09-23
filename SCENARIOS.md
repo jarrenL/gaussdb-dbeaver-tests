@@ -81,3 +81,11 @@ OUT 修复尚需新的产品打包与 GUI 回归，旧发布安装包不包含�
 日期初始 SQL 使用 ISO 日期字面量，被当前 ORA 会话的日期格式拒绝；改用显式 `to_date(...,'YYYY-MM-DD')` 测试日期值。没有宣称 ISO 字面量在当前配置通过，也未修改全局 NLS 设置。原失败保留。
 
 完整回归 **784 项：771 通过、13 跳过、0 失败/错误**，历史 JDBC 类 46 项中 44 通过、2 能力跳过。证据：`docs/gaussdb/test-results-20260923-types-followup.json`。本批不等于数据网格、JSON/XML 编辑器、GB18030 或时区验收。
+
+## DML、查询与函数结果补充
+
+新增 6 项真实 507 ORA 分布式 JDBC 场景全部通过：MERGE 匹配更新、未匹配插入及事务回滚；ON DUPLICATE KEY UPDATE 仅更新冲突行；关联 EXISTS/NOT EXISTS 与含 NULL 的 NOT IN；LEFT JOIN/GROUP BY/HAVING 和带空格别名；中文长度/截取/替换/引号/大小写/拼接；abs/ceil/floor/round/mod/power 精确数值断言。
+
+测试调用真实厂商 JDBC，每个场景独占随机 schema，设置查询超时，核对完整有序结果行，结束清理自己创建的对象。对应方法名位于 `GaussDBHistoricalJdbcLiveTest`，不是原内网测试源码迁移，也不代替编辑器补全/高亮验证。
+
+完整回归 **790 项：777 通过、13 跳过、0 失败/错误**；历史 JDBC 类 52 项中 50 通过、2 能力跳过。结果 `docs/gaussdb/test-results-20260923-sql-followup.json`，运行目录 `results/run-mD5B9C`。GUI OUT 过程、参数校验、F8/F9、提交/回滚独立证据另见 `GUI_PROGRESS.md`，不叠加到 JUnit 数量。
