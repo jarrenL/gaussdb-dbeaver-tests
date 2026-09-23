@@ -1,5 +1,7 @@
 # 场景清单与层级
 
+XLSX日期/类型NULL/行号再补8项：1900边界/闰日/毫秒日期数值格格式及本地时间相等、1899日期文本回退、数值布尔NULL空文本、有无表头行号偏移不覆盖。run-RKbqWt1304项/1280通过/24跳过/零失败错误，本类39项，无生产修改，grantee删除。主仓XLSX_EXPORT_20260924.md与date脱敏报告。时区/DST/亚毫秒/默认空日期格式/JDBC取数/GUI未覆盖。
+
 XLSX稀疏/多Sheet/空Sheet追加4项：第0和5/100行文件追加后保留空隙且新行位于6/101；两个已有Sheet限额3分别追加；空Sheet从第0行表头开始。run-dDuEPC两项稀疏追加异常，修复物理行数误作位置，改为原Sheet末行+1。run-jwlnvs1296项/1272通过/24跳过/零失败错误，本类31项。主仓XLSX_EXPORT_20260924.md与sparse脱敏报告，grantee删除。公式/最大行数/GUI仍待验。
 
 XLSX追加文件再补2项：实际importData后分别复用单Sheet/新建Sheet，旧两行保留、新两行位置与表头准确，输入文件字节不变。run-FlET8c复用策略footer越界；修复sheetIndex计数误用并处理全部复用sheet。run-f0FJvz1292项/1268通过/24跳过/零失败错误；本类27项。主仓XLSX_EXPORT_20260924.md与append脱敏结果；grantee删除。稀疏行/公式/多sheet、同路径覆盖和GUI仍待验。
