@@ -161,3 +161,11 @@ PostgrePrivilegeCommandTest 新增 7 项：角色引号及限定对象名、REVO
 PostgreAclParsingTest 新增 4 项：含等号及转义双引号的角色名、授权者名称和逐项转授权标记、PUBLIC/重复角色/无分隔符输入、默认 ACL 的授权者与未授予项。红测发现 ACL 按第一个等号截断引号内角色名，且授权者引号和名称内部双引号未正确还原。生产修复识别引号外分隔符，并用方言的反转义入口处理授权双方名称。名称边界仅为模型测试，不声称已在真库创建特殊名称角色。
 
 完整回归 **838 项，825 通过、13 跳过、0 失败/错误**。证据 `docs/gaussdb/test-results-20260923-default-acl.json`，运行 `results/run-yva6Xu`。管理员删除临时角色并核对计数 0。权限 UI、独立用户拒绝访问等未完成项继续保留。
+
+### JDBC ACL 数组进入生产解析器
+
+扩展既有 productionGrantCommandsPreservePerPrivilegeGrantabilityInDatabase：授权后从 pg_class 读取真实 relacl JDBC Array，交给 PostgreUtils.extractPermissionsFromACL（Array 入口），检查目标角色恰好一项、SELECT 含转授权、INSERT 不含转授权、UPDATE 未授予；撤销后该角色不再出现在解析结果，最后释放 JDBC Array。使用实际 PostgreServerGaussDB 类型识别，其他对象元数据为 mock。修复测试接入时遗漏的服务端类型对象后通过；本轮没有新增生产修改，也没有靠拆分测试增加用例计数。
+
+尝试在 507 创建含等号和双引号的专用角色被服务端以 Invalid name 拒绝，随后以该不存在角色运行的两项权限测试也失败。这不算通过。改用合法 NOLOGIN 测试角色后完整链路通过；特殊角色名仍只有解析器单元证据，不能对当前 507 承诺该名称受支持。
+
+最新回归 **838 项，825 通过、13 跳过、0 失败/错误**。证据 `docs/gaussdb/test-results-20260923-jdbc-acl.json`，运行 `results/run-GD5bCR`。临时合法角色已删除，管理员核对测试角色前缀计数为 0。
