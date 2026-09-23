@@ -1,5 +1,7 @@
 # 场景清单与层级
 
+最新INTERVAL能力批次：985项，963通过、22跳过、零失败/错误，results/run-ZsqBtD。新增月间隔自动分区1→3、生产DDL往返后继续扩展至4的正向用例；当前507分布式在建表时明确拒绝“Interval partitioned table is only supported in single-node mode”，因此正向未执行，不能算通过。run-HN97Ku初次失败，run-NzR66V证明此限制并非通用0A000；仅精确限制消息触发跳过且记录实际SQLSTATE，其他异常仍失败。报告test-results-20260923-interval-capability.json；临时grantee清理，未切换数据库模式。docker清单发现停止的gaussdb-507/gaussdb-507-ha-lab，后续需核对其实际模式和可复用性，不能直接认定无单节点环境。
+
 最新HASH分区真库批次：984项，963通过、21跳过、零失败/错误，results/run-6Jl9K4。生产readTableDDL读取四HASH分区表后删除本轮表/原样重建；21行含负数/零/NULL键分别读取p0..p3，合并排序恰好等于id0..20无重无漏，全表21行，NULL键仅id0，pg_partition四名称一致。不绑定服务器哈希算法的具体桶分配。报告test-results-20260923-hash-partitions.json；随机schema和临时grantee清理。未验证HASH分区扩展/合并、UI或跨版本哈希稳定性，无产品代码修改。
 
 最新LIST分区真库批次：983项，962通过、21跳过、零失败/错误，results/run-47F3F0。507 ORA分布式建立中文LIST键分区，生产readTableDDL取DDL、删除本轮表、原样重建；华北/华南进入p_cn，海外进入p_other；新增西部p_west后写入定位正确；删除p_other只去掉海外行，目录只剩p_cn/p_west。报告test-results-20260923-list-partitions.json；随机schema与临时grantee清理。不是分区管理UI、默认分区/NULL键或全量分区类型验收，无产品代码修改。
