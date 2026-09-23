@@ -1,5 +1,7 @@
 # 场景清单与层级
 
+最新序列管理器批次：993项，971通过、22跳过、零失败/错误，results/run-jQcTUO。新增4项生产修改SQL单测覆盖负步长/零上界/NULL当前值/仅循环修改/空修改；新增集中式和分布式2项生产CREATE/DROP真实执行，中文空格名、取号1/2、目录S、删除后42P01、重建从1起及删除无残留均通过。详见SEQUENCE_CAPABILITY.md；报告test-results-20260923-sequence-manager.json。已确认lastValue属性仍会生成GaussDB507不支持的RESTART，能力门控未修；不能将生成SQL测试当作GaussDB支持该语法。本轮无生产代码变更。
+
 最新集中式正向批次：987项，965通过、22跳过、零失败/错误，results/run-puJlJz。恢复507集中式并使用独立普通账号/专用库，月间隔分区生产DDL往返和自动扩展通过；复合外键生产DDL重建后的JDBC元数据、非法引用23503、更新/删除级联通过。集中式序列RESTART仍被服务端以0A000拒绝，未算通过；默认分布式的相应限制记录保留。明细见CENTRAL_ENVIRONMENT.md；报告test-results-20260923-central-partition-fk.json。随机schema/其他连接残留0，临时grantee删除；专用集中式测试库及窄范围密码认证规则保留供后续测试。并非GUI或全部历史场景已验收。
 
 最新INTERVAL能力批次：985项，963通过、22跳过、零失败/错误，results/run-ZsqBtD。新增月间隔自动分区1→3、生产DDL往返后继续扩展至4的正向用例；当前507分布式在建表时明确拒绝“Interval partitioned table is only supported in single-node mode”，因此正向未执行，不能算通过。run-HN97Ku初次失败，run-NzR66V证明此限制并非通用0A000；仅精确限制消息触发跳过且记录实际SQLSTATE，其他异常仍失败。报告test-results-20260923-interval-capability.json；临时grantee清理，未切换数据库模式。docker清单发现停止的gaussdb-507/gaussdb-507-ha-lab，后续需核对其实际模式和可复用性，不能直接认定无单节点环境。
