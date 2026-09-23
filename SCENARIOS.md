@@ -1,5 +1,7 @@
 # 场景清单与层级
 
+Linux GUI571–590复制行插入重复主键，真实23505、独立原两行不变；修正待插入id3重试成功，独立三行且UI插入1。删除id3未保存数据库仍三行，放弃界面恢复；重新删除保存独立仅原两行、UI删除1。fixture清理、SELECT1恢复；主仓RESULTSET_EDITABILITY_20260924.md含截图。不是手动事务/NULL/空白新增行全覆盖，JUnit数不变。
+
 Linux GUI553–570结果编辑异常恢复：amount=-1保存23514，独立数据10/20不变；放弃恢复10。id改2实际42P10分布键不可改，不算重复键通过。放弃后amount22成功，独立1|22、2|20，UI更新1行保存禁用。仅自动提交失败恢复，不计手动事务回滚。fixture清理，JUnit数不变；主仓RESULTSET_EDITABILITY_20260924.md含截图。错误摘要英文列为后续本地化项。
 
 Linux GUI539–552模型1613：实际查询混合*、计算amount、别名total；计算列内嵌/查看器editable=false且明确无表列提示，total正向editable=true。输入31保存后UI更新1行，独立gsql原表1|31、2|20，计算值32；保存禁用。专用表已删除、脚本恢复SELECT1。主仓RESULTSET_EDITABILITY_20260924.md含截图/版本hash，JUnit数量不变；不是客户桌面云或全部写回场景验收。
