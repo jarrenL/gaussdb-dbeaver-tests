@@ -1,5 +1,7 @@
 # 场景清单与层级
 
+最新序列改名门控：1005项，981通过、24跳过、零失败/错误，results/run-ICN7IJ。Gauss扩展关闭rename能力、PG默认保持开启；管理器canRenameObject、提交命令及生成SQL三层控制；3项新增测试覆盖不入队、不产生动作、支持分支中文/双引号转义。真实服务端RENAME探测仍跳过不算支持。报告test-results-20260923-sequence-rename-gate.json；GUI菜单/属性页及新发布包待实测，详见SEQUENCE_CAPABILITY.md。
+
 最新序列注释/改名批次：1002项，978通过、24跳过、零失败/错误，results/run-UWZjps。生产管理器注释SQL在集中式/分布式验证中文、引号、分号、换行原样保留，清空注释变NULL，号码连续1→2→3通过。两实例生产重命名SQL均被0A000及明确“不支持”拒绝，OID/连续性/冲突正向均未验证，不算通过；客户端重命名能力门控另有待办。报告test-results-20260923-sequence-comments.json，细节见SEQUENCE_CAPABILITY.md。无生产代码修改。
 
 最新GUI序列门控：更新Linux测试副本PG/Gauss插件后，通过普通用户SQL创建序列并实际打开属性页；测试驱动只读诊断确认最后值editable=false、其他字段editable=true，描述编辑能使保存启用，撤销后恢复且数据库无修改。专用序列已删除。详细431–457操作及无效尝试见GUI_PROGRESS.md。本轮增强测试驱动诊断，不更改产品代码；JUnit总数仍998/976通过/22跳过，发布包及其他场景继续验证。

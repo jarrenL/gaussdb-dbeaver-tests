@@ -4,9 +4,17 @@
 
 run-UWZjps：1002项，978通过、24跳过、零失败/错误。生产PostgreSequenceManager的额外动作生成COMMENT ON SEQUENCE，真实GaussDB方言处理引号。集中式及分布式分别验证中文、单引号、SQL形态分号文本及换行原样保存；注释操作前后nextval连续1→2，清空注释后obj_description为NULL且nextval为3，未重置序列。两项正向通过。
 
-两实例执行管理器生成的ALTER SEQUENCE RENAME时均返回0A000及“RENAME SEQUENCE is not yet supported”。对应重命名保留OID/号码/注释、旧名失效、重名冲突保护正向流程未能执行，明确跳过，不当作通过。只对该精确能力限制跳过，其他异常失败。客户端目前仍生成重命名命令，能力门控需继续处理；与已修复的RESTART门控不是同一项。
+两实例执行管理器生成的ALTER SEQUENCE RENAME时均返回0A000及“RENAME SEQUENCE is not yet supported”。对应重命名保留OID/号码/注释、旧名失效、重名冲突保护正向流程未能执行，明确跳过，不当作通过。只对该精确能力限制跳过，其他异常失败。后续已补重命名能力门控，见下；它与RESTART门控不是同一项。
 
 run-Ws9CxZ最初在夹具里嵌套Mockito设定而失败，改为先计算限定名称；run-U5jaFr暴露真实重命名限制。随后拆分注释独立正向场景，避免全部被重命名阻塞。报告docs/gaussdb/test-results-20260923-sequence-comments.json；随机schema已清理、集中式残留0、临时grantee删除。本批不替代注释编辑器保存/重命名GUI测试。
+
+## 重命名能力门控补充
+
+run-ICN7IJ：1005项，981通过、24跳过、零失败/错误。增加supportsSequenceRename能力，默认PG为true，Gauss适配器为false（依据当前507验证，后续版本需重新确认）。管理器canRenameObject返回能力判断，renameObject在加入命令队列前拒绝，底层生成方法再次检查，均有中英文说明。导航树ObjectPropertyTester的重命名判断调用canRenameObject；最终菜单/属性名字段GUI仍待实测。
+
+新增3项测试验证入口不可用且命令上下文零调用、底层拒绝且动作列表为空、支持分支正确转义中文空格schema及双引号名称。已有Gauss模型/扩展测试同时验证rename能力false和默认PG能力true。服务端探测夹具显式启用支持分支，仅为继续验证服务器SQL能力；它不是正常Gauss客户端绕过能力控制的证明。原两条正向仍跳过。
+
+初次run-AQq40X因父类addObjectRenameActions不声明受检异常而编译失败，已改为底层IllegalStateException防御，正常公开入口仍抛DBException；没有修改共享框架签名。报告docs/gaussdb/test-results-20260923-sequence-rename-gate.json，临时grantee删除。GUI副本及发布包尚未更新此批修复。
 
 ## 生产入口
 
