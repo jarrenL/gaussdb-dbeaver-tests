@@ -1,5 +1,7 @@
 # 场景清单与层级
 
+最新调试缓存批次：**878项，863通过、15跳过、零失败/错误**，`results/run-G0sfud`。GUI外部新建子函数后F7进入两层栈但找不到源码；新增refreshesOnlyTargetRoutineCachesWhenCatalogConfirmsNewFunction，红测Routine42未找到（run-9u44Ml），修复为目录确认OID目标schema存在且第二次缓存查找仍遗漏时，仅重载该schema两类routine缓存一次。回归同时保留跨schema/OID不改变启动配置测试。报告`test-results-20260923-debug-cache-refresh.json`。源码GUI待换新插件复验，已有父编辑器旧文本是另一未闭环问题，不能用单测通过替代。
+
 最新验证范围升级：同样 **877项/862通过/15跳过/零失败错误**，`results/run-rDu0i6`。两个序列往返方法现已移除手工填充 AdditionalInfo，改为生产 loadAdditionalInfo 实际 SQL经厂商 JDBC读取序列；生产 getSequenceBody复用加载结果后重建，连续值、边界、步长和缓存值实际比对通过。mock仍用于元数据对象和会话桥接，但目录值不再预置；生产缓存值必须大于0，结果/语句/会话各关闭一次。报告 `docs/gaussdb/test-results-20260923-sequence-live-loader.json`。下文“参数加载由测试完成”仅描述此前批次，最新加载路径已覆盖。未增加方法数量，未计作额外用例。
 
 最新序列批次：**877项，862通过、15跳过、零失败/错误**，`results/run-E6f6jm`。新增真库升序/降序生产 getSequenceBody 重建：真实目录参数输入生成器，重建后连续值分别10/13/16与-2/-5/-8，min/max/increment保持，覆盖负起点/负步长/上界0。参数加载在这两个场景中由测试桥接完成，不冒充生产元数据加载真库联验。
