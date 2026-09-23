@@ -1,5 +1,7 @@
 # 场景清单与层级
 
+UPDATE生成真库：集中式/分布式507各依次写SQL NULL、字面NULL、引号、中文换行、SQL形状文本；每轮实际生成SQL影响1行，更新/回滚/重试提交后均逐行核对全部7行，其他6行不变，参考表7行。随机schema与grantee清理。run-DXB77F1201/1177通过/24跳过/零失败错误；主仓UPDATE_GENERATOR_20260924.md及脱敏报告，无生产修改，不算GUI菜单验收。
+
 DELETE追加6项空键集合不可变性/多行顺序/隐藏伪列/空选择，run-0liDaJ1192/1168通过/24跳过。UPDATE追加7项键值分离、引号、NULL值与NULL键、多行、空选择及隐藏伪列过滤。最终run-CSH3cv1199/1175通过/24跳过/零失败错误；主仓DELETE_GENERATOR_20260924.md、UPDATE_GENERATOR_20260924.md及脱敏报告。本批无生产修改，grantee清理；不算UPDATE真库或GUI验收。
 
 DELETE无键真库执行：集中式/分布式507各验证单引号、NULL、SQL形状文本，真实生成SQL不改写执行；每轮删除/回滚恢复/重试提交，重复行影响2行，其余各1行，剩余id严格为1/2/4/5，独立参考表7行不变。随机schema与grantee清理。run-z6y8CN1186/1162通过/24跳过/零失败错误。主仓DELETE_GENERATOR_20260924.md与脱敏报告；非GUI验收。
