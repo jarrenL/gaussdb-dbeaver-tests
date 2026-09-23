@@ -1,5 +1,7 @@
 # 场景清单与层级
 
+XLSX稀疏/多Sheet/空Sheet追加4项：第0和5/100行文件追加后保留空隙且新行位于6/101；两个已有Sheet限额3分别追加；空Sheet从第0行表头开始。run-dDuEPC两项稀疏追加异常，修复物理行数误作位置，改为原Sheet末行+1。run-jwlnvs1296项/1272通过/24跳过/零失败错误，本类31项。主仓XLSX_EXPORT_20260924.md与sparse脱敏报告，grantee删除。公式/最大行数/GUI仍待验。
+
 XLSX追加文件再补2项：实际importData后分别复用单Sheet/新建Sheet，旧两行保留、新两行位置与表头准确，输入文件字节不变。run-FlET8c复用策略footer越界；修复sheetIndex计数误用并处理全部复用sheet。run-f0FJvz1292项/1268通过/24跳过/零失败错误；本类27项。主仓XLSX_EXPORT_20260924.md与append脱敏结果；grantee删除。稀疏行/公式/多sheet、同路径覆盖和GUI仍待验。
 
 XLSX生产导出器补25项文件往返：中文/公式形状文本/NULL/布尔、普通和高精度数值、表头开关、拆Sheet行数、trim和长文本限制。run-djsmdS修正测试编译；run-VoOFmZ复现7项数值丢精度/溢出。共享导出器对无法安全表示的BigDecimal/BigInteger/Long改为原值文本，普通数值保持数值。run-2cP8aw1290项/1266通过/24跳过/零失败错误，grantee删除。主仓XLSX_EXPORT_20260924.md与脱敏报告；不是GUI/真库取数或Excel软件验收，追加工作簿等另验。
