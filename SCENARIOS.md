@@ -1,5 +1,7 @@
 # 场景清单与层级
 
+数字输入补9项：非法尾随/空/非数字6种，38位BigDecimal、区域分隔符与指数、整数界限及NULL。run-hVQHcM复现4项部分解析；生产NumberDataFormatter增加完整消费校验后run-XbdLQw 1420项/1396通过/24跳过/零失败错误。grantee删除；NUMBER_INPUT_VALIDATION_20260924.md。不是GUI或分组合法性/收窄溢出验收。
+
 对象搜索特殊名称补两种部署真库：%/_/反斜杠/中文单引号/双引号名称逐项转义精确匹配；未转义_匹配3个名称对照，注入形状参数不执行且六表仍在。run-kenIYD 1411项/1387通过/24跳过/零失败错误，grantee删除。主仓SEARCH_LITERAL_NAMES_20260924.md；无生产修改，搜索GUI未验。
 
 对象搜索补2项集中式/分布式SQL函数重载：生产搜索保留numeric/varchar不同签名，按签名删除一个后仍能搜索并调用另一个。run-LdgHAq 1409项/1385通过/24跳过/零失败错误；grantee删除。独立PL/SQL创建重载被两实例拒绝，不算通过；第一次SQL预期错误多写IN已按目录修正。主仓ROUTINE_OVERLOAD_SEARCH_20260924.md；同时修正覆盖表9.5已过时描述。
