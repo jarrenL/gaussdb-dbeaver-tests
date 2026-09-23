@@ -1,5 +1,7 @@
 # 场景清单与层级
 
+最新范围分区真库批次：981项，960通过、21跳过、零失败/错误，results/run-hIcoeP。新增HASH分布+RANGE分区真实DDL，id1/9进入p_low，10/19进入p_mid；ADD p_high后20/29进入新分区；pg_partition列出三分区；DROP p_mid后目录仅剩low/high，全表只保留1/9/20/29及对应文本。只操作随机schema且自动清理。报告test-results-20260923-range-partitions.json，临时grantee删除；未验证LIST/HASH/INTERVAL分区变更、移动表空间、分区编辑器或生产DDL导出往返，无产品代码修改。
+
 最新不存在库连接批次：980项，959通过、21跳过、零失败/错误，results/run-kbErOR。新增随机不存在数据库连接场景，pg_database先确认不存在；初次run-an8Tb4期望3D000而得到28000。复查新增严格HBA消息断言确认访问规则先拒绝，失败后原连接SELECT11、新正常连接SELECT12均成功；3D000路径按明确HBA前置拒绝跳过，**未计为通过**。无扩大HBA/认证权限，无错误密码重试。报告test-results-20260923-missing-database.json；临时grantee删除。需允许该目标库进入认证/数据库查找流程的隔离环境才可完成3D000验收。
 
 最新枚举/范围真库批次：979项，959通过、20跳过、零失败/错误，results/run-FepgQZ。507 ORA分布式真实建类型/表，枚举按声明顺序返回中文标签，NULL读取wasNull正确，非法枚举22P02且行数保持4。int4range验证[1,5)上下界/包含标记/1包含5不包含，empty非SQL NULL，NULL getObject/wasNull，缺省下界lower_inf，JDBC类型名int4range。报告test-results-20260923-enum-range.json；随机schema自动清理，临时grantee删除。无产品代码修改；不等同范围编辑器、枚举DDL管理器、任意用户定义range或多模式GUI通过。
