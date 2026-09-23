@@ -1,5 +1,7 @@
 # 场景清单与层级
 
+最新补充：表 DDL 读取批次 **870 项，855 通过、15 跳过、零失败/错误**（普通权限配置，`results/run-qRnIdr`）。新增 PostgreServerGaussDBTest 5 项直接调用生产 readTableDDL，断言原生文本含分布子句/中文原样保留、OID 参数绑定、不支持时不打开会话，以及空结果/权限拒绝/prepare 失败的降级和资源关闭。初次编译测试常量误写 ORA，改为仓库实际 ORACLE 枚举后完整通过；未修改生产代码。报告 `docs/gaussdb/test-results-20260923-table-ddl-reader.json`。这不是真实导出重建或 GUI 验收，其他范围仍按覆盖计划执行。
+
 最新执行摘要：分布式批次在普通账号、临时监控管理员两个配置下，各 **865 项，850 通过、15 跳过、零失败/错误**。正反权限测试分别在对应配置通过，不能将两个计数相加。ROUNDROBIN 当前被服务端拒绝，仍未通过。下文按时间保留各历史批次，不应将旧批次计数当最新总数。Linux GUI 变量修改/非法值拒绝/变量名监视/修改值参与 OUT 计算/回滚/F10 首次暂停终止的独立证据见 [GUI_PROGRESS.md](GUI_PROGRESS.md)，不并入 JUnit 数量。
 
 最新新增真库方法：`closingConnectionRollsBackUncommittedRowsAndRejectsFurtherStatements`、`enablingAutocommitCommitsPendingRowsButLaterManualRollbackRemainsIsolated`、`readOnlyTransactionRejectsWritesAndNormalConnectionRemainsWritable`。分别验证关闭回滚及已关闭连接拒绝使用、自动提交切换的提交边界、只读事务 SQLSTATE 25006 与恢复后提交。均以其他连接观察实际数据，使用测试随机 schema 并清理。结果 `docs/gaussdb/test-results-20260923-connection-lifecycle.json`，本地执行 `results/run-fIxeiF`。不是连接池、SSL、异常认证或自动重连验收。
