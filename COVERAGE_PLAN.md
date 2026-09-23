@@ -33,8 +33,8 @@
 | 4.1 | 断点 | 既有 Routing/Session/RemovedBreakpoint；补历史场景对照与 UI 真库执行 | 部分 |
 | 4.2 | 调试启动、单步、调用参数 | Arguments 及真实 CALL；完整 DBE_PLDEBUGGER 生命周期与快捷键需分层复跑 | 部分 |
 | 4.3 | attach/detach | 既有 Session 单元断言；真实双会话附着/分离及错误恢复 | 部分 |
-| 4.4 | 终止/恢复 | 既有取消竞态；终止后的连接、事务和按钮状态 | 部分 |
-| 4.5 | 改变量/监视 | 既有变量写入、watch 生命周期；类型错误、常量、栈帧与 UI 联验 | 部分 |
+| 4.4 | 终止/恢复 | 既有取消竞态；Linux GUI 在首次暂停实际按 F10 后树显示已终止、独立表无新增。运行中阻塞及已有 DML 的终止仍待验 | 部分 |
+| 4.5 | 改变量/监视 | Linux GUI 将 numeric 112 改 777，非法输入被拒后变量名监视仍为 777，F8 后 OUT=result-777，F9 回滚后独立表无新增已验。常量、其他类型及跨栈帧仍待补 | 部分 |
 | 4.6 | 调用栈 | 既有 Snapshot/CrossSchema；真实多层调用、切换源码和异常退出 | 部分 |
 | 5.1–5.2 | 静态规则 | DELETE/UPDATE WHERE、INSERT 列、ORDER BY、LIKE、NULL、重复表达式、SELECT *、EXISTS、CASE、NOT IN：先逐规则核实现有实现；缺失是能力缺口，不伪造通过测试 | 待核 |
 | 6.1 | SELECT/JOIN/表达式解析 | 生产解析器拆分已扩展；AST、格式化及语义输出另验 | 部分 |

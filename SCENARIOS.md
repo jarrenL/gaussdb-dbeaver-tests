@@ -1,5 +1,9 @@
 # 场景清单与层级
 
+最新执行摘要：连接生命周期批次 **860 项，847 通过、13 跳过、零失败/错误**；下文按时间保留各历史批次，不应将旧批次计数当最新总数。Linux GUI 变量修改/非法值拒绝/变量名监视/修改值参与 OUT 计算/回滚/F10 首次暂停终止的独立证据见 [GUI_PROGRESS.md](GUI_PROGRESS.md)，不并入 JUnit 数量。
+
+最新新增真库方法：`closingConnectionRollsBackUncommittedRowsAndRejectsFurtherStatements`、`enablingAutocommitCommitsPendingRowsButLaterManualRollbackRemainsIsolated`、`readOnlyTransactionRejectsWritesAndNormalConnectionRemainsWritable`。分别验证关闭回滚及已关闭连接拒绝使用、自动提交切换的提交边界、只读事务 SQLSTATE 25006 与恢复后提交。均以其他连接观察实际数据，使用测试随机 schema 并清理。结果 `docs/gaussdb/test-results-20260923-connection-lifecycle.json`，本地执行 `results/run-fIxeiF`。不是连接池、SSL、异常认证或自动重连验收。
+
 此表映射用户提供的场景摘要，不替代未取得的原始方法断言。测试 ID 以 DBeaver JUnit 类名、方法名为准。
 
 | 范围 | 实际入口 | 本轮状态 |
