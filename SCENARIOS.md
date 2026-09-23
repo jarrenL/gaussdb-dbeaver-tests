@@ -1,5 +1,14 @@
 # 场景清单与层级
 
+当前最新：DDL 真库往返批次 **872项，857通过、15跳过、零失败/错误**，`results/run-Zf3fWA`；新增两个生产入口真库场景，见下方。
+
+### 表 DDL 生产读取及重建（507）
+
+- `productionTableDdlRebuildsHashDefaultsConstraintsAndComments`：真实建 HASH 表含默认中文值、PK、NOT NULL、CHECK、表/列中文注释；调用生产 `PostgreServerGaussDB.readTableDDL`，删除本轮表后原样执行返回 DDL。重建后的默认值和 numeric 值正确，重复键/负数/NULL 分别报23505/23514/23502，注释保留。
+- `productionTableDdlRebuildsReplicatedQuotedIdentifiers`：真实建复制表，表名含空格、列名含中文/空格；同样经生产读取、删除、重建，带单引号数据正确返回，目录仍为复制策略R。
+
+测试桥接仅 mock 对象/会话框架，生产 SQL、OID 绑定、真实厂商 JDBC 执行、DDL 返回及重建结果不是 mock；验证生产结果集、语句、会话关闭。capability fixture 明确提供 pg_get_tabledef，实际函数必须执行成功；不冒充服务器能力探测测试。只删除随机专用 schema 中本轮创建的表，测试结束清理 schema 和临时 grantee。报告 `docs/gaussdb/test-results-20260923-ddl-roundtrip.json`。不覆盖导出文件向导、整个 schema、分区/索引全部变体或无原生函数时的通用生成器。
+
 最新补充：表 DDL 读取批次 **870 项，855 通过、15 跳过、零失败/错误**（普通权限配置，`results/run-qRnIdr`）。新增 PostgreServerGaussDBTest 5 项直接调用生产 readTableDDL，断言原生文本含分布子句/中文原样保留、OID 参数绑定、不支持时不打开会话，以及空结果/权限拒绝/prepare 失败的降级和资源关闭。初次编译测试常量误写 ORA，改为仓库实际 ORACLE 枚举后完整通过；未修改生产代码。报告 `docs/gaussdb/test-results-20260923-table-ddl-reader.json`。这不是真实导出重建或 GUI 验收，其他范围仍按覆盖计划执行。
 
 最新执行摘要：分布式批次在普通账号、临时监控管理员两个配置下，各 **865 项，850 通过、15 跳过、零失败/错误**。正反权限测试分别在对应配置通过，不能将两个计数相加。ROUNDROBIN 当前被服务端拒绝，仍未通过。下文按时间保留各历史批次，不应将旧批次计数当最新总数。Linux GUI 变量修改/非法值拒绝/变量名监视/修改值参与 OUT 计算/回滚/F10 首次暂停终止的独立证据见 [GUI_PROGRESS.md](GUI_PROGRESS.md)，不并入 JUnit 数量。
