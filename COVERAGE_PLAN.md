@@ -30,7 +30,7 @@
 | 3.13 | 安全连接及凭据 | SSL 验证、证书/密钥失败、安全存储；不以自写 AES 替代产品凭据模块 | 待补 |
 | 3.14 | DDL 导出 | 生产 readTableDDL 成功/降级/资源关闭已单测；生产读取→真实 JDBC→原样重建 HASH 表的默认值/PK/CHECK/NOT NULL/中文注释、复制表的引号/中文标识符/策略已通过。整个 schema、序列、分区/索引全部变体、通用降级生成器及导出向导仍待补 | 部分 |
 | 3.15 | gs_dump | 既有 NativePassword/Output/Publication；原生工具真库及错误场景需复跑 | 部分 |
-| 4.1 | 断点 | 既有 Routing/Session/RemovedBreakpoint；补历史场景对照与 UI 真库执行 | 部分 |
+| 4.1 | 断点 | Linux GUI活动会话菜单新增第7行→F9命中；窗格禁用→新会话不命中；重新启用→命中；删除按钮→新会话不命中，全部回滚并独立查表已验。Ctrl+Shift+B与Delete自动化未生效，焦点/快捷键待排查；重复添加/跨过程等继续补 | 部分 |
 | 4.2 | 调试启动、单步、调用参数 | Arguments 及真实 CALL；完整 DBE_PLDEBUGGER 生命周期与快捷键需分层复跑 | 部分 |
 | 4.3 | attach/detach | 既有 Session 单元断言；真实双会话附着/分离及错误恢复 | 部分 |
 | 4.4 | 终止/恢复 | 既有取消竞态；Linux GUI 在首次暂停实际按 F10 后树显示已终止、独立表无新增。运行中阻塞及已有 DML 的终止仍待验 | 部分 |
