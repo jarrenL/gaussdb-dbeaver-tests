@@ -1,5 +1,7 @@
 # 场景清单与层级
 
+最新网络属性别名批次：**952项，932通过、20跳过、零失败/错误**，`results/run-ETOZBk`。新增普通/安全属性两个测试，各覆盖外部Map复制后修改隔离、自身Map传回、只读视图传回、替换旧键及清空。run-2YYrwA红测确认两类自身Map被clear清空；DBWHandlerConfiguration改为先LinkedHashMap快照再替换。生产解析/网络配置加载会调用这些setter，但未证明当前UI实际传入自身Map，因此只声明API边界缺陷修复及单测，不宣称复现客户UI故障。报告test-results-20260923-network-property-alias.json。当前ssl=off，三项TLS专用环境测试跳过，其此前真库结果分别保留；临时grantee已删除。新模型修复尚未装入GUI/发布包。
+
 最新TLS主机名批次：**950项，930通过、20跳过、零失败/错误**，`results/run-7KYLa5`。strictTlsRejectsTrustedCertificateWithWrongHostname以仅SAN=wrong-host.invalid的有效自签名测试证书运行507 CN；客户端信任此证书，verify-ca连接查询1成功，verify-full因hostname校验返回08类异常，再次verify-ca查询2成功。证明校验证书链与校验主机名有别，不以放宽校验作为修复。当前错误SAN环境未运行正确SAN/无关CA两项，另ssl-off场景跳过，均不算通过。报告test-results-20260923-tls-hostname.json，TLS_VALIDATION.md更新。测试后已恢复ssl=off，CSV目标表仍3行，临时grantee删除。无生产代码修改。
 
 最新错误CA批次：**949项，931通过、18跳过、零失败/错误**，`results/run-DULzqA`。strictTlsRejectsExistingUnrelatedCertificateWithoutDowngrade先以正确证书verify-full连接并SELECT1，再以存在且不同的无关证书连接，断言08类SQLSTATE及异常链SSLHandshakeException，最后恢复正确证书SELECT2成功；排除连接不可达的假拒绝。报告test-results-20260923-tls-untrusted-ca.json。新增TLS_VALIDATION.md记录环境准备、参数、断言和未覆盖范围。验证后ssl恢复off，原CSV目标表3行，临时grantee已删除。无生产代码修改；TLS-on时ssl-off反向测试仍跳过，不算通过。
