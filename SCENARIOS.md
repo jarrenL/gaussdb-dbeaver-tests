@@ -191,3 +191,11 @@ PostgreStructureSearchTest 新增 5 项，通过生产 findObjectsByMask 入口�
 productionTableSearchUsesRealCatalogCaseCommentsAndLimit 验证表/视图名称和结果类型、LIKE/ILIKE 大小写差异、LIMIT、开启/关闭注释搜索、含引号分号文本无匹配且不破坏对象。productionSearchKeepsSameNamedTablesInTheirRequestedSchema 验证两个随机 schema 的同名表各返回一项，删除其中一个后该 scope 无结果、另一个仍保留。测试结束清理各自创建的 schema。
 
 完整回归 **851 项，838 通过、13 跳过、0 失败/错误**。证据 `docs/gaussdb/test-results-20260923-live-search.json`，运行 `results/run-jfsml2`。权限回归临时角色再次清理并确认计数 0。函数/过程、列、约束、类型、schema 搜索和 GUI 仍需补齐。
+
+### 507 列、约束和复合类型搜索
+
+新增 productionColumnSearchExcludesSystemDroppedAndIndexAttributes，真实建表带主键、删除一列、添加列注释，再调用生产列搜索。修复前结果包括已删除列占位名、ctid/xmin/xmax 等系统列以及来自主键索引的重复 id，红测准确复现。生产查询增加正 attnum、非 attisdropped 和表/视图关系类型条件，修复后仅返回 id/search_col，注释搜索也只返回目标列。新增一个无数据库测试固定查询过滤条件。
+
+productionConstraintAndCompositeTypeSearchFindNamedCatalogObjects 验证真实命名主键/CHECK 约束，以及 CREATE TYPE AS 复合类型搜索（隐式数组类型不混入结果）。测试复用生产搜索 SQL→真实 JDBC 的桥接器，目录数据真实，仍不代表 GUI 或对象元数据缓存整体已验收。
+
+完整回归 **854 项，841 通过、13 跳过、0 失败/错误**。证据 `docs/gaussdb/test-results-20260923-column-search.json`，运行 `results/run-JCIkr0`。历史 JDBC 类 65 项中 63 通过、2 能力跳过。临时角色删除并确认计数 0；随机 schema 由用例清理。
