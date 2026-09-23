@@ -197,6 +197,8 @@
 
 ## 验收证据要求
 
+9.6 原子保存边界补7项：成功只commit一次且先于模型更新；四类上下文不支持时无执行/事务修改；中途取消rollback；rollback失败不恢复autocommit且异常保留。run-N10zlN为1553/1530通过/23跳过/0失败错误。新路径真库和GUI尚未通过，不将模拟管理器等同端到端；见ATOMIC_COMMAND_SAVE_IMPLEMENTATION_20260924.md。
+
 9.6 模型实现阶段：新增显式atomicTransaction保存选项，拒绝手工事务/不支持DDL事务/不兼容动作，整批失败rollback且不更新模型。新旧路径对照测试run-HtGzsT通过，总1546/1523通过/23跳过/0失败。新路径尚未接GUI、未真库验收，必须隔离连接及补成功/取消/异常边界，原子批删仍未闭环；详见ATOMIC_COMMAND_SAVE_IMPLEMENTATION_20260924.md。
 
 9.6 原子性根因测试：实际AbstractCommandContext即使atomic=true也每命令commit；第二命令失败前第一已提交且其模型更新。新增特征测试run-4bvThs通过，总1545/1522通过/23跳过/0失败。它证明当前缺口、排除“只合并上下文即可”的修复，绝不计为原子回滚验收通过。本轮未改生产事务行为。
