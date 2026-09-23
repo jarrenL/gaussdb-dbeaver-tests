@@ -267,3 +267,13 @@ productionConstraintAndCompositeTypeSearchFindNamedCatalogObjects 验证真实�
 - PostgreServerExtension 新增方言表达式扩展，GaussDB 使用标量子查询读取 definition；PostgreSQL 默认仍用 pg_catalog.pg_get_functiondef，新增 `routineDefinitionSearchRetainsPostgreSqlScalarExpression` 单元测试固定该边界。共享搜索仍保留原对象种类过滤和参数化匹配。
 - `productionRoutineSearchPreservesInputAndOutputSignatureTypes`：真实创建 IN numeric/OUT varchar 过程，生产搜索返回限定 schema 的 `signature_probe(in numeric, out varchar)`。桥接器从真实 pg_type 获取类型名，再交给生产参数签名生成逻辑；不等同于完整类型缓存或重载导航验收。
 - 修复后 run-0Aft27 为887/872通过/15跳过；追加签名和PG默认表达式断言后 run-oumVeM **889项、874通过、15跳过、零失败错误**。脱敏报告 `docs/gaussdb/test-results-20260923-routine-definition.json`。临时 grantee 已删除，专用账号 systemadmin/monitoradmin 均false。GUI源码检索、重载及目标金融版本仍待验。
+
+### 视图生命周期、依赖和生产DDL
+
+- `viewRenamePreservesDefinitionDataAndProductionSearchIdentity`：有过滤条件的视图改为带空格/大写名称；生产目录搜索旧名为空、新名为PostgreView；真实查询保留中文和过滤条件，基表两行未变。
+- `viewDependencyRejectsRestrictAndCascadeRemovesOnlyDependentViews`：第一层/依赖层/独立视图共用基表；RESTRICT收到2BP01，依赖视图仍可读；CASCADE后生产搜索确认两层视图消失，独立视图和基表均保留数据。
+- `invalidViewReplacementCanRollbackToSavepointWithoutLosingOriginalDefinition`：手动事务插入后设保存点，无效列替换视图收到42703；回滚到保存点保留原视图及之前插入，提交后独立连接确认一行。此项是JDBC事务验证，不代表自动UI恢复。
+- 以上三项首次run-8t2HWU通过（892/877通过/15跳过）。随后生产生成器两项红测run-UOFpYF复现：字符串/注释含create时仅返回SELECT，不生成CREATE VIEW；run-4ThCib是测试监视器构造错误导致编译失败，不作为产品缺陷。
+- PostgreViewManager改用首个SQL关键字判定完整DDL。`PostgreViewDdlTest`覆盖字符串create、注释create、带前导注释的完整DDL不重复包装。
+- `productionViewManagerWrapsCreateLiteralAndExecutesItsGeneratedDdl`：生产生成器输出经507厂商JDBC执行，真实视图查询返回字符串create且仅一行，生产对象搜索可找到新视图。
+- 最终run-QDNlnL：**896项、881通过、15跳过、零失败错误**；报告 `docs/gaussdb/test-results-20260923-view-lifecycle.json`。随机schema已自动清理，临时grantee已删除。视图编辑器、懒加载、自动补全、批量删除界面仍待验，不计为本轮通过。
