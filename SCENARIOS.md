@@ -1,5 +1,7 @@
 # 场景清单与层级
 
+最新调试源码新鲜度批次：**884项，869通过、15跳过、零失败/错误**，`results/run-9aFLah`，源码98932d5af6。新增debuggerSourceReloadsPersistedBodyInsteadOfCachedCatalogText：预置old_call目录缓存，两次生产调试源码请求必须分别读取new_call/newer_call，并关闭语句、结果和会话。红测run-DSwu6O准确返回old_call而失败；修复仅在调试正文读取时重新查询持久化prosrc，普通DDL缓存策略不改变。报告test-results-20260923-debug-source-freshness.json。GUI尚未安装该批次，不等同已打开编辑器文档刷新通过。
+
 最新导航节点批次：**883项，868通过、15跳过、零失败/错误**，`results/run-di9NkY`。DebugUtils增加源码节点缺失时仅刷新所属容器并重新解析原OID一次的路径，避免沿用刷新前模型实例；使用普通来源事件而非FORCE_REFRESH，不强制丢弃其他编辑器本地修改。新增DebugSourceNavigationTest四场景：刷新后模型实例替换、已存在节点不刷新、取消不刷新、重试仍缺失不循环。报告`test-results-20260923-source-navigator.json`。单元/真库回归通过；GUI新函数热加载仍待重新安装插件后复验，旧父编辑器源码另需修复，不计为完成。
 
 最新厂商目录类型批次：**879项，864通过、15跳过、零失败/错误**，`results/run-8Sf77R`。Linux GUI展开函数树真实报错 `Unsupported vector type: com.huawei.gauss200.jdbc.util.PGobject`。新增 `vendorCatalogVectorsAndArraysUseProductionUnwrapping`，在507创建含numeric/integer参数的函数，读取真实proargtypes对象，调用生产isPGObject/getIdVector/getIntVector；另读取真实bigint[]并验证生产isPGArray/getIdVector与资源释放，普通Object不能误识别。红测`run-PUYwu6`准确失败于厂商PGobject未识别，生产GaussDB server扩展补充gauss200命名空间，保留已有postgresql/gaussdb命名空间。报告`test-results-20260923-vendor-catalog-types.json`。该批次证明真实驱动类型解包，不直接等同完整函数模型或GUI通过；后续界面结果见GUI_PROGRESS。临时权限测试角色已删除。
