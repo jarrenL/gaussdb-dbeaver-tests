@@ -1,5 +1,7 @@
 # 场景清单与层级
 
+转义字符串失败回退9项：空输入、E/e、未闭合/尾部反斜杠/双引号及非匹配输入，两种扫描器偏移与首字符恢复。run-2JGlEB7项偏移-1失败；改为记录起始offset按实际推进回退。run-KB7Qy41243/1219通过/24跳过/零失败错误。主仓PREDICATE_SCANNER_20260924.md和回退脱敏报告，grantee清理。非零起始位置与完整GUI另验。
+
 转义字符串EOF追加8项：5合法末尾字符串、3分隔符保留。run-X1oQz7五项EOF失败，修复共享PostgreEscapeStringRule闭合引号后EOF被拒；同时校验片段与文档扫描器正确结束偏移。run-rz3aa81234/1210通过/24跳过/零失败错误，主仓PREDICATE_SCANNER_20260924.md和EOF脱敏结果。grantee清理；未闭合失败回退和实际GUI仍待验。
 
 谓词扫描器补5项：CR/LF/CRLF列位置与回退、实际转义字符串规则、标识符后缀防误识别。run-RvrQvn3项复现getColumn未实现异常，另2项测试bundle加载修正；实现共享扫描器列偏移。run-ia05QF1226/1202通过/24跳过/零失败错误，对应异常栈435→0。主仓PREDICATE_SCANNER_20260924.md与脱敏报告，grantee清理；不算完整字符串语法/GUI高亮验收。
