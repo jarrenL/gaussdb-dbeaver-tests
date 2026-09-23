@@ -1,5 +1,7 @@
 # 场景清单与层级
 
+麒麟GUI执行计划737–763：只读generate_series+窗口聚合排序查询，旧会话08003及菜单重连未恢复；连接树断开再双击重连后普通查询5行/total15，计划Sort→WindowAgg→Function Scan及成本/Plan-Rows/Sort-Key属性与独立gsql一致。截图已检查，PLAN_GUI_ACCEPTANCE_20260924.md。无DB变更；ANALYSE/更多节点/保存加载/最新包仍未覆盖，自动化误开向导已取消、失效ID操作不计通过。
+
 配置备份+序列化实文件补6项：当天保留/旧备份刷新/点号命名/删除后恢复、生产saveConfigFile/loadConfigFile明文加密两路径经NIO落盘恢复。run-W4sBOj 1493项/1469通过/24跳过/零失败错误，grantee删除，无生产改动。CONFIGURATION_FILE_IO_20260924.md：删除主凭据仍有可恢复备份，不宣称全量秘密清除或完整saveDataSources/GUI验收。
 
 NIO配置文件管理器新增11项实文件测试：Unicode读写覆盖备份、新旧格式发现及优先级、缺失/清空、写删失败。run-9pOeOF复现删除失败吞异常1项，改deleteIfExists传播后run-Xbw7bd 1487项/1463通过/24跳过/零失败错误；grantee删除。CONFIGURATION_FILE_IO_20260924.md，非Windows/网络盘/断电原子性或GUI验收。
