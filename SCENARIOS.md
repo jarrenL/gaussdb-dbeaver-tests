@@ -305,3 +305,14 @@ run-ta6sGb完整回归 **901项、886通过、15跳过、零失败错误**；报
 `failedBatchRetainsSqlstateRollsBackAndCanReusePreparedStatement` 在手动事务提交id=1/1/2批次，要求BatchUpdateException及23505；更新计数必须符合JDBC取值且不能整批报告成功。独立连接确认无提交行，显式回滚后本连接和独立连接均0行。同一PreparedStatement clearBatch后插入9/恢复成功，更新计数1，提交后独立观察1行，逐列核对只有新数据。
 
 run-nWIvlp完整回归 **902项、887通过、15跳过、零失败错误**；报告 `docs/gaussdb/test-results-20260923-batch-recovery.json`。随机schema自动清理，临时grantee删除。本项验证真实厂商JDBC，不等同于数据导入向导的自动事务处理或全部批量执行器UI路径。
+
+### 生产批量执行器警告、逐行失败和中途取消
+
+ExecuteBatchHistoricalTest新增四项调用真实ExecuteBatchImpl，底层DBCStatement使用mock以精确检查交互：
+
+- `batchWarningsAreRetainedInOrderWithoutChangingUpdateCount`：两条SQLWarning原对象/顺序保留，更新数2不变，语句关闭。
+- `disabledBatchUsesIndividualExecutionAndKeepsStatementReuse`：禁用batch后逐行执行三次，计数1/0/1合计2，既不addToBatch也不executeStatementBatch，最终关闭。
+- `individualExecutionFailureRetainsCauseAndStopsRemainingRows`：第二行异常对象/SQLException原因保留，第三行不执行，语句关闭。
+- `cancellationAfterFirstQueuedRowDoesNotQueueRemainingRows`：第一行加入后取消，后两行不加入；当前产品仍刷新已经加入的批次，更新数1并关闭。明确这是现有部分执行语义，不宣称取消自动回滚或原子取消。
+
+run-PzH7V7首次因测试使用需非空上下文的异常构造器失败，修正测试构造方式后run-t5z0g0 **906项、891通过、15跳过、零失败错误**。报告 `docs/gaussdb/test-results-20260923-executor-lifecycle.json`；临时grantee已删除。无生产代码修改，GUI任务取消和上层事务处理仍需单独验收。
