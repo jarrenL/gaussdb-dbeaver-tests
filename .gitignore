@@ -1,0 +1,5 @@
+/results/
+/private/
+.env
+*.properties
+.DS_Store
