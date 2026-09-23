@@ -1,5 +1,7 @@
 # 场景清单与层级
 
+Linux GUI603–618：隔离客户端原无Office扩展，正常退出备份后加入Office1817与POI/压缩/lang依赖。普通分布式账号SELECT高精度数值/Long.MIN/中文𠀀/NULL→实际XLSX向导SINGLE_QUERY新连接→输出，ZIP/XML独立断言2行4列/值类型全通过。主仓XLSX_EXPORT_20260924.md与截图；JUnit计数不变。扩展汉字界面缺字但文件正确，非客户实机/发布包/全部GUI场景验收；609定位错误610纠正。无数据库写入。
+
 XLSX空结果/SQL文本补4项：空结果有无表头、独立SQL Sheet整段/按行。run-l9DfHU空结果两项失败（合成全NULL数据行）；footer改只初始化sheet/表头，真实NULL行测试保留。run-jxjvAh1321项/1297通过/24跳过/零失败错误，本类54项另真库2项；grantee删除。主仓XLSX_EXPORT_20260924.md与empty脱敏报告，GUI/超长SQL仍待验。
 
 XLSX接真实JDBC补2项：集中式/分布式507隔离表写numeric38,18/Long.MIN/中文𠀀引号换行/NULL，getObject先对比输入，原样交生产导出器，XLSX逐格类型/值/表头/行列数验证。run-ECvtcg1317项/1293通过/24跳过/零失败错误，无生产修改；两库xlsx_values残留0/grantee删除。主仓XLSX_EXPORT_20260924.md及jdbc脱敏报告；绑定和site仍模拟，不代表GUI向导或办公软件验收。
