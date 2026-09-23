@@ -1,5 +1,7 @@
 # 场景清单与层级
 
+XLSX生产导出器补25项文件往返：中文/公式形状文本/NULL/布尔、普通和高精度数值、表头开关、拆Sheet行数、trim和长文本限制。run-djsmdS修正测试编译；run-VoOFmZ复现7项数值丢精度/溢出。共享导出器对无法安全表示的BigDecimal/BigInteger/Long改为原值文本，普通数值保持数值。run-2cP8aw1290项/1266通过/24跳过/零失败错误，grantee删除。主仓XLSX_EXPORT_20260924.md与脱敏报告；不是GUI/真库取数或Excel软件验收，追加工作簿等另验。
+
 原生恢复追加失败重试阶段：除零后DELETE不执行，count3/sum6保留，错误无密码；后续正常INSERT进程成功count4/sum10。run-eCRNx8错误文案大小写断言失败，直接gsql确认Division by zero/退出3后修正。run-XDMUEZ1265/1242通过/23跳过/零失败错误，已有test内部扩展不加计数。主仓NATIVE_RECHECK_20260924.md及错误脱敏报告，schema/grantee清理，无生产修改。
 
 原生工具复验run-cc4Ush：普通隔离账号实际gs_dump→gsql plain恢复（4MB级输出）及custom→gs_restore，生产输出重定向/密码管道、无PGPASSWORD、恢复count3/sum6通过。全1265/1242通过/23跳过/零失败错误，本轮未启用上轮六项review，不能混合计数。schema/grantee清理。主仓NATIVE_RECHECK_20260924.md与脱敏报告，GUI/Windows/dumpall空集群另验。
