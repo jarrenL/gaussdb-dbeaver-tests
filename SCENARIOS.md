@@ -316,3 +316,12 @@ ExecuteBatchHistoricalTest新增四项调用真实ExecuteBatchImpl，底层DBCSt
 - `cancellationAfterFirstQueuedRowDoesNotQueueRemainingRows`：第一行加入后取消，后两行不加入；当前产品仍刷新已经加入的批次，更新数1并关闭。明确这是现有部分执行语义，不宣称取消自动回滚或原子取消。
 
 run-PzH7V7首次因测试使用需非空上下文的异常构造器失败，修正测试构造方式后run-t5z0g0 **906项、891通过、15跳过、零失败错误**。报告 `docs/gaussdb/test-results-20260923-executor-lifecycle.json`；临时grantee已删除。无生产代码修改，GUI任务取消和上层事务处理仍需单独验收。
+
+### GB18030客户端编码：通过路径与未闭环限制
+
+- 默认连接执行SET client_encoding=GB18030后被驱动关闭（run-a4muCq）；清理逻辑曾覆盖原始异常并留下本次随机schema。已精确删除该测试schema，改进测试框架：连接已关闭时用独立连接清理同一随机schema；清理异常不覆盖原场景异常。后续检查encoded_rows残留0。
+- `driverRejectsEncodingChangeWhenExplicitlyDisallowed`：显式allowEncodingChanges=false，验证08006且连接关闭。这是驱动限制的负向验证，不是GB18030成功链路。
+- allowEncodingChanges=true、默认扩展协议时，插入扩展汉字返回字符转换错误（run-CTBrUe），**此组合仍失败、未闭环**。本地驱动SimpleParameterList字节码显示参数序列化调用Utils.encodeUTF8；服务器convert_from对已知GB18030字节95328236能正确得到𠀀。尚未修复厂商驱动，也未修改客户默认驱动配置。
+- `simpleProtocolGb18030PreservesChineseSupplementaryCharactersAndNull`：仅此测试显式allowEncodingChanges=true和preferQueryMode=simple，确认SHOW编码GB18030，PreparedStatement写入中文银行、𠀀、引号/反斜杠、NULL；当前连接与独立默认连接逐行核对完全一致，结束恢复原编码。此明确配置路径通过，**不替代上面的扩展协议失败**。
+- run-968iNy及最终命名明确后的run-UHWNQQ：908项、893通过、15跳过、零失败错误；报告 `docs/gaussdb/test-results-20260923-client-encoding.json`。绿报告仅涵盖上述成功配置/限制断言，不能声称GB18030全部支持。临时grantee已删除。
+- 还需验证GB18030服务端数据库配合默认UTF8 JDBC链路、DBeaver驱动属性界面和编码提示；此组仍部分覆盖。
