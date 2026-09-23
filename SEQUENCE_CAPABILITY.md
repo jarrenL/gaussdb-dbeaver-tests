@@ -14,7 +14,7 @@ GaussDB当前复用PostgreSequence模型和PostgreSequenceManager管理器，并
 
 已加入服务端扩展能力supportsSequenceRestart，默认true以保持其他PostgreSQL适配器行为，GaussDB当前适配器为false（依据507集中式/分布式实测，不宣称未来全部版本均不支持）。当前值仍可查看，编辑/更新表达式按此能力控制；命令校验和生成SQL两处均拒绝非空lastValue修改，附中英文说明。混合修改也在生成动作前完整拒绝，避免只执行部分属性变更。其他属性单独修改不受影响。
 
-未用setval替代RESTART，避免改变事务和并发语义。其他目标版本若确认新增RESTART能力，应更新版本/能力策略并补相应正向测试。目前仅代码/属性表达式层已验证，最终GUI点击和发布包仍待验证。
+未用setval替代RESTART，避免改变事务和并发语义。其他目标版本若确认新增RESTART能力，应更新版本/能力策略并补相应正向测试。代码/属性表达式层及Linux GUI测试副本的最后值只读、描述可编辑/撤销对照已通过，详见GUI_PROGRESS.md的431–457记录；最终发布包仍待验证。
 
 ## 本轮新增验证
 

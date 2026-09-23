@@ -1,5 +1,7 @@
 # 场景清单与层级
 
+最新GUI序列门控：更新Linux测试副本PG/Gauss插件后，通过普通用户SQL创建序列并实际打开属性页；测试驱动只读诊断确认最后值editable=false、其他字段editable=true，描述编辑能使保存启用，撤销后恢复且数据库无修改。专用序列已删除。详细431–457操作及无效尝试见GUI_PROGRESS.md。本轮增强测试驱动诊断，不更改产品代码；JUnit总数仍998/976通过/22跳过，发布包及其他场景继续验证。
+
 最新序列重启门控修复：998项，976通过、22跳过、零失败/错误，results/run-r7TVsA。Gauss扩展关闭RESTART能力，默认PostgreSQL保持开启；当前值查看保留、编辑/更新表达式受控，命令校验及SQL动作生成双重拒绝不支持的lastValue修改，混合属性不产生部分动作，其他属性正常。5项新增测试通过，报告test-results-20260923-sequence-restart-gate.json。详情和版本边界见SEQUENCE_CAPABILITY.md；GUI副本/发布包尚未更新验证。两条服务端RESTART正向仍为跳过，不算支持。
 
 最新序列管理器批次：993项，971通过、22跳过、零失败/错误，results/run-jQcTUO。新增4项生产修改SQL单测覆盖负步长/零上界/NULL当前值/仅循环修改/空修改；新增集中式和分布式2项生产CREATE/DROP真实执行，中文空格名、取号1/2、目录S、删除后42P01、重建从1起及删除无残留均通过。详见SEQUENCE_CAPABILITY.md；报告test-results-20260923-sequence-manager.json。已确认lastValue属性仍会生成GaussDB507不支持的RESTART，能力门控未修；不能将生成SQL测试当作GaussDB支持该语法。本轮无生产代码变更。
