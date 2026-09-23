@@ -1,5 +1,7 @@
 # 场景清单与层级
 
+最新搜索路径批次：**928项，911通过、17跳过、零失败/错误**，`results/run-dc12z9`。searchPathOrderResolvesShadowedTablesWithoutChangingQualifiedAccess使用两个随机schema各一同名表，数据11/22；不存在schema前缀被忽略，current_schema及不限定表随路径顺序切换，显式限定仍准确；路径只有不存在schema时不限定查询42P01但限定访问仍正确。localSearchPathRestoresAfterCommitAndRollback验证事务内SET LOCAL切到第二schema，分别rollback/commit后都恢复第一schema，finally恢复自动提交再清理。两个场景507真实厂商JDBC通过，不等同DBeaver活动schema下拉、连接初始化设置、SQL补全或路径权限过滤GUI验收。报告`test-results-20260923-search-path.json`；临时grantee已删除。
+
 最新外键能力批次：**926项，909通过、17跳过、零失败/错误**，`results/run-TmXrWX`。新增compositeForeignKeyMetadataAndCascadeWhenServerSupportsForeignKeys：真实创建复制父/子表，支持时验证复合FK KEY_SEQ/列映射、UPDATE/DELETE CASCADE规则、孤儿行23503、级联更新/删除。**当前507分布式在CREATE子表时返回0A000、FOREIGN KEY ... REFERENCES constraint is not yet supported，因此正向路径跳过，未验证通过**。只对明确0A000跳过，权限/语法/其他错误仍失败；没有将外键本身列为项目不适用。先前人工探测在事务中回滚，两探测表计数0；自动用例随机schema按通用清理机制退出。报告`test-results-20260923-foreign-key-capability.json`；临时grantee已删除。需支持外键的目标实例继续验收，不能以此宣称全部约束支持。
 
 最新表达式/部分索引批次：**925项，909通过、16跳过、零失败/错误**，`results/run-Y3bY3v`。productionTableDdlPreservesExpressionAndPartialIndexAfterRename在507分布式真库创建lower(label) WHERE active非唯一索引，重命名为含空格中文的Index 中文，通过生产readTableDDL读取、删除本轮表、原样DDL重建。目录独立核对索引名、表达式lower(label)、predicate=active；插入三行，过滤查询只返回匹配的active行；JDBC元数据新名存在/旧名不存在且NON_UNIQUE=true。删除该索引后JDBC元数据不再列出、表三行仍保留。不是证明优化器选择该索引，也不是索引编辑器/批量删除UI。报告`test-results-20260923-expression-index.json`；临时grantee已删除。
