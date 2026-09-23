@@ -183,3 +183,11 @@ PostgreStructureSearchTest 新增 5 项，通过生产 findObjectsByMask 入口�
 新增 5 个关系类型参数化场景（r/p/f/v/m）及 1 个缺失 schema 场景。生产搜索入口必须保留结果类型和名称，通过 schema+OID 解析正确对象；对象随后被删除时抛 DBException；无法解析所属 schema 时不发布无效引用。最初红测证实 p（分区表）和 f（外部表）都被标为 PostgreMaterializedView，修复分别映射为 PostgreTable 与 PostgreTableForeign。r/v/m 原行为保持。
 
 搜索类 11 项全部通过；完整回归 **849 项，836 通过、13 跳过、0 失败/错误**。证据 `docs/gaussdb/test-results-20260923-search-types.json`，运行 `results/run-4zUrtE`。本组为 mock JDBC 目录行的生产搜索入口测试，尚非真库元数据或 GUI 跳转验收。权限回归临时角色已删除且计数 0。
+
+### 507 真库表/视图搜索
+
+新增两项真库测试，调用 PostgreStructureAssistant.findObjectsByMask，JDBCSession/Statement/ResultSet 接口通过测试桥接器转发到厂商驱动。SQL 与绑定顺序由生产实现生成，查询真实 pg_class/pg_namespace，非手写等价搜索 SQL。上下文/schema 元数据对象为 mock，不算完整连接注册或搜索 UI 验收。
+
+productionTableSearchUsesRealCatalogCaseCommentsAndLimit 验证表/视图名称和结果类型、LIKE/ILIKE 大小写差异、LIMIT、开启/关闭注释搜索、含引号分号文本无匹配且不破坏对象。productionSearchKeepsSameNamedTablesInTheirRequestedSchema 验证两个随机 schema 的同名表各返回一项，删除其中一个后该 scope 无结果、另一个仍保留。测试结束清理各自创建的 schema。
+
+完整回归 **851 项，838 通过、13 跳过、0 失败/错误**。证据 `docs/gaussdb/test-results-20260923-live-search.json`，运行 `results/run-jfsml2`。权限回归临时角色再次清理并确认计数 0。函数/过程、列、约束、类型、schema 搜索和 GUI 仍需补齐。
