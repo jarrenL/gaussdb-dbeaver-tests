@@ -1,5 +1,7 @@
 # 场景清单与层级
 
+最新不存在库连接批次：980项，959通过、21跳过、零失败/错误，results/run-kbErOR。新增随机不存在数据库连接场景，pg_database先确认不存在；初次run-an8Tb4期望3D000而得到28000。复查新增严格HBA消息断言确认访问规则先拒绝，失败后原连接SELECT11、新正常连接SELECT12均成功；3D000路径按明确HBA前置拒绝跳过，**未计为通过**。无扩大HBA/认证权限，无错误密码重试。报告test-results-20260923-missing-database.json；临时grantee删除。需允许该目标库进入认证/数据库查找流程的隔离环境才可完成3D000验收。
+
 最新枚举/范围真库批次：979项，959通过、20跳过、零失败/错误，results/run-FepgQZ。507 ORA分布式真实建类型/表，枚举按声明顺序返回中文标签，NULL读取wasNull正确，非法枚举22P02且行数保持4。int4range验证[1,5)上下界/包含标记/1包含5不包含，empty非SQL NULL，NULL getObject/wasNull，缺省下界lower_inf，JDBC类型名int4range。报告test-results-20260923-enum-range.json；随机schema自动清理，临时grantee删除。无产品代码修改；不等同范围编辑器、枚举DDL管理器、任意用户定义range或多模式GUI通过。
 
 最新复合/数组真库批次：977项，957通过、20跳过、零失败/错误，results/run-GKXrge。text[]经createArrayOf/setArray真实入表，getArray保留中文逗号、双引号、反斜杠、换行、字面NULL和null元素；空数组非null且长度0、SQL NULL数组getArray=null/wasNull=true。复合类型真实建表/参数写入，JDBC完整限定类型名、getObject非null、命名字段中文引号及numeric四位小数、NULL复合及字段读取通过。首轮run-jOCUmA短类型名预期错误，实际为带引号schema限定名；据实改成严格完整名断言，非生产缺陷。报告test-results-20260923-composite-array.json；随机schema与临时grantee已清理。未覆盖DBeaver复杂值编辑器、任意嵌套复合/多维数组或所有模式，无产品代码修改。
