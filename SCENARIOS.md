@@ -1,5 +1,7 @@
 # 场景清单与层级
 
+麒麟GUI684–704更新model1933（SHA3e5d8671…8ed7f1d），真实只读SQL验证时间戳默认3位→首选项6个f→网格/查看器.001234，重新打开设置读回6位；NULL及独立时区列显示已观察。3截图已检视。699过期控件失败不算证据，后续实际结果核实；无DB对象写入，保留测试工作区6位设置。DATE_GUI_ACCEPTANCE_20260924.md。编辑保存/错误提示/重启持久化另验。
+
 日期偏移新增6项：X/XX/XXX/Z自动与显式解析保留偏移和微秒、引用Z保持本地时间、xxx旧格式限制负向断言。修复contains-Z类型推断为parseBest后run-aIRTsG 1407项/1383通过/24跳过/零失败错误。grantee删除；DATE_OFFSET_PARSING_20260924.md记录首次3失败1错误与正向矩阵调整。xxx依旧不支持，不能算功能通过。
 
 小数秒补4项：fff/ffffff/fffffffff各测0/1ms/123456789ns的现代与JDBC日期显示及显式/自动解析，另测引用fff字面量。run-i2YJVL四失败；修复f转S保留位宽/引用后run-x8mLQ4 1401项/1377通过/24跳过/零失败错误。grantee删除；主仓DATE_FRACTION_PRECISION_20260924.md；GUI及可选小数格式另验。
