@@ -1,5 +1,7 @@
 # 场景清单与层级
 
+最新角色权限/SSL批次：**938项，921通过、17跳过、零失败/错误**，`results/run-3ETAvm`。PostgreRoleMetadataTest增加三项：六个权限/登录标志64组合独立生成正/负选项（按一个测试方法统计，不虚增64项）、有效期及角色名内嵌双引号/注释单引号转义、不支持的权限选项即使模型为true仍省略。前一阶段`run-Chgt8T`937项/920通过/17跳过。另新增requiredSslDoesNotSilentlyDowngradeWhenServerSslIsDisabled，507真实厂商JDBC确认SHOW ssl=off后sslmode=require拒绝连接且SQLSTATE=08004，prefer明确允许回退并执行SELECT 1，原连接仍可查询。该场景不是TLS正向、证书校验、客户端SSL配置UI或凭据存储验证；未修改服务端SSL/HBA配置。报告`test-results-20260923-role-flags-ssl-required.json`，临时grantee已删除。无新增生产代码修改。
+
 最新角色DDL批次：**934项，917通过、17跳过、零失败/错误**，`results/run-r2bXZs`。新增两个生产PostgreRole.getObjectDefinitionText单测，验证连接限制0/7/-1、中文空格角色名引用、LOGIN/NOCREATEROLE、服务器不支持时不导出SUPERUSER/REPLICATION以及不包含密码。红测`run-nFqYW9`捕获连接限制0被错误导出为-1；修复判断为非负数原样保留。报告`test-results-20260923-role-ddl.json`。该新增覆盖为生产DDL生成器mock层，不等同真实创建角色、角色权限UI或所有能力标记均验收。临时grantee已删除；现有GUI副本/发布包尚未包含此修复。
 
 最新角色真库可见性批次：**932项，915通过、17跳过、零失败/错误**，`results/run-eirFpD`。productionRoleModelReadsLiveCatalogWithServerVisibilityRules以真实pg_roles结果集构造生产PostgreRole，对比OID、继承、建库/建角色/复制、登录、连接数和有效期。首次run-0P6bSi错误假设普通账号可读自身及NOLOGIN角色两行，实际只有自身一行；管理员只读检查确认两角色都存在，pg_roles视图明确定义“自身或CREATEROLE/SYSADMIN”。据此修正测试预期为按当前角色权限读取1/2行，当前普通账号一行通过，不提升账号权限。NOLOGIN在管理员查询中存在，但生产模型的真实NOLOGIN分支本轮未执行；此前mock测试不替代该分支。报告`test-results-20260923-role-live-visibility.json`；临时grantee已删除。无生产代码修改。
