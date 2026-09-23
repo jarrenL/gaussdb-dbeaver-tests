@@ -1,5 +1,7 @@
 # 场景清单与层级
 
+配置读取补10项：生产readConfiguration普通/加密读取、有效内容后IO失败、立即失败、关闭失败、缺失文件及双故障。run-JcPvwx复现4项吞异常；run-zJbNz5暴露2项重复关闭；改为transferTo+外层单次关闭，run-c2ik2b 1463项/1439通过/24跳过/零失败错误。grantee删除。CONFIGURATION_READ_FAILURE_20260924.md；上层项目加载继续处理策略和GUI仍待验。
+
 加密器及临时文件新增15项：5种文本/边界往返、新实例解密、随机IV、8种截断和损坏填充恢复。run-jvBnfx复现0/1/15/16字节未拒绝4项失败，生产DefaultValueEncryptor增加块结构校验后run-lkNWTC 1453项/1429通过/24跳过/零失败错误。grantee删除，CREDENTIAL_FILE_STRUCTURE_20260924.md。不等同完整配置落盘/钥匙串；CBC没有认证保护，不宣称识别全部篡改。
 
 profile存储隔离新增3项：保存开关两种下嵌套user/password不覆盖主字段、中文特殊字符往返、两profile更新互不干扰。run-Mffnzp 1438项/1414通过/24跳过/零失败错误，grantee删除。AUTH_PROFILE_FIELD_ISOLATION_20260924.md；生产无改动、内存模拟控制器。嵌套自定义秘密仍会保存，不宣称保存主密码开关清除全部secret。
