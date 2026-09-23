@@ -248,3 +248,8 @@
 正常退出旧实例，安装SQL编辑器1.0.185.202609231515，主机/容器SHA256一致。原工作区-clean启动并关闭每日提示，Script-1替换为两条三行SELECT，113字符，projection实测offset0/57、length56、均展开。20次长短交替替换后最终SELECT 1，后台完成折叠数0；恢复原文后两处正确注解重建。X11实际点击第一处折叠图标后collapsed=true且截图首条只剩首行，再点击恢复false。xdotool未安装的尝试未计成功。
 
 当前会话无旧折叠越界，仍有既有navigate/goTo菜单扩展警告。未执行SQL或更改数据库数据。最终Script-1保留多行测试文本；旧已删除序列页重启后显示Error，未当作本修复缺陷。JUnit仍1012/988通过/24跳过，本轮仅新增GUI证据与只读Bot诊断。下一队列504。详见主仓SQL_FOLDING_REVISION_20260923.md及截图。
+# ONLY危险查询确认与取消（504–517）
+
+正常退出后更新模型2.0.45.202609231529，hash与主机相同，原工作区-clean重启。管理员创建专用两行safety_only_probe并仅授普通账号SELECT/UPDATE/DELETE。实际客户端执行UPDATE ONLY无WHERE出现警告，取消后独立数据仍10/20；再次执行并确定后两行30。DELETE FROM ONLY取消后仍2行30，确定后独立计数0。未勾不再询问。517文本换成SELECT 1，专用表删除、目录0。
+
+发现提示缺陷：UNKNOWN预览及missing argument。源码confirmAction重载把类型字符串当codeBlockText，剩余参数不足；完整解析失败时类型也UNKNOWN。拦截/数据结果通过不代表文案通过，下一步修复并重验。当前下一队列518，JUnit仍1063/1039通过/24跳过。模型新包同时包含历史模型修复，但此场景不替代历史功能回归。
