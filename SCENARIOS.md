@@ -1,5 +1,7 @@
 # 场景清单与层级
 
+最新序列名称字段补强：1006项，982通过、24跳过、零失败/错误，results/run-ianpRl。补齐属性页直接编辑名称的能力表达式：新建可命名、Gauss已持久化名称只读、支持重命名的PG保持可编辑；真实模型/生产属性描述符三分支验证通过。报告test-results-20260923-sequence-name-field.json。名称及重命名菜单GUI仍待更新副本验证，不能沿用此前最后值字段的GUI结果。
+
 最新序列改名门控：1005项，981通过、24跳过、零失败/错误，results/run-ICN7IJ。Gauss扩展关闭rename能力、PG默认保持开启；管理器canRenameObject、提交命令及生成SQL三层控制；3项新增测试覆盖不入队、不产生动作、支持分支中文/双引号转义。真实服务端RENAME探测仍跳过不算支持。报告test-results-20260923-sequence-rename-gate.json；GUI菜单/属性页及新发布包待实测，详见SEQUENCE_CAPABILITY.md。
 
 最新序列注释/改名批次：1002项，978通过、24跳过、零失败/错误，results/run-UWZjps。生产管理器注释SQL在集中式/分布式验证中文、引号、分号、换行原样保留，清空注释变NULL，号码连续1→2→3通过。两实例生产重命名SQL均被0A000及明确“不支持”拒绝，OID/连续性/冲突正向均未验证，不算通过；客户端重命名能力门控另有待办。报告test-results-20260923-sequence-comments.json，细节见SEQUENCE_CAPABILITY.md。无生产代码修改。

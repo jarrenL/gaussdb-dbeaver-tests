@@ -1,5 +1,11 @@
 # 序列管理验证边界
 
+## 名称字段的直接编辑入口
+
+PostgreSequence此前继承JDBCTable的通用名称属性，editable=true，未按序列rename能力限制直接编辑。现在覆盖名称属性，保留名称大小写转换器、显示顺序及可见性：新建对象允许命名；已持久化对象仅在supportsSequenceRename为true时允许编辑。更新表达式也检查同一能力，不影响PG支持分支。
+
+run-ianpRl：1006项，982通过、24跳过、零失败/错误。新增真实PostgreSequence模型与生产ObjectPropertyDescriptor表达式验证：新对象可命名→setPersisted(true)后不支持改名则只读→支持改名时恢复可编辑；字段始终可见。报告docs/gaussdb/test-results-20260923-sequence-name-field.json，临时grantee删除。此项是属性描述符验证，不是GUI实测；GUI副本仍需更新名称字段及上一批rename门控。
+
 ## 注释与重命名真库补充
 
 run-UWZjps：1002项，978通过、24跳过、零失败/错误。生产PostgreSequenceManager的额外动作生成COMMENT ON SEQUENCE，真实GaussDB方言处理引号。集中式及分布式分别验证中文、单引号、SQL形态分号文本及换行原样保存；注释操作前后nextval连续1→2，清空注释后obj_description为NULL且nextval为3，未重置序列。两项正向通过。
