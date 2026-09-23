@@ -1,5 +1,7 @@
 # 场景清单与层级
 
+最新历史游标批次：**964项，944通过、20跳过、零失败/错误**，`results/run-2eFOs7`。QueryHistoryCursorTest五项调用生产ListCursorImpl及QMRegistryImpl.DefaultEventBrowser：前/后定位、越界不改变当前位置、空游标；USER/META与query类型、中文大小写文本、自定义排除条件组合后按最新优先读取；无匹配结果为空。run-6gjHIV红测确认scroll只验证参数但不更新位置，定位第三条仍读取第一条；生产补this.position赋值。源QMUtils保持原CRLF。通过模拟collector隔离输入，未验证真实事件收集、UI翻页、日期/状态过滤或跨重启存储；默认当前会话浏览器源码并未实现全部criteria字段，仍待能力核实。报告test-results-20260923-history-cursor.json。临时grantee已删除，新修复未装入GUI/发布包。
+
 最新SQL日志重配置批次：**959项，939通过、20跳过、零失败/错误**，`results/run-8maXxy`。QueryHistoryFileTest新增三项：切换日志目录关闭旧Writer并真实落盘中文SQL到新文件；目标是普通文件而非目录时打开失败，旧Writer关闭且后续不再写旧目的地；禁用日志关闭旧Writer并忽略后续事件。首轮run-j5KHi7因测试框架不支持静态mock而未进入断言，改用隔离OSGi测试运行时首选项、finally恢复值及默认状态。run-Qwf9jq红测证明启用状态下initLogFile不关闭旧Writer；修复在重配置开始先关闭/置空，失败时不保留旧目的地。报告test-results-20260923-query-log-reconfigure.json。验证生产初始化与文件IO，不等同客户首选项GUI操作或数据库历史分页验收。临时grantee已删除；GUI/发布包未更新。
 
 最新SQL文件日志批次：**956项，936通过、20跳过、零失败/错误**，`results/run-ojWQ7W`。新增QueryHistoryFileTest四项：生产事件格式化/写入/flush实际临时文件并重新打开追加，中文SQL、SUCCESS与错误消息及两条记录保持；模拟IO异常关闭且第二次事件不再写；保留7天只删除匹配文件名且严格早于边界的日志，保留边界/当日/无关/格式错误文件；dispose幂等关闭且后续不写。run-3GUpxj红测确认dispose未关闭Writer且仍write/flush，生产修复同步关闭、置空并关闭enabled。该测试通过注入Writer/filter隔离全局工作区配置；证明文件日志生产路径，不等同Query Manager数据库历史重启读取、分页、UI清除/收藏或全局首选项初始化。报告test-results-20260923-query-log-files.json；临时grantee已删除，新修复未装入GUI/发布包。
