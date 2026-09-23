@@ -1,5 +1,7 @@
 # 场景清单与层级
 
+转义字符串EOF追加8项：5合法末尾字符串、3分隔符保留。run-X1oQz7五项EOF失败，修复共享PostgreEscapeStringRule闭合引号后EOF被拒；同时校验片段与文档扫描器正确结束偏移。run-rz3aa81234/1210通过/24跳过/零失败错误，主仓PREDICATE_SCANNER_20260924.md和EOF脱敏结果。grantee清理；未闭合失败回退和实际GUI仍待验。
+
 谓词扫描器补5项：CR/LF/CRLF列位置与回退、实际转义字符串规则、标识符后缀防误识别。run-RvrQvn3项复现getColumn未实现异常，另2项测试bundle加载修正；实现共享扫描器列偏移。run-ia05QF1226/1202通过/24跳过/零失败错误，对应异常栈435→0。主仓PREDICATE_SCANNER_20260924.md与脱敏报告，grantee清理；不算完整字符串语法/GUI高亮验收。
 
 数值科学计数/配置刷新4项：1E-38、1E+38、高精度负小数、38位整数，真实handler普通→科学→普通三阶段生成INSERT整句断言。run-RQOp2W1221/1197通过/24跳过/零失败错误；主仓DML_GENERATOR_OPTIONS_20260924.md与脱敏报告。无生产修改，grantee清理；不是GUI首选项事件或真库存储范围验收。9.4台账同步近期DML证据。
