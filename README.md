@@ -8,7 +8,7 @@
 - DBeaver 仓库：依赖 Eclipse/OSGi 及内部模型的 JUnit 测试、生产修复。
 - 内网连接信息、密码、原始 JDBC 日志及本地运行结果不得上传。
 
-DBeaver 源码：https://github.com/jarrenL/dbeaver 。当前工作区内的测试扩充尚未提交发布，使用时应核对后续记录的源码提交，不直接假定远端已有新用例。
+DBeaver 源码：https://github.com/jarrenL/dbeaver 。测试扩充已分批本地提交，但尚未推送发布；使用时应核对后续记录的源码提交，不直接假定远端已有新用例。
 
 ## 运行
 
