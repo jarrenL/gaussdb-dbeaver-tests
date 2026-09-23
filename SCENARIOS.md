@@ -199,3 +199,11 @@ productionTableSearchUsesRealCatalogCaseCommentsAndLimit 验证表/视图名称�
 productionConstraintAndCompositeTypeSearchFindNamedCatalogObjects 验证真实命名主键/CHECK 约束，以及 CREATE TYPE AS 复合类型搜索（隐式数组类型不混入结果）。测试复用生产搜索 SQL→真实 JDBC 的桥接器，目录数据真实，仍不代表 GUI 或对象元数据缓存整体已验收。
 
 完整回归 **854 项，841 通过、13 跳过、0 失败/错误**。证据 `docs/gaussdb/test-results-20260923-column-search.json`，运行 `results/run-JCIkr0`。历史 JDBC 类 65 项中 63 通过、2 能力跳过。临时角色删除并确认计数 0；随机 schema 由用例清理。
+
+### schema 搜索范围和列引用类型
+
+新增 schemaSearchHonorsTheSameEnabledSchemaFilter 与 columnSearchReferenceIsTypedAsAColumn 两个入口测试。修复前红测分别显示 schema 搜索 SQL 没有 n.oid 过滤和列引用被标记为 PostgreTableBase。生产修复向 schema 查询传递已计算的 namespace 范围，保留 has_schema_privilege 检查并绑定 schema OID；列引用改为 PostgreTableColumn。
+
+新增真库 productionSchemaSearchExecutesNamespaceIdBinding，验证生产 schema 查询能执行 mask/OID 参数绑定、返回目标 schema 类型和名称、不存在 mask 返回空。mock 测试证明过滤 SQL 与绑定，真库证明该 SQL 可执行及结果；未声称完整全局搜索 UI 已验收。
+
+完整回归 **857 项，844 通过、13 跳过、0 失败/错误**。证据 `docs/gaussdb/test-results-20260923-schema-search.json`，运行 `results/run-mNVHZn`。临时权限角色删除后计数 0。更多搜索对象类型、跨 catalog、结果上限组合及 UI 仍需覆盖。
