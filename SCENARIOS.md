@@ -1,5 +1,7 @@
 # 场景清单与层级
 
+XLSX空结果/SQL文本补4项：空结果有无表头、独立SQL Sheet整段/按行。run-l9DfHU空结果两项失败（合成全NULL数据行）；footer改只初始化sheet/表头，真实NULL行测试保留。run-jxjvAh1321项/1297通过/24跳过/零失败错误，本类54项另真库2项；grantee删除。主仓XLSX_EXPORT_20260924.md与empty脱敏报告，GUI/超长SQL仍待验。
+
 XLSX接真实JDBC补2项：集中式/分布式507隔离表写numeric38,18/Long.MIN/中文𠀀引号换行/NULL，getObject先对比输入，原样交生产导出器，XLSX逐格类型/值/表头/行列数验证。run-ECvtcg1317项/1293通过/24跳过/零失败错误，无生产修改；两库xlsx_values残留0/grantee删除。主仓XLSX_EXPORT_20260924.md及jdbc脱敏报告；绑定和site仍模拟，不代表GUI向导或办公软件验收。
 
 XLSX输出失败清理补2项：0/512字节后IOException，要求异常传播、workbook/sheet引用清空、再次dispose不重写。run-cPnfVE两项复现write异常跳过关闭/清理；改try-with-resources与finally。run-hcvL7P1315项/1291通过/24跳过/零失败错误，本类50项，grantee删除。主仓XLSX_EXPORT_20260924.md与output-failure脱敏报告；未模拟真实磁盘满/句柄统计/GUI，不自动删除调用方输出路径。
