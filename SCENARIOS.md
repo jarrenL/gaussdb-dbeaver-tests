@@ -1,5 +1,7 @@
 # 场景清单与层级
 
+DELETE追加6项空键集合不可变性/多行顺序/隐藏伪列/空选择，run-0liDaJ1192/1168通过/24跳过。UPDATE追加7项键值分离、引号、NULL值与NULL键、多行、空选择及隐藏伪列过滤。最终run-CSH3cv1199/1175通过/24跳过/零失败错误；主仓DELETE_GENERATOR_20260924.md、UPDATE_GENERATOR_20260924.md及脱敏报告。本批无生产修改，grantee清理；不算UPDATE真库或GUI验收。
+
 DELETE无键真库执行：集中式/分布式507各验证单引号、NULL、SQL形状文本，真实生成SQL不改写执行；每轮删除/回滚恢复/重试提交，重复行影响2行，其余各1行，剩余id严格为1/2/4/5，独立参考表7行不变。随机schema与grantee清理。run-z6y8CN1186/1162通过/24跳过/零失败错误。主仓DELETE_GENERATOR_20260924.md与脱敏报告；非GUI验收。
 
 DELETE生成补3项（无键、单键、复合NULL键）。run-gBLYKJ复现无键追加不可修改列表异常，另两项测试未initGenerator的装配问题修正；生产无键分支使用局部ArrayList。run-3k7fre1184/1160通过/24跳过/零失败错误。主仓DELETE_GENERATOR_20260924.md及脱敏结果，grantee清理。共享修复，真库删除及GUI待验；无键可见列条件不保证唯一删除。
