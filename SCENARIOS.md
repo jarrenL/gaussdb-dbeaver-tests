@@ -1,5 +1,7 @@
 # 场景清单与层级
 
+最新收集器保留批次：970项，950通过、20跳过、零失败/错误，results/run-9uGRc1。新增两项生产dispatcher单周期测试：超10000条保留最新记录、连续追加顺序/防御快照；关闭连接缓存清理同时保留重开对象。run-230CQa红测证实待关闭列表直接赋值再清空导致无清理，修复列表快照和关闭判断。报告test-results-20260923-history-retention.json；临时grantee删除，GUI仍1322模型包，不含本次清理修复。无长期并发/内存压测结论。
+
 最新回滚时间戳批次：968项，948通过、20跳过、零失败/错误，results/run-hHlYz3。生产collector回滚事件红测run-dBCwoc确认timestamp=0，改为回滚对象结束时间后通过；不是改测试预期来绕过异常。测试隔离异步dispatcher，仍执行生产handler/private事件创建、检查eventPool及QMUtils事件时间。报告test-results-20260923-rollback-timestamp.json；临时grantee已删除，新model补丁尚未GUI安装复验。
 
 最新事务历史模型批次：967项，947通过、20跳过、零失败/错误，results/run-SnfyTy。QueryHistoryExecutionTest新增回滚与后续自动提交独立性、提交后新事务、关闭连接回滚三个测试。报告test-results-20260923-history-transactions.json；临时grantee删除。另从GUI异常日期追到collector使用连接closeTime=0生成回滚事件，尚待独立修复，模型绿测不覆盖此路径。

@@ -2,6 +2,8 @@
 
 ## 实现核对
 
+收集器保留/清理补测：QueryHistoryCollectorTest直接执行生产EventDispatcher一个周期，关闭自动调度，隔离输入。输入10005条后保留最新10000条（时间标记5..10004），追加一条后为6..10005；清空返回快照不改变内部历史，pending池已排空。关闭连接清理红测run-230CQa发现已关闭对象仍留缓存；修复待清理列表先复制再clear，并修正仅删除isClosed对象的条件，重新打开对象保留。run-9uGRc1全套970项/950通过/20跳过/零失败错误，报告test-results-20260923-history-retention.json。不是异步调度竞态压测、堆内存测量或UI永久删除验证；最新清理修复尚未装入GUI副本。
+
 2026-09-23事务历史补查：416快照有独立“回滚”事件，417还显示后续切换自动提交产生的“提交”事件。新增三个生产模型测试确认回滚后切自动提交不会把旧事务改为提交、提交关闭当前事务并建立独立新事务、关闭连接历史将未完成事务标记回滚。run-SnfyTy：967项/947通过/20跳过/零失败错误；不代表全部事件收集/UI都通过。
 
 **已修复、GUI复验待补**：回滚事件显示1月1日，源码QMMCollectorImpl.handleTransactionRollback使用sessionInfo.getCloseTime()而不是oldTxn.getCloseTime()构造END事件；连接仍打开时前者为0。QueryLogViewer经QMUtils读取事件timestamp并格式化。新增测试调用生产collector.handleTransactionRollback和事件创建，隔离后台dispatcher但检查实际eventPool及QMUtils返回时间；run-dBCwoc红测得到真实结束时间vs0，修复为oldTxn.getCloseTime()后run-hHlYz3为968项/948通过/20跳过/零失败错误。报告test-results-20260923-rollback-timestamp.json。尚未安装新model包到GUI，不宣称GUI日期已复验。
