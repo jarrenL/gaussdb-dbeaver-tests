@@ -15,7 +15,7 @@ function rows(path, filter) {
     }
     return result;
 }
-const [allFile, filteredFile, restoredFile] = process.argv.slice(2);
+const [allFile, filteredFile, restoredFile, openedFile, replayedFile] = process.argv.slice(2);
 assert(allFile && filteredFile && restoredFile, 'Usage: verifier all.dump filtered.dump restored.dump');
 const all = rows(allFile, '');
 const filtered = rows(filteredFile, 'history_gui_20260924_error');
@@ -29,5 +29,19 @@ assert.equal(filtered.length, 1);
 assert(filtered[0].includes('history_gui_20260924_error') && filtered[0].includes('Division by zero'));
 checkBoth(restored);
 assert.deepEqual(restored, all, 'Clearing filter must restore the same records');
+let guiReplayVerified = false;
+if (openedFile || replayedFile) {
+    assert(openedFile && replayedFile, 'Both open and replay snapshots are required');
+    const openedText = fs.readFileSync(openedFile, 'utf8');
+    assert(openedText.includes('CTabItem <distributed_acceptance> QueryManager'));
+    assert(openedText.includes("StyledText SELECT 'history_gui_20260924_success' AS marker, 7 AS expected;\\n visible=true"));
+    assert.deepEqual(rows(openedFile, ''), restored, 'Opening a console must not add execution records');
+    const replayed = rows(replayedFile, '');
+    assert.equal(replayed.length, restored.length + 1);
+    assert(replayed[0].includes('history_gui_20260924_success') && replayed[0].includes(', 1, 成功,'));
+    assert(replayed[0].includes('SQLEditor <QueryManager>'));
+    assert.deepEqual(replayed.slice(1), restored);
+    guiReplayVerified = true;
+}
 console.log(JSON.stringify({successAndFailureVisible: true, filteredRows: filtered.length,
-    restoredRows: restored.length, filterRestorationVerified: true, guiReplayVerified: false}));
+    restoredRows: restored.length, filterRestorationVerified: true, guiReplayVerified}));
