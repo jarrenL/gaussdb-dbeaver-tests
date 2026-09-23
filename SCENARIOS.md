@@ -1,5 +1,9 @@
 # 场景清单与层级
 
+最新序列批次：**877项，862通过、15跳过、零失败/错误**，`results/run-E6f6jm`。新增真库升序/降序生产 getSequenceBody 重建：真实目录参数输入生成器，重建后连续值分别10/13/16与-2/-5/-8，min/max/increment保持，覆盖负起点/负步长/上界0。参数加载在这两个场景中由测试桥接完成，不冒充生产元数据加载真库联验。
+
+同时新增旧目录/新版视图的生产 loadAdditionalInfo mock 回归。旧目录红测读取 cache_value=64 却得到0（`results/run-6GPe4x`），修复 PostgreSequence 旧分支误用 cache_size，改为 cache_value；新版仍使用 cache_size。两个分支生成 CACHE 64，且重复获取使用缓存、资源仅关闭一次。报告 `docs/gaussdb/test-results-20260923-sequence-roundtrip.json`。序列文件向导、RESTART、所有版本仍未完成；当前 GUI 副本/发布包不含本次修复。临时角色已删除确认0。
+
 最新索引往返补充：**873项，858通过、15跳过、零失败/错误**，`results/run-1mBJvo`。新增 `productionTableDdlRebuildsUniqueAndOrderedCompositeIndexes`：HASH 表建复合唯一索引和 amount DESC/label ASC 索引，经生产读取 DDL、删除、原样重建；同 id 不同 label 可写，重复 id/label 返回23505；真实 JDBC 索引元数据断言列序和 DESC/ASC（D/A），不以查询 ORDER BY 替代索引定义验证。报告 `docs/gaussdb/test-results-20260923-index-roundtrip.json`。临时角色清理确认0；不代表表达式/部分索引、批量删除或 GUI 全覆盖。
 
 当前最新：DDL 真库往返批次 **872项，857通过、15跳过、零失败/错误**，`results/run-Zf3fWA`；新增两个生产入口真库场景，见下方。
