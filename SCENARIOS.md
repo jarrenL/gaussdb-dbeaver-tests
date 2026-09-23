@@ -1,5 +1,7 @@
 # 场景清单与层级
 
+最新表达式/部分索引批次：**925项，909通过、16跳过、零失败/错误**，`results/run-Y3bY3v`。productionTableDdlPreservesExpressionAndPartialIndexAfterRename在507分布式真库创建lower(label) WHERE active非唯一索引，重命名为含空格中文的Index 中文，通过生产readTableDDL读取、删除本轮表、原样DDL重建。目录独立核对索引名、表达式lower(label)、predicate=active；插入三行，过滤查询只返回匹配的active行；JDBC元数据新名存在/旧名不存在且NON_UNIQUE=true。删除该索引后JDBC元数据不再列出、表三行仍保留。不是证明优化器选择该索引，也不是索引编辑器/批量删除UI。报告`test-results-20260923-expression-index.json`；临时grantee已删除。
+
 最新会话终止真库批次：**924项，908通过、16跳过、零失败/错误**，`results/run-TYJMOB`。terminatedOwnSessionRollsBackAndFreshConnectionCanWrite在507上创建随机schema/表及独立同账号writer，writer未提交插入1行且自身可见、controller不可见；controller仅对刚从writer获取的pg_backend_pid调用pg_terminate_backend并断言true。writer后续SELECT必须报57P01或08类连接SQLSTATE。再以独立观察连接确认0行，创建新连接写入id=2/reconnected，原controller也读取相同值。原连接终止、未提交数据不残留、重新连接读写通过，耗时0.188秒；不是整个服务停机/主备切换/网络断连，也不证明DBeaver自动重连弹窗或SQL重试策略。报告`test-results-20260923-session-termination.json`；临时grantee已删除。无产品代码修改。
 
 最新异常关闭批次：**923项，907通过、16跳过、零失败/错误**，`results/run-rdF7uo`。新增红测直接准备待执行batch后调用生产close，旧实现未关闭batch，run-w8XGN7报Wanted but not invoked。closeExporter补充在会话关闭前释放残留batch并清空引用；batch.close异常记录日志但继续事务回滚和会话/独立连接清理。两个新测试验证正常关闭顺序/重复close仅一次，以及batch.close异常不阻断其余资源释放、不提交。反射只准备运行态，未声称GUI泄漏测量或所有JDBC资源已穷尽覆盖。报告`test-results-20260923-consumer-abort-cleanup.json`；临时grantee已删除。此共享组件补丁尚未装入GUI副本，后续集成验收需使用更新bundle。
