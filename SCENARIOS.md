@@ -259,3 +259,11 @@ productionConstraintAndCompositeTypeSearchFindNamedCatalogObjects 验证真实�
 - `productionRoutineSearchKeepsSameNamedFunctionsIsolatedAfterDrop`：两个随机 schema 分别创建同名函数，各自范围搜索均只有一条；删除一侧后该侧为空，另一侧仍保留一条。
 - 初次 run-OvyMFb 因测试 JDBC 接口桥接缺少结果集会话上下文报错，不记录为生产缺陷。补齐会话、数据源、厂商服务扩展和真实 ResultSet 对象/数组/布尔读取后，run-IaDGzA 完整回归 **886项、871通过、15跳过、零失败错误**。
 - 脱敏结果 `docs/gaussdb/test-results-20260923-routine-search.json`；随机 schema 自动清理，临时 grantee 已删除。当前覆盖无参对象搜索，不代表有参签名、重载、源码全文搜索或 GUI 搜索已验证。
+
+### 过程源码检索与参数签名
+
+- `productionRoutineDefinitionSearchFindsBodyWithoutNameOrCommentMatch`：关键字仅出现在函数正文，关闭源码检索结果为空；开启后命中；区分大小写时错误大小写不匹配，忽略大小写时匹配。
+- run-M6KyWq 真库红测报42883：`operator does not exist: record ~~ character varying`。目录证实 GaussDB pg_get_functiondef 返回 headerlines/definition 两个输出字段，不能作为标量文本直接 LIKE。
+- PostgreServerExtension 新增方言表达式扩展，GaussDB 使用标量子查询读取 definition；PostgreSQL 默认仍用 pg_catalog.pg_get_functiondef，新增 `routineDefinitionSearchRetainsPostgreSqlScalarExpression` 单元测试固定该边界。共享搜索仍保留原对象种类过滤和参数化匹配。
+- `productionRoutineSearchPreservesInputAndOutputSignatureTypes`：真实创建 IN numeric/OUT varchar 过程，生产搜索返回限定 schema 的 `signature_probe(in numeric, out varchar)`。桥接器从真实 pg_type 获取类型名，再交给生产参数签名生成逻辑；不等同于完整类型缓存或重载导航验收。
+- 修复后 run-0Aft27 为887/872通过/15跳过；追加签名和PG默认表达式断言后 run-oumVeM **889项、874通过、15跳过、零失败错误**。脱敏报告 `docs/gaussdb/test-results-20260923-routine-definition.json`。临时 grantee 已删除，专用账号 systemadmin/monitoradmin 均false。GUI源码检索、重载及目标金融版本仍待验。
