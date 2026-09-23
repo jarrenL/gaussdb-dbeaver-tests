@@ -1,5 +1,7 @@
 # 场景清单与层级
 
+最新角色DDL批次：**934项，917通过、17跳过、零失败/错误**，`results/run-r2bXZs`。新增两个生产PostgreRole.getObjectDefinitionText单测，验证连接限制0/7/-1、中文空格角色名引用、LOGIN/NOCREATEROLE、服务器不支持时不导出SUPERUSER/REPLICATION以及不包含密码。红测`run-nFqYW9`捕获连接限制0被错误导出为-1；修复判断为非负数原样保留。报告`test-results-20260923-role-ddl.json`。该新增覆盖为生产DDL生成器mock层，不等同真实创建角色、角色权限UI或所有能力标记均验收。临时grantee已删除；现有GUI副本/发布包尚未包含此修复。
+
 最新角色真库可见性批次：**932项，915通过、17跳过、零失败/错误**，`results/run-eirFpD`。productionRoleModelReadsLiveCatalogWithServerVisibilityRules以真实pg_roles结果集构造生产PostgreRole，对比OID、继承、建库/建角色/复制、登录、连接数和有效期。首次run-0P6bSi错误假设普通账号可读自身及NOLOGIN角色两行，实际只有自身一行；管理员只读检查确认两角色都存在，pg_roles视图明确定义“自身或CREATEROLE/SYSADMIN”。据此修正测试预期为按当前角色权限读取1/2行，当前普通账号一行通过，不提升账号权限。NOLOGIN在管理员查询中存在，但生产模型的真实NOLOGIN分支本轮未执行；此前mock测试不替代该分支。报告`test-results-20260923-role-live-visibility.json`；临时grantee已删除。无生产代码修改。
 
 最新角色模型批次：**931项，914通过、17跳过、零失败/错误**，`results/run-u4KIQR`。新增PostgreRoleMetadataTest三项，调用生产PostgreRole构造/属性读取，验证长OID/中文空格名/描述、超级用户/建库/复制与其他false标记独立、无限连接数-1、有效期；可选boolean/有效期字段读取SQLException时保持false/null而非扩大权限；新建角色与用户仅按显式登录选择区分且均未持久化、默认非管理员。mock ResultSet层级，不等同GaussDB专有SYSADMIN/MONADMIN字段适配、真实创建用户或权限UI通过。报告`test-results-20260923-role-metadata.json`，临时grantee已删除。
