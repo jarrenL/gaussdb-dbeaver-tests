@@ -1,5 +1,7 @@
 # 场景清单与层级
 
+认证profile安全存储接口补7项：保存开关往返2、开到关替换旧记录、set/flush/get故障、缺失记录。run-l3QNro复现false仍保存主密码及旧密码未移除；persistSecrets按savePassword加入主密码后run-cKhsKy1360项/1336通过/24跳过/零失败错误。虚构凭据+内存控制器，不是真实钥匙串/文件加密；grantee删除。主仓AUTH_PROFILE_STORAGE_20260924.md及脱敏结果，GUI未同步。
+
 凭据模型/序列化补11项：三类来源保存选项6、属性隔离/只读2、自身集合及视图2、空值1。run-0aLfX9复现4项属性问题；run-tBLu1k复现profile不保存仍输出密码；复制Map及按选项保留主密码后run-wG7ema1353项/1329通过/24跳过/零失败错误。grantee删除，全部虚构凭据；主仓CREDENTIAL_SNAPSHOT_20260924.md与脱敏结果。persistSecrets/既有存储清理/GUI/加密另验。
 
 连接过滤配置补9项：中文/换行/引号及大小写敏感往返2、空用户配置、旧格式、多个对象范围隔离、无效JSON3、父配置省略空字段。run-aMCmNT复现大小写标志丢失与空JSON关闭失败；修复读写case-sensitive、独立空数组及UTF-8解码。run-dckZMU1342项/1318通过/24跳过/零失败错误，grantee删除。主仓CONNECTION_FILTER_CONFIG_20260924.md及脱敏报告；非完整配置向导、凭据安全或GUI验收。
