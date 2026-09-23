@@ -28,6 +28,11 @@ export GAUSSDB_HISTORY_ALLOW_DDL=YES
 bash scripts/run-dbeaver-tests.sh /absolute/path/to/dbeaver
 ```
 
+另有集中式实例时，设置 `GAUSSDB_HISTORY_CENTRAL_CONNECTION` 指向另一份同格式的私有连接文件。
+复合外键和序列重启分别执行集中式场景；间隔分区优先在该实例验证，未配置时沿用默认实例并明确记录能力限制。
+默认实例的分布式场景不会因此全部切换到集中式。关闭连接后的清理也使用原用例选择的连接配置。
+请只给专用普通用户在测试库内建删对象的权限，访问规则限定实际测试来源地址，不开放公共匿名访问。
+
 连接文件需权限 0600，包含 `url`、`driverClass`、`user`、`password`。必须与供应商 JDBC jar 匹配，不提供真实凭据示例。新用例创建随机 `dbv_hist_` schema，仅清理自身成功创建的 schema；不要连接生产库。
 
 权限 SQL 真库场景另需管理员预建专用 **NOLOGIN** 角色，名称须以 `dbv_hist_grantee_` 开头，然后设置 `GAUSSDB_HISTORY_GRANTEE_ROLE` 为该角色名。部分 GaussDB 版本即使 NOLOGIN 也要求符合密码策略的随机密码；不要使用真实业务角色或将密码写入仓库。测试只向自身随机 schema 中的表授权并核对 SELECT/INSERT 与转授权范围，随后撤销；不负责创建或删除集群角色。运行后确认测试 schema 已清理，再由管理员删除该专用角色。未配置角色时该项跳过，不计为通过。
