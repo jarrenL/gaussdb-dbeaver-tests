@@ -1,5 +1,9 @@
 # Linux 图形回归执行记录
 
+## 新发现：SQL折叠解析位置过期（待修）
+
+458–459检查旧GUI副本时发现14:37:43的后台异常弹窗：Delayed Reconciler startup / SQLReconcilingStrategyException，原因BadLocationException: Offset > length: 1228 > 393。堆栈位于SQLReconcilingStrategy.getNumberOfLines→deservesFolding→reconcile→initialReconcile。不是GaussDB SQL执行错误，也没有被序列能力修复覆盖。应补文档长度变更/旧解析结果的确定性回归并处理过期结果；当前仅完成日志和代码定位，未修复，不能因后续启动无弹窗算通过。
+
 ## 序列重启能力门控（431–457）
 
 - 在既有麒麟x86_64 GUI容器测试副本中正常退出应用（确认Java进程结束），安装postgresql 2.1.258.202609231424及gaussdb 1.0.48.202609231424，更新bundles.info后clean启动。旧jar及注册文件保留备份。SHA256分别为fe537277ae0008a1aac8e64efa6e92576508f646a0238e6ca48ae2fa1eb47663、9b2fb52540c40ddebae16b62ade182a63c18cf9150f70d20620f42bf2359b33f，与构建产物一致。
@@ -232,3 +236,8 @@
 417查询历史显示成功/1行，独立数据断言表为空。另观察417历史中有13:16:54“事务/提交”记录，可能与随后切换自动提交有关；尚未核对回滚事件与该记录关联，不能据此断言事务历史标签完全正确，留作后续核查。
 
 使用同一隔离GUI旧模型包，不作为新安装包验收；没有增加JUnit计数。下一队列418。
+# 序列属性页重命名门控（475、480–486）
+
+475发现名称框仍editable=true，原因是CustomFormEditor只检查管理器存在而未检查canRenameObject。修复后更新UI插件5.1.200.202609231501，480/481名称只读、最后值只读、描述可编辑。483输入描述使编辑器变脏、保存启用；484–485撤销确认后描述为空、保存禁用，独立数据库注释仍为空。清理本轮seq_ui_gate_20260923，目录计数0；临时grantee角色亦删除。486–488关闭菜单操作未观察到编辑器消失，不算关闭通过，保留无未保存更改的旧对象页。
+
+主菜单重命名在481/482诊断仍enabled=true，菜单动态刷新尚未核对，不将其计为通过。SQL折叠并发越界仍独立待修。回归run-7m0867：1006总数、982通过、24跳过、零失败/错误；未新增JUnit计数。下一队列489。详见主仓docs/gaussdb/SEQUENCE_FORM_ACCEPTANCE_20260923.md。
