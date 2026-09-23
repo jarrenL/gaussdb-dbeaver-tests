@@ -1,5 +1,7 @@
 # 场景清单与层级
 
+最新编辑器会话批次：**884项，869通过、15跳过、零失败/错误**，`results/run-f15Gje`，源码c2ed8205e6。未增加JUnit数量。GUI在同一客户端第二次调试复现仍显示旧源码，补充稳定的launch对象作为调试编辑器输入属性，使跨launch时重新加载文档、同一launch单步不反复刷新。已安装debug.ui 202609231021及GaussDB 202609231013实测两次启动：第一次v4，外部改为v3，第二次显示v3且line5正确；F8后line6与caretLine6一致；F9后回滚且独立表不变。证据GUI_PROGRESS 226–253。普通非调试编辑器F5及未保存文本保护仍需独立验证，不能由本场景推导通过。
+
 最新调试源码新鲜度批次：**884项，869通过、15跳过、零失败/错误**，`results/run-9aFLah`，源码98932d5af6。新增debuggerSourceReloadsPersistedBodyInsteadOfCachedCatalogText：预置old_call目录缓存，两次生产调试源码请求必须分别读取new_call/newer_call，并关闭语句、结果和会话。红测run-DSwu6O准确返回old_call而失败；修复仅在调试正文读取时重新查询持久化prosrc，普通DDL缓存策略不改变。报告test-results-20260923-debug-source-freshness.json。GUI尚未安装该批次，不等同已打开编辑器文档刷新通过。
 
 最新导航节点批次：**883项，868通过、15跳过、零失败/错误**，`results/run-di9NkY`。DebugUtils增加源码节点缺失时仅刷新所属容器并重新解析原OID一次的路径，避免沿用刷新前模型实例；使用普通来源事件而非FORCE_REFRESH，不强制丢弃其他编辑器本地修改。新增DebugSourceNavigationTest四场景：刷新后模型实例替换、已存在节点不刷新、取消不刷新、重试仍缺失不循环。报告`test-results-20260923-source-navigator.json`。单元/真库回归通过；GUI新函数热加载仍待重新安装插件后复验，旧父编辑器源码另需修复，不计为完成。
