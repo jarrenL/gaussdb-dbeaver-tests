@@ -1,5 +1,7 @@
 # 场景清单与层级
 
+原生恢复追加失败重试阶段：除零后DELETE不执行，count3/sum6保留，错误无密码；后续正常INSERT进程成功count4/sum10。run-eCRNx8错误文案大小写断言失败，直接gsql确认Division by zero/退出3后修正。run-XDMUEZ1265/1242通过/23跳过/零失败错误，已有test内部扩展不加计数。主仓NATIVE_RECHECK_20260924.md及错误脱敏报告，schema/grantee清理，无生产修改。
+
 原生工具复验run-cc4Ush：普通隔离账号实际gs_dump→gsql plain恢复（4MB级输出）及custom→gs_restore，生产输出重定向/密码管道、无PGPASSWORD、恢复count3/sum6通过。全1265/1242通过/23跳过/零失败错误，本轮未启用上轮六项review，不能混合计数。schema/grantee清理。主仓NATIVE_RECHECK_20260924.md与脱敏报告，GUI/Windows/dumpall空集群另验。
 
 review权限复验：一次性独立sysadmin+专用库/账号/网关窄HBA入口，普通账号不变。run-qwuWKN因HBA所有权未加载而6项连接失败；修正后run-3oeAQZ1265/1247通过/18跳过/零失败错误，断点并发/标记删除与其余5项真库全通过。账号/凭据/grantee删除、schema无残留、HBA恢复hash一致、普通账号systemadmin=false。主仓SKIPPED_REVIEW_AUDIT_20260924.md和复验报告。18跳过继续不算通过。
