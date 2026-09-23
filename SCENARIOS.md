@@ -145,3 +145,11 @@ PostgrePrivilegeCommandTest 新增 7 项：角色引号及限定对象名、REVO
 夹具校正：507 对 NOLOGIN 角色仍要求密码；由管理员在服务器生成符合策略的随机密码。pg_roles 对普通用户过滤其他角色，因此不能以普通用户查不到角色判断不存在；管理员确认 NOLOGIN，测试验证真实授权结果。运行结束删除临时角色并确认角色计数 0，随机 schema 由测试清理。
 
 完整回归 **830 项，817 通过、13 跳过、0 失败/错误**；历史 JDBC 类 60 项中 58 通过、2 能力跳过。证据 `docs/gaussdb/test-results-20260923-privileges.json`，运行 `results/run-lj7A5H`。新修复尚未打入发布包。普通用户拒绝访问、权限 UI、默认权限和列级权限仍待继续覆盖。
+
+### 列级权限边界修复
+
+新增 3 个命令测试：多个权限分别保留带引号列名、默认权限 schema/授权者/接收者正确引用、重复合并幂等。测试夹具最初有嵌套 Mockito stubbing 错误，修正后真正红测确认生产输出 `GRANT SELECT, UPDATE(column)`，SELECT 实际不受列限制。
+
+扩展现有真库授权测试，使用 id 和 restricted_value 两列；修复前数据库明确返回 restricted_value 的 SELECT 权限为 true，与预期 false 不符。生产修复改为每一项权限均附列名：`GRANT SELECT(id), UPDATE(id)`。修复后真库逐项验证两列的 SELECT/UPDATE/INSERT，只有 id 的 SELECT/UPDATE 为 true；生产 REVOKE 后全部 false。仍是生产 SQL + JDBC + 数据库权限函数验证，不等于另一登录用户执行查询或 GUI 验收。
+
+命令测试 10 项全部通过；完整回归 **833 项，820 通过、13 跳过、0 失败/错误**。证据 `docs/gaussdb/test-results-20260923-column-privileges.json`，运行 `results/run-TEF5rG`。临时 NOLOGIN 角色已删除并确认计数 0。默认权限目前只验证生成 SQL，未完成真库新对象继承权限验证；发布包尚未更新。
