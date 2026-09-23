@@ -1,5 +1,7 @@
 # 场景清单与层级
 
+最新索引往返补充：**873项，858通过、15跳过、零失败/错误**，`results/run-1mBJvo`。新增 `productionTableDdlRebuildsUniqueAndOrderedCompositeIndexes`：HASH 表建复合唯一索引和 amount DESC/label ASC 索引，经生产读取 DDL、删除、原样重建；同 id 不同 label 可写，重复 id/label 返回23505；真实 JDBC 索引元数据断言列序和 DESC/ASC（D/A），不以查询 ORDER BY 替代索引定义验证。报告 `docs/gaussdb/test-results-20260923-index-roundtrip.json`。临时角色清理确认0；不代表表达式/部分索引、批量删除或 GUI 全覆盖。
+
 当前最新：DDL 真库往返批次 **872项，857通过、15跳过、零失败/错误**，`results/run-Zf3fWA`；新增两个生产入口真库场景，见下方。
 
 ### 表 DDL 生产读取及重建（507）
