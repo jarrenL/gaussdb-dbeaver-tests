@@ -103,3 +103,9 @@ OUT 修复尚需新的产品打包与 GUI 回归，旧发布安装包不包含�
 通过生产 DataImporterCSV.runImport 新增 5 项：短行补 NULL + trim；引号逗号/双引号/多行中文；空串与显式 NULL 标记；未闭合引号返回带 IOException 的 DBException；trim + emptyStringNull + 缺列组合。接收器采集生产结果集的实际值，正常结束校验 fetchEnd/close。数据库会话使用 mock，这不是文件向导或数据库写入端到端验收。
 
 首轮红测明确复现 DataImporterCSV.java 的 NullPointerException：短行补齐 null 后直接 trim。生产修复仅跳过 null 元素的 trim，不把缺失值变成空字符串。复跑 CSVImporterTest 12 项全部通过；全量 **800 项，787 通过、13 跳过、0 失败/错误**。证据 `docs/gaussdb/test-results-20260923-import-followup.json`，本地运行 `results/run-iHicdy`。新修复尚未装入正在运行的 GUI 副本或发布包。
+
+### 编码、上限及取消
+
+新增 5 项生产导入器测试：GB18030 中文及扩展字符、无表头 UTF-16LE BOM 去除和前导零保留、maxRows 只计数据行、读取前取消、首行后取消。接收器 fetchEnd/close 断言移入 finally，既有未闭合引号异常路径也验证释放。未声称取消后数据库事务已回滚；接收器仍是 mock。
+
+CSVImporterTest **17 项全部通过**；完整回归 **805 项，792 通过、13 跳过、0 失败/错误**。证据 `docs/gaussdb/test-results-20260923-import-lifecycle.json`，本地运行 `results/run-CA0qP0`。金融字符集覆盖限于本地 CSV 字节解码，不代表数据库连接 client_encoding 或客户金融版本验证。
