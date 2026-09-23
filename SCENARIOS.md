@@ -1,5 +1,7 @@
 # 场景清单与层级
 
+review权限复验：一次性独立sysadmin+专用库/账号/网关窄HBA入口，普通账号不变。run-qwuWKN因HBA所有权未加载而6项连接失败；修正后run-3oeAQZ1265/1247通过/18跳过/零失败错误，断点并发/标记删除与其余5项真库全通过。账号/凭据/grantee删除、schema无残留、HBA恢复hash一致、普通账号systemadmin=false。主仓SKIPPED_REVIEW_AUDIT_20260924.md和复验报告。18跳过继续不算通过。
+
 跳过审计补跑review6项：入口兼容当前隔离central库命名+显式DDL允许，原规则保留。run-mNPloL1265/1246通过/18跳过/1错误，**不是全绿**。包编译诊断2项、重载与COMMIT故障3项新增真库通过；断点测试turn_on需system admin被普通账号拒绝，待独立调试账号，不提升普通账号。五schema无残留、grantee清理。主仓SKIPPED_REVIEW_AUDIT_20260924.md及脱敏结果。
 
 转义脚本提取→执行：集中式/分布式507各7类非空E字符串脚本，每个实际解析3条、原样JDBC执行、精确核对0/目标字符串/2和每条单行。run-1NeeUG1265/1241通过/24跳过/零失败错误。主仓PREDICATE_SCANNER_20260924.md和真库脱敏报告；无生产修改，schema/grantee清理，不替代GUI高亮事件验收。
