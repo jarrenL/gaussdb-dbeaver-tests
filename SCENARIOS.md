@@ -135,3 +135,13 @@ QueryHistoryExecutionTest 新增 6 项：SELECT 的文本/schema/catalog/取数�
 测试启动曾因未初始化 Query Manager 和不支持静态 mock 失败。最终使用应用测试基类并通过 DBWorkbench 正常初始化平台，没有静态 mock 或修改生产日志服务。最新完整回归 **822 项，809 通过、13 跳过、0 失败/错误**，历史 JDBC 类 59 项中 57 通过、2 能力跳过。证据 `docs/gaussdb/test-results-20260923-csv-jdbc.json`，运行 `results/run-1KSrvf`。
 
 边界：接收器是测试 JDBC 写入桥接器，不是生产 DatabaseTransferConsumer；回滚由测试显式执行。因此这些结果不证明导入向导、自动取消回滚、字段映射 UI 已验收。
+
+## 权限 SQL 生成与实际授权范围
+
+PostgrePrivilegeCommandTest 新增 7 项：角色引号及限定对象名、REVOKE 不附带转授权、单项转授权、全部权限转授权、DDL 导出显式 ALL、混合转授权拆分、相反操作合并抵消。首轮红测证实全部权限路径丢失 WITH GRANT OPTION。修复生产 PostgreCommandGrantPrivilege：展开显式 ALL，并将可转授权和普通权限分为独立 GRANT，避免提升其他权限；枚举集合确保输出顺序稳定。权限编辑器和对象 DDL 导出使用该共享入口。
+
+真库新增 productionGrantCommandsPreservePerPrivilegeGrantabilityInDatabase：普通对象拥有者执行生产命令生成的 SQL，向预建 NOLOGIN 测试角色赋 SELECT（可转授权）及 INSERT（不可转授权），用 has_table_privilege 检查两项基本权限、两项转授权和未赋予的 UPDATE；执行生产 REVOKE 后逐项确认为 false。对象元数据为测试 mock，SQL 生成器、厂商 JDBC 和数据库权限检查是真实实现；这不是权限编辑器 GUI 或第二用户实际访问验收。
+
+夹具校正：507 对 NOLOGIN 角色仍要求密码；由管理员在服务器生成符合策略的随机密码。pg_roles 对普通用户过滤其他角色，因此不能以普通用户查不到角色判断不存在；管理员确认 NOLOGIN，测试验证真实授权结果。运行结束删除临时角色并确认角色计数 0，随机 schema 由测试清理。
+
+完整回归 **830 项，817 通过、13 跳过、0 失败/错误**；历史 JDBC 类 60 项中 58 通过、2 能力跳过。证据 `docs/gaussdb/test-results-20260923-privileges.json`，运行 `results/run-lj7A5H`。新修复尚未打入发布包。普通用户拒绝访问、权限 UI、默认权限和列级权限仍待继续覆盖。
