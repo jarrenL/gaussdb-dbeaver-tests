@@ -1,5 +1,7 @@
 # 场景清单与层级
 
+最新SQL折叠版本一致性：1012项、988通过、24跳过、零失败/错误，results/run-mJkx7Z。实际生产策略新增6项确定性测试：缩短、等长替换、文档对象替换、编辑恢复原文、正常多行折叠、混合越界整批拒绝。前三项先在旧代码失败，再在修复后通过。GUI副本尚未更新该插件，不计GUI通过；详见主仓docs/gaussdb/SQL_FOLDING_REVISION_20260923.md及相应脱敏JSON。
+
 最新序列名称字段补强：1006项，982通过、24跳过、零失败/错误，results/run-ianpRl。补齐属性页直接编辑名称的能力表达式：新建可命名、Gauss已持久化名称只读、支持重命名的PG保持可编辑；真实模型/生产属性描述符三分支验证通过。报告test-results-20260923-sequence-name-field.json。名称及重命名菜单GUI仍待更新副本验证，不能沿用此前最后值字段的GUI结果。
 
 最新序列改名门控：1005项，981通过、24跳过、零失败/错误，results/run-ICN7IJ。Gauss扩展关闭rename能力、PG默认保持开启；管理器canRenameObject、提交命令及生成SQL三层控制；3项新增测试覆盖不入队、不产生动作、支持分支中文/双引号转义。真实服务端RENAME探测仍跳过不算支持。报告test-results-20260923-sequence-rename-gate.json；GUI菜单/属性页及新发布包待实测，详见SEQUENCE_CAPABILITY.md。
