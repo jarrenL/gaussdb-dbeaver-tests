@@ -1,5 +1,7 @@
 # 场景清单与层级
 
+DML选项补6项：INSERT/UPDATE/DELETE完整限定名与多行格式三项；缺失绑定时数字/字符串/时间表达式默认值三项各断言INSERT和UPDATE，避免再次加引号。run-Dg3jMg1207/1183通过/24跳过/零失败错误。主仓DML_GENERATOR_OPTIONS_20260924.md及脱敏报告，grantee清理，无生产修改。限定名由模拟实体提供，不算真实schema名称生成/GUI/默认值元数据验收。
+
 UPDATE生成真库：集中式/分布式507各依次写SQL NULL、字面NULL、引号、中文换行、SQL形状文本；每轮实际生成SQL影响1行，更新/回滚/重试提交后均逐行核对全部7行，其他6行不变，参考表7行。随机schema与grantee清理。run-DXB77F1201/1177通过/24跳过/零失败错误；主仓UPDATE_GENERATOR_20260924.md及脱敏报告，无生产修改，不算GUI菜单验收。
 
 DELETE追加6项空键集合不可变性/多行顺序/隐藏伪列/空选择，run-0liDaJ1192/1168通过/24跳过。UPDATE追加7项键值分离、引号、NULL值与NULL键、多行、空选择及隐藏伪列过滤。最终run-CSH3cv1199/1175通过/24跳过/零失败错误；主仓DELETE_GENERATOR_20260924.md、UPDATE_GENERATOR_20260924.md及脱敏报告。本批无生产修改，grantee清理；不算UPDATE真库或GUI验收。
