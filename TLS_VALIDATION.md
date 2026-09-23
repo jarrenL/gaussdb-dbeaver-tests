@@ -27,9 +27,10 @@ bash scripts/run-dbeaver-tests.sh /absolute/path/to/dbeaver
 1. `strictTlsConnectsWithTrustedCertificateAndRejectsMissingTrustFile`：SHOW ssl=on，verify-full连接后查询中文/数值；不存在的信任文件必须报08类连接异常，不得明文回退；原连接仍能查询。
 2. `strictTlsRejectsExistingUnrelatedCertificateWithoutDowngrade`：正确证书先连接成功；有效但无关的证书必须报08类错误且异常链包含SSLHandshakeException；再次使用正确证书查询成功。双向正向对照排除服务器不可用造成的假拒绝。
 3. `requiredSslDoesNotSilentlyDowngradeWhenServerSslIsDisabled`：另在ssl=off时运行，require报08004；prefer允许明文回退。该结果绝不作为加密连接证据。
+4. `strictTlsRejectsTrustedCertificateWithWrongHostname`：服务端另装SAN仅wrong-host.invalid的有效测试证书，客户端通过GAUSSDB_HISTORY_TLS_WRONG_HOST_CA信任它，不同时设置前两项TLS变量。verify-ca前后查询1/2成功，verify-full必须报08类且明确hostname错误，证明证书受信任仍执行主机名校验。此批次不能同时执行要求正确SAN的正向测试。
 
 ## 已验证与待验证
 
 2026-09-23，GaussDB507分布式CN、厂商JDBC、上述1/2通过；第3在此前SSL-off批次通过。TLS-on批次第3跳过，两种互斥环境分开报告。
 
-主机名不匹配、证书过期、双向客户端证书认证、DBeaver证书配置UI、其他目标版本尚未完成。配置映射单测也不能代替这些握手/UI场景。
+主机名不匹配已在独立证书批次验证（run-7KYLa5）。证书过期、双向客户端证书认证、DBeaver证书配置UI、其他目标版本尚未完成。配置映射单测也不能代替这些握手/UI场景。

@@ -1,5 +1,7 @@
 # 场景清单与层级
 
+最新TLS主机名批次：**950项，930通过、20跳过、零失败/错误**，`results/run-7KYLa5`。strictTlsRejectsTrustedCertificateWithWrongHostname以仅SAN=wrong-host.invalid的有效自签名测试证书运行507 CN；客户端信任此证书，verify-ca连接查询1成功，verify-full因hostname校验返回08类异常，再次verify-ca查询2成功。证明校验证书链与校验主机名有别，不以放宽校验作为修复。当前错误SAN环境未运行正确SAN/无关CA两项，另ssl-off场景跳过，均不算通过。报告test-results-20260923-tls-hostname.json，TLS_VALIDATION.md更新。测试后已恢复ssl=off，CSV目标表仍3行，临时grantee删除。无生产代码修改。
+
 最新错误CA批次：**949项，931通过、18跳过、零失败/错误**，`results/run-DULzqA`。strictTlsRejectsExistingUnrelatedCertificateWithoutDowngrade先以正确证书verify-full连接并SELECT1，再以存在且不同的无关证书连接，断言08类SQLSTATE及异常链SSLHandshakeException，最后恢复正确证书SELECT2成功；排除连接不可达的假拒绝。报告test-results-20260923-tls-untrusted-ca.json。新增TLS_VALIDATION.md记录环境准备、参数、断言和未覆盖范围。验证后ssl恢复off，原CSV目标表3行，临时grantee已删除。无生产代码修改；TLS-on时ssl-off反向测试仍跳过，不算通过。
 
 最新TLS真库批次：**948项，930通过、18跳过、零失败/错误**，`results/run-4WBfXG`。新增strictTlsConnectsWithTrustedCertificateAndRejectsMissingTrustFile，以GAUSSDB_HISTORY_TLS_CA指向隔离测试证书；507 CN临时启用SSL，厂商JDBC sslmode=verify-full受信任证书/SAN匹配127.0.0.1或localhost后执行中文/数值查询；信任文件缺失时08类异常，禁止明文回退，原控制连接仍可查询。初次run-NoH0WN握手报Unsupported or unrecognized SSL message，服务端日志明确certificate has group or world access；服务端证书从0644改0600后通过，属于测试配置纠正，非DBeaver修复。TLS-on时原ssl-off反向测试额外跳过，不能把两种互斥环境合并成单轮全通过。报告test-results-20260923-tls-verify-full.json。测试后CN已重启恢复ssl=off、默认server.crt/server.key，原csv_import_probe三行保留，临时grantee删除。仅命令行启动参数临时变化，未编辑gaussdb.conf/HBA。证书/私钥仅在临时目录，私钥0600，不入仓。尚未覆盖错误CA/主机名不匹配/过期证书、双向认证或SSL配置GUI；此用例不代表所有TLS场景完成。
