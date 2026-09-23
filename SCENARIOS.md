@@ -153,3 +153,11 @@ PostgrePrivilegeCommandTest 新增 7 项：角色引号及限定对象名、REVO
 扩展现有真库授权测试，使用 id 和 restricted_value 两列；修复前数据库明确返回 restricted_value 的 SELECT 权限为 true，与预期 false 不符。生产修复改为每一项权限均附列名：`GRANT SELECT(id), UPDATE(id)`。修复后真库逐项验证两列的 SELECT/UPDATE/INSERT，只有 id 的 SELECT/UPDATE 为 true；生产 REVOKE 后全部 false。仍是生产 SQL + JDBC + 数据库权限函数验证，不等于另一登录用户执行查询或 GUI 验收。
 
 命令测试 10 项全部通过；完整回归 **833 项，820 通过、13 跳过、0 失败/错误**。证据 `docs/gaussdb/test-results-20260923-column-privileges.json`，运行 `results/run-TEF5rG`。临时 NOLOGIN 角色已删除并确认计数 0。默认权限目前只验证生成 SQL，未完成真库新对象继承权限验证；发布包尚未更新。
+
+### 默认权限继承与 ACL 名称解析
+
+新增 productionDefaultPrivilegesApplyOnlyToFutureObjectsAndRevocationIsNotRetroactive 真库场景：生产生成的 ALTER DEFAULT PRIVILEGES 仅向专用随机 schema 中以后创建的表赋 SELECT；旧表不追溯授权；撤销后新表无 SELECT，之前已继承权限的表仍保留 SELECT。各阶段同时验证 INSERT 和 SELECT WITH GRANT OPTION 均未意外获得。使用普通对象拥有者连接与预建 NOLOGIN 角色，生产 SQL 生成器、厂商 JDBC、has_table_privilege 均真实执行，元数据对象为 mock。不是第二登录用户访问或 GUI 验收。
+
+PostgreAclParsingTest 新增 4 项：含等号及转义双引号的角色名、授权者名称和逐项转授权标记、PUBLIC/重复角色/无分隔符输入、默认 ACL 的授权者与未授予项。红测发现 ACL 按第一个等号截断引号内角色名，且授权者引号和名称内部双引号未正确还原。生产修复识别引号外分隔符，并用方言的反转义入口处理授权双方名称。名称边界仅为模型测试，不声称已在真库创建特殊名称角色。
+
+完整回归 **838 项，825 通过、13 跳过、0 失败/错误**。证据 `docs/gaussdb/test-results-20260923-default-acl.json`，运行 `results/run-yva6Xu`。管理员删除临时角色并核对计数 0。权限 UI、独立用户拒绝访问等未完成项继续保留。
