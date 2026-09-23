@@ -1,5 +1,7 @@
 # 场景清单与层级
 
+最新收尾取消竞态批次：**921项，905通过、16跳过、零失败/错误**，`results/run-azbk3S`。新增红测在bulk.flushRows回调中设置取消，旧fetchEnd仍调用finishBulkLoad，run-C3qJgw报NeverWantedButInvoked（真实生产入口、确定性mock交错，不是GUI并发压测）。生产修复在最终刷新后及afterDataChange通知前重新检查源/目标监视器，避免沿用入口取消快照。最终三项新测试分别覆盖源端取消、目标端取消以及无取消对照；取消不得finish或通知，正常仍按flush→finish→close执行。报告`test-results-20260923-consumer-cancel-race.json`；临时grantee已删除。此补丁在共享数据传输组件内，不限于GaussDB；未安装进当前GUI隔离副本，不能声称GUI此竞态已复验，运行中工具栏取消仍待补。
+
 最新接收器取消批次：**918项，902通过、16跳过、零失败/错误**，`results/run-3AHbLL`。DatabaseConsumerCleanupTest新增四项：源端已取消但目标端未取消、目标端已取消但源端未取消，都必须在fetchEnd关闭待执行batch且无execute/commit，随后close回滚；bulk模式取消不得flushRows或finishBulkLoad，close只释放bulk资源；空结果重复fetchEnd只关闭batch一次且不提交。断言直接调用生产入口，反射准备运行态、mock事务/批次，不算真实GUI运行中取消通过。报告`test-results-20260923-consumer-cancellation.json`。16项跳过包含本轮未启用的专用GB18030数据库场景；临时grantee已删除。日志中rollback failed/session close failed为异常注入用例预期路径，不是测试失败。
 
 最新接收器清理批次：**914项，898通过、16跳过、零失败/错误**，`results/run-e1Mclr`。新增DatabaseConsumerCleanupTest五项直接调用生产DatabaseTransferConsumer.close：回滚→恢复自动提交→关闭会话/独立连接的顺序且重复关闭不重复释放；回滚失败仍释放资源且不启用自动提交；共享连接不关闭且恢复原手动模式；自动提交状态不发回滚；会话关闭失败仍关闭独立连接。反射只用于准备私有运行态，事务/会话为mock，不声称真实连接或完整取消流程。真实GUI错误停止与间隔提交证据另见GUI_PROGRESS 322–347。本次未配置专用GB18030数据库，因此比此前多1跳过，原通过证据保留但不并入本轮通过数。首次run-9mQp5b测试常量引用错误导致编译失败，修为本分支实际构造方式后完整重跑。报告`test-results-20260923-consumer-cleanup.json`。临时grantee已删除。
