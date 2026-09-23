@@ -1,5 +1,7 @@
 # 场景清单与层级
 
+加密器及临时文件新增15项：5种文本/边界往返、新实例解密、随机IV、8种截断和损坏填充恢复。run-jvBnfx复现0/1/15/16字节未拒绝4项失败，生产DefaultValueEncryptor增加块结构校验后run-lkNWTC 1453项/1429通过/24跳过/零失败错误。grantee删除，CREDENTIAL_FILE_STRUCTURE_20260924.md。不等同完整配置落盘/钥匙串；CBC没有认证保护，不宣称识别全部篡改。
+
 profile存储隔离新增3项：保存开关两种下嵌套user/password不覆盖主字段、中文特殊字符往返、两profile更新互不干扰。run-Mffnzp 1438项/1414通过/24跳过/零失败错误，grantee删除。AUTH_PROFILE_FIELD_ISOLATION_20260924.md；生产无改动、内存模拟控制器。嵌套自定义秘密仍会保存，不宣称保存主密码开关清除全部secret。
 
 凭据保留字段补5项：数据源/profile保存主密码开关各2、空主字段1；run-Ok3AmB复现扩展user/password覆盖主值或重新引入密码5失败。生产序列化跳过同名扩展键后run-E7bLUX 1435项/1411通过/24跳过/零失败错误；其他token及来源Map保留。grantee删除，CREDENTIAL_RESERVED_FIELDS_20260924.md；全用虚构凭据，非实际加密存储/GUI验收。

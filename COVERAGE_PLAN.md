@@ -1,5 +1,7 @@
 # 历史清单覆盖计划
 
+3.13/10.3 加密文件边界：生产DefaultValueEncryptor真实算法和临时文件读写15项通过（run-lkNWTC），修复短于IV+填充块的损坏输入被静默解密为空。完整配置保存链路、权限、原子替换/并发及钥匙串仍待验；LocalSecretController不加密，CBC格式不具完整认证能力。
+
 3.13/10.3 profile嵌套存储字段隔离3项通过（run-Mffnzp）：主字段/扩展user-password隔离、Unicode字符和两key更新隔离。与扁平配置路径不同；嵌套秘密仍持久化，不能把主密码开关等同禁止一切秘密保存；真实加密存储另验。
 
 3.12/3.13/10.3 保留字段冲突：生产DataSourceParser.saveCredentialsToMap修复扩展user/password覆盖和绕过主密码保存选项，5项通过（run-E7bLUX）。其他扩展秘密字段策略、底层存储及GUI未由本轮覆盖。
