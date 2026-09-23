@@ -37,3 +37,5 @@ bash scripts/run-dbeaver-tests.sh /absolute/path/to/dbeaver
 提交前须人工检查覆盖范围、跳过原因、失败处理和敏感信息。构建成功不能替代 GUI 或目标金融版本验收；当前没有完成七千条等价迁移。验证通过后再推送到用户指定的测试仓库，DBeaver 修复单独提交到其源码仓库。
 
 当前场景范围和已知限制见 [场景清单](SCENARIOS.md)。
+
+完整历史清单的逐组登记和剩余工作见 [覆盖计划](COVERAGE_PLAN.md)。该表未完成项不因某一批回归成功而自动关闭。
