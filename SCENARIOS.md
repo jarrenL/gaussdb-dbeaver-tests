@@ -1,5 +1,7 @@
 # 场景清单与层级
 
+日期偏移新增6项：X/XX/XXX/Z自动与显式解析保留偏移和微秒、引用Z保持本地时间、xxx旧格式限制负向断言。修复contains-Z类型推断为parseBest后run-aIRTsG 1407项/1383通过/24跳过/零失败错误。grantee删除；DATE_OFFSET_PARSING_20260924.md记录首次3失败1错误与正向矩阵调整。xxx依旧不支持，不能算功能通过。
+
 小数秒补4项：fff/ffffff/fffffffff各测0/1ms/123456789ns的现代与JDBC日期显示及显式/自动解析，另测引用fff字面量。run-i2YJVL四失败；修复f转S保留位宽/引用后run-x8mLQ4 1401项/1377通过/24跳过/零失败错误。grantee删除；主仓DATE_FRACTION_PRECISION_20260924.md；GUI及可选小数格式另验。
 
 日期输入新增10项：六种非法日期/时间/尾随文本覆盖显式与自动类型、两种年份格式合法闰日偏移、仅日期/时间旧格式往返。run-nJcWDC复现5失败；STRICT+默认ERA及回退完整校验修复后run-O64tLN 1397项/1373通过/24跳过/零失败错误。grantee删除；主仓DATE_INPUT_VALIDATION_20260924.md。GUI错误提示尚未验。
