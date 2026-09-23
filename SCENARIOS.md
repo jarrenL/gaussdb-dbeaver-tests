@@ -1,5 +1,7 @@
 # 场景清单与层级
 
+配置正向及重试新增5项：明文/加密配置+独立加密凭据恢复文件夹和profile两项、缺失凭据仍加载无密码profile两项、失败后正常重试一项。run-IGPrkG 1472项/1448通过/24跳过/零失败错误；grantee删除，无生产改动。CONFIGURATION_READ_FAILURE_20260924.md追加边界：非完整驱动连接或注册表重载、重试初始化凭据Map不证明缓存保留。
+
 公开配置解析入口新增4项：主配置明文/密文读取失败、凭据IO失败/损坏密文均在run-kwB0qD复现异常未传出。移除parseDataSources吞错后run-CnOno0 1467项/1443通过/24跳过/零失败错误，解析变更集合为空、主配置失败不读凭据。grantee删除；CONFIGURATION_READ_FAILURE_20260924.md追加说明。真实注册表及GUI/多文件加载另验。
 
 配置读取补10项：生产readConfiguration普通/加密读取、有效内容后IO失败、立即失败、关闭失败、缺失文件及双故障。run-JcPvwx复现4项吞异常；run-zJbNz5暴露2项重复关闭；改为transferTo+外层单次关闭，run-c2ik2b 1463项/1439通过/24跳过/零失败错误。grantee删除。CONFIGURATION_READ_FAILURE_20260924.md；上层项目加载继续处理策略和GUI仍待验。
