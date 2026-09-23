@@ -51,8 +51,8 @@
 | 9.8 | 表格数据编辑 | 插入/删除/更新、只读列、NULL、约束失败与回滚 | 待补 |
 | 9.9 | 其他表现层 | 游标/结果物化/版本/统计；DN 监控先确认产品入口 | 待核 |
 | 10.1–10.4 | Windows 文件/外部工具/配置 | 平台中立逻辑本地测；Windows 权限、路径、进程须 Windows 实机，不以 Linux 代替 | 待补 |
-| 11.1 | 类型 | numeric/bigint/Unicode/NULL/bytea/timestamp 已有真实往返；数组、JSON、XML、复合、时区等继续补 | 部分 |
-| 11.2 | 函数 | 普通调用已有；数学、字符串、日期、聚合、窗口和系统结果待扩展 | 部分 |
+| 11.1 | 类型 | numeric/bigint/Unicode/NULL/bytea/timestamp、整数数组含 NULL、JSON 嵌套、SQLXML、布尔 wasNull、闰日和 TIME 微秒已验证；复合、时区及 GUI 等继续补 | 部分 |
+| 11.2 | 函数 | 普通调用、count/sum/avg/min/max 空值及精度、row_number/rank/dense_rank 分组与同值排名已验证；数学、字符串、系统等结果仍待扩展 | 部分 |
 | 11.3 | DML/DDL/分布式 SQL | MERGE/UPSERT/分布键/分区/EXECUTE DIRECT：拆分不等于服务端执行，分开验证 | 部分 |
 | 12 | HA/升级/扩缩容/健康/故障注入 | 集群编排、kill、系统加固、Roach 不属客户端；仅提取客户端断线/取消/错误/恢复场景 | 范围外（集群操作）；客户端待补 |
 
