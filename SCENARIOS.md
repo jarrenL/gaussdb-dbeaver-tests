@@ -97,3 +97,9 @@ OUT 修复尚需新的产品打包与 GUI 回归，旧发布安装包不包含�
 首次运行 `results/run-Dg3LyJ` 有 1 项失败：测试错误地期待 YEAR 分类为 TYPE。源码 AbstractSQLDialect.addKeywords 明确保留既有 KEYWORD 优先，避免标识符漏加引号。修正断言为 YEAR 属于类型枚举且分类仍为 KEYWORD；没有为使测试通过改生产行为。
 
 复跑 `results/run-m1qfVB`：**795 项，782 通过、13 跳过、0 失败/错误**。GaussDBDialectTest 的 24 项全部通过。证据 `docs/gaussdb/test-results-20260923-dialect-followup.json`。这是方言 API 契约，不代表全部模式、实时语法检查或编辑器高亮均通过。
+
+## CSV 导入边界与缺陷修复
+
+通过生产 DataImporterCSV.runImport 新增 5 项：短行补 NULL + trim；引号逗号/双引号/多行中文；空串与显式 NULL 标记；未闭合引号返回带 IOException 的 DBException；trim + emptyStringNull + 缺列组合。接收器采集生产结果集的实际值，正常结束校验 fetchEnd/close。数据库会话使用 mock，这不是文件向导或数据库写入端到端验收。
+
+首轮红测明确复现 DataImporterCSV.java 的 NullPointerException：短行补齐 null 后直接 trim。生产修复仅跳过 null 元素的 trim，不把缺失值变成空字符串。复跑 CSVImporterTest 12 项全部通过；全量 **800 项，787 通过、13 跳过、0 失败/错误**。证据 `docs/gaussdb/test-results-20260923-import-followup.json`，本地运行 `results/run-iHicdy`。新修复尚未装入正在运行的 GUI 副本或发布包。
