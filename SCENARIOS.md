@@ -1,5 +1,7 @@
 # 场景清单与层级
 
+最新复合/数组真库批次：977项，957通过、20跳过、零失败/错误，results/run-GKXrge。text[]经createArrayOf/setArray真实入表，getArray保留中文逗号、双引号、反斜杠、换行、字面NULL和null元素；空数组非null且长度0、SQL NULL数组getArray=null/wasNull=true。复合类型真实建表/参数写入，JDBC完整限定类型名、getObject非null、命名字段中文引号及numeric四位小数、NULL复合及字段读取通过。首轮run-jOCUmA短类型名预期错误，实际为带引号schema限定名；据实改成严格完整名断言，非生产缺陷。报告test-results-20260923-composite-array.json；随机schema与临时grantee已清理。未覆盖DBeaver复杂值编辑器、任意嵌套复合/多维数组或所有模式，无产品代码修改。
+
 最新日期时区真库批次：975项，955通过、20跳过、零失败/错误，results/run-evsucb。507 ORA分布式/厂商JDBC新增三项：2024-02-28加一天到闰日保留123456微秒、2023年末加1微秒跨年、闰日date_trunc月首；timestamptz真实入表后UTC/Asia-Shanghai格式化分别15:30/23:30，epoch数值完全一致；to_char/date_trunc/extract对SQL NULL经JDBC读取null且wasNull=true。随机schema清理/连接关闭，无全局时区修改，无产品代码修改。报告test-results-20260923-date-timezone.json，临时grantee删除。不等同客户端本地日期格式、Java时区转换、DST全部边界或结果编辑器验收。
 
 最新事件通知批次：972项，952通过、20跳过、零失败/错误，results/run-uL72tn。QueryHistoryCollectorTest新增失败监听器隔离及移除监听器两项：首个监听器抛异常不影响下个接收和历史入库（此处为内存列表，不是持久化数据库），空周期不重复发送；移除监听器后新事件继续保留但不通知已移除者。实际生产dispatcher单周期，非并发压力/网络消息队列测试；无生产代码修改。报告test-results-20260923-history-listeners.json，临时grantee已删除。
