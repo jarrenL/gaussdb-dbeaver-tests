@@ -1,5 +1,7 @@
 # 场景清单与层级
 
+SQL历史日志补3项：过期命名目录/符号链接不删除、flush失败停止后续写、close失败不重复关闭。run-M8RJGQ复现空目录误删，增加NOFOLLOW_LINKS普通文件过滤。run-r3O4Jp1330项/1306通过/24跳过/零失败错误，临时grantee删除。主仓SQL_HISTORY_CLEANUP_20260924.md及脱敏报告；仅JUnit临时目录，未碰用户日志；非历史GUI/重启/Windows链接权限验收。
+
 XLSX列分组补6项：单列1/重复值/NULL、-1/0/越界、两列首末分组及组内顺序。run-SJsBa6首列不能选择；改1基编号/0禁用，中英文说明同步。run-smJkv21327项/1303通过/24跳过/零失败错误，本类60+真库2，grantee删除。旧非零任务配置需复核，GUI仍1817未含分组修复；主仓XLSX_EXPORT_20260924.md与grouping脱敏报告。
 
 麒麟GUI619–628空结果补验：SELECT两列WHERE false，界面无数据；实际XLSX向导默认表头导出到独立新文件，XML严格1行2列表头id/label、0数据行，通过。主仓XLSX_EXPORT_20260924.md含截图/哈希。无数据库写入，JUnit计数不变；无表头/追加/取消/失败GUI仍待验。
