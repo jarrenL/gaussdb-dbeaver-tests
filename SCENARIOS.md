@@ -115,3 +115,9 @@ CSVImporterTest **17 项全部通过**；完整回归 **805 项，792 通过、1
 新增 4 项真实 507 测试全部通过：过程 RAISE WARNING 能通过 Statement.getWarnings 读取和 clearWarnings 清除且继续查询；结果元数据保留中文/空格别名、列序、numeric(18,4) 精度与标度、varchar(37) 长度；ResultSet/Statement 关闭后操作抛 SQLException，但连接 isValid 且能继续查询；参数化插入含分号/引号/DROP 文本/中文/换行/反斜杠，按完整原文取回且表仍在。
 
 历史 JDBC 类 56 项，54 通过、2 能力跳过。完整回归 **809 项，796 通过、13 跳过、0 失败/错误**。证据 `docs/gaussdb/test-results-20260923-jdbc-contracts.json`，运行 `results/run-idizTN`。仅证明所用厂商驱动和 507 的契约，不代表所有驱动版本或 GUI 警告显示已经验证。
+
+## 连接配置复制隔离
+
+新增 ConnectionConfigurationHistoricalTest 4 项，使用生产 DBPConnectionConfiguration/Bootstrap/ShellCommand：复制后的驱动/provider 属性独立；认证属性从外部 Map 防御复制、复制后移除不影响原值；初始化 SQL、默认 schema 和自动提交配置保留且独立；连接事件命令深复制、修改/清除不影响原对象。命令仅为未执行的测试文本，没有执行外部程序或使用真实凭据。
+
+完整回归 **813 项，800 通过、13 跳过、0 失败/错误**。证据 `docs/gaussdb/test-results-20260923-configuration.json`，运行 `results/run-kdwAWV`。这是配置模型行为，不等于连接文件导入导出、安全存储加密或 SQL 历史持久化验收。
