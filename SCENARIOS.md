@@ -1,5 +1,7 @@
 # 场景清单与层级
 
+麒麟GUI629–638补SQL安全确认：普通账号对隔离表无WHERE UPDATE→中文确认→取消，独立gsql2行原值；重试→确认，2行变更。截图已保存；schema/table删除且目录计数0，编辑器恢复SELECT文本。当前model.sql仍09220932，不代表ONLY修复GUI；JUnit数量未加。其他9条TPDSS质量规则仍待能力核实，不能以解析/执行通过替代告警。
+
 对象过滤匹配补8项：精确包含/排除大小写各2、包含/排除缓存双向切换各1、列表替换1、副本隔离1。run-iKMA0d复现4项失败；修复敏感精确字面量及切换缓存后run-fbwx8P1373项/1349通过/24跳过/零失败错误。grantee删除，主仓OBJECT_FILTER_MATCHING_20260924.md及脱敏结果。导航按方言设敏感性，不宣称独立UI开关或树端到端已验。
 
 兼容凭据存储补5项：替换移除主密码/token、清空单节点保留其他范围、清空末节点与重复清理、profile键、secret-storage模式跳过。run-CtYjF0复现4项旧内容残留；生产saveSecuredCredentials新map替换后run-QICTYu1365项/1341通过/24跳过/零失败错误。grantee删除，主仓CREDENTIAL_REPLACEMENT_20260924.md及脱敏报告。实际文件加密覆盖、GUI及保留字段冲突未覆盖。
