@@ -1,0 +1,4 @@
+id,label,amount,postal
+4,new-before-error,4.0000,00004
+1,duplicate,1.0000,00001
+5,after-error,5.0000,00005
