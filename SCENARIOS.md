@@ -1,5 +1,7 @@
 # 场景清单与层级
 
+ONLY安全检查修复已转绿：run-rAR5u0，1063总数/1039通过/24跳过/零失败错误，安全检查类51项。词法回退识别外层DML/WHERE，保留原执行文本；ONLY注释/子查询/CTE/引用名及非DML负例补齐。507集中式/分布式临时表真实UPDATE ONLY与DELETE FROM ONLY各影响2行，回滚并确认目录0。初次分布式ON COMMIT DROP准备失败已记录，最终统一脚本复跑通过。GUI确认仍待验证，见主仓SQL_SAFETY_COVERAGE_20260923.md。
+
 SQL安全检查新增33项当前为红：run-y1bSnO，31新增通过，UPDATE ONLY/DELETE FROM ONLY无WHERE两项错误返回非危险。保留失败用例待修，不跳过不改预期；详见主仓SQL_SAFETY_COVERAGE_20260923.md和sql-safety-red.json。此前1012项绿灯不能覆盖本轮新增要求。
 
 SQL折叠GUI补充：隔离Linux客户端已更新1.0.185.202609231515，489–503验证两条SQL正确折叠位置、20次长短替换最终无残留、恢复位置、实际鼠标折叠/展开；当前会话无原越界。截图及详细边界见主仓SQL_FOLDING_REVISION_20260923.md。JUnit计数不变，新安装包及更多并发仍待验。
