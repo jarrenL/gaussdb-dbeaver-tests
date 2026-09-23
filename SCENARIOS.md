@@ -1,5 +1,7 @@
 # 场景清单与层级
 
+最新会话终止真库批次：**924项，908通过、16跳过、零失败/错误**，`results/run-TYJMOB`。terminatedOwnSessionRollsBackAndFreshConnectionCanWrite在507上创建随机schema/表及独立同账号writer，writer未提交插入1行且自身可见、controller不可见；controller仅对刚从writer获取的pg_backend_pid调用pg_terminate_backend并断言true。writer后续SELECT必须报57P01或08类连接SQLSTATE。再以独立观察连接确认0行，创建新连接写入id=2/reconnected，原controller也读取相同值。原连接终止、未提交数据不残留、重新连接读写通过，耗时0.188秒；不是整个服务停机/主备切换/网络断连，也不证明DBeaver自动重连弹窗或SQL重试策略。报告`test-results-20260923-session-termination.json`；临时grantee已删除。无产品代码修改。
+
 最新异常关闭批次：**923项，907通过、16跳过、零失败/错误**，`results/run-rdF7uo`。新增红测直接准备待执行batch后调用生产close，旧实现未关闭batch，run-w8XGN7报Wanted but not invoked。closeExporter补充在会话关闭前释放残留batch并清空引用；batch.close异常记录日志但继续事务回滚和会话/独立连接清理。两个新测试验证正常关闭顺序/重复close仅一次，以及batch.close异常不阻断其余资源释放、不提交。反射只准备运行态，未声称GUI泄漏测量或所有JDBC资源已穷尽覆盖。报告`test-results-20260923-consumer-abort-cleanup.json`；临时grantee已删除。此共享组件补丁尚未装入GUI副本，后续集成验收需使用更新bundle。
 
 最新收尾取消竞态批次：**921项，905通过、16跳过、零失败/错误**，`results/run-azbk3S`。新增红测在bulk.flushRows回调中设置取消，旧fetchEnd仍调用finishBulkLoad，run-C3qJgw报NeverWantedButInvoked（真实生产入口、确定性mock交错，不是GUI并发压测）。生产修复在最终刷新后及afterDataChange通知前重新检查源/目标监视器，避免沿用入口取消快照。最终三项新测试分别覆盖源端取消、目标端取消以及无取消对照；取消不得finish或通知，正常仍按flush→finish→close执行。报告`test-results-20260923-consumer-cancel-race.json`；临时grantee已删除。此补丁在共享数据传输组件内，不限于GaussDB；未安装进当前GUI隔离副本，不能声称GUI此竞态已复验，运行中工具栏取消仍待补。
