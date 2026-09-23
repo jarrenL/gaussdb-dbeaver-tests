@@ -252,3 +252,10 @@ productionConstraintAndCompositeTypeSearchFindNamedCatalogObjects 验证真实�
 完整回归两次各865项/850通过/15跳过/零失败错误。报告分别为 `test-results-20260923-distribution-ordinary.json` 和 `test-results-20260923-distribution-monitor.json`。两报告的权限正反用例互补，不能要求同一账号同时拥有和不拥有权限，也不能把环境跳过当通过。测试前确认专用账号 rolsystemadmin=false/rolmonitoradmin=false，授权配置临时 MONADMIN，结束 NOMONADMIN 后再次确认两个字段 false；临时 grantee 删除后计数0。随机 schema 自动清理。
 
 以上为真实厂商 JDBC/507 分布式 SQL 与结果验证，不证明分布策略 GUI 编辑、DDL 导出后重新建表或其他内核版本。ROUNDROBIN 仍是未覆盖能力约束，不能因本机拒绝而宣布历史场景全覆盖。
+
+### 过程/函数生产搜索与跨 schema 隔离
+
+- `productionRoutineSearchUsesCatalogCaseCommentsAndLimit`：在随机 schema 创建大小写函数和过程，调用生产 PostgreStructureAssistant，经真实厂商 JDBC 执行目录 SQL；验证忽略大小写返回两者、区分大小写只返回过程、结果上限1、关闭注释搜索不匹配、打开后只返回带目标注释的函数，并检查引用对象类型。
+- `productionRoutineSearchKeepsSameNamedFunctionsIsolatedAfterDrop`：两个随机 schema 分别创建同名函数，各自范围搜索均只有一条；删除一侧后该侧为空，另一侧仍保留一条。
+- 初次 run-OvyMFb 因测试 JDBC 接口桥接缺少结果集会话上下文报错，不记录为生产缺陷。补齐会话、数据源、厂商服务扩展和真实 ResultSet 对象/数组/布尔读取后，run-IaDGzA 完整回归 **886项、871通过、15跳过、零失败错误**。
+- 脱敏结果 `docs/gaussdb/test-results-20260923-routine-search.json`；随机 schema 自动清理，临时 grantee 已删除。当前覆盖无参对象搜索，不代表有参签名、重载、源码全文搜索或 GUI 搜索已验证。
