@@ -127,3 +127,11 @@ CSVImporterTest **17 项全部通过**；完整回归 **805 项，792 通过、1
 QueryHistoryExecutionTest 新增 6 项：SELECT 的文本/schema/catalog/取数计数及生命周期；DML 影响行与取数行分离；META 查询不会仅凭方言判定标为修改事务；SQLException 保留厂商错误码/文本并标记事务失败；恢复记录的执行+取数耗时；清除错误不丢 SQL 文本。
 
 首轮因模型和测试 OSGi 类加载器不同，包内 API 直接访问触发 IllegalAccessError（测试接入问题）。改为测试中反射调用实际包内方法，没有扩大生产接口。6 项复跑通过；完整回归 **819 项，806 通过、13 跳过、0 失败/错误**。证据 `docs/gaussdb/test-results-20260923-history-model.json`，运行 `results/run-wXjdB7`。没有通过数据库持久化/重启恢复/固定收藏/清理 SQL 历史的证据，这些仍未完成。
+
+## CSV 解析与真实 JDBC 写入衔接
+
+新增 3 项：生产 DataImporterCSV 解析中文、引号、跨行和缺列后经厂商 JDBC 写入，独立观察连接验证提交前不可见、提交后完整值；未闭合引号发生在已写入一行后，显式回滚后无数据；重复主键保留 SQLSTATE 23505，显式回滚后无数据。正常及异常路径均检查接收器 fetchEnd/close，关闭断言失败不能被预期异常测试掩盖。
+
+测试启动曾因未初始化 Query Manager 和不支持静态 mock 失败。最终使用应用测试基类并通过 DBWorkbench 正常初始化平台，没有静态 mock 或修改生产日志服务。最新完整回归 **822 项，809 通过、13 跳过、0 失败/错误**，历史 JDBC 类 59 项中 57 通过、2 能力跳过。证据 `docs/gaussdb/test-results-20260923-csv-jdbc.json`，运行 `results/run-1KSrvf`。
+
+边界：接收器是测试 JDBC 写入桥接器，不是生产 DatabaseTransferConsumer；回滚由测试显式执行。因此这些结果不证明导入向导、自动取消回滚、字段映射 UI 已验收。
