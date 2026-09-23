@@ -1,5 +1,7 @@
 # 场景清单与层级
 
+Linux GUI553–570结果编辑异常恢复：amount=-1保存23514，独立数据10/20不变；放弃恢复10。id改2实际42P10分布键不可改，不算重复键通过。放弃后amount22成功，独立1|22、2|20，UI更新1行保存禁用。仅自动提交失败恢复，不计手动事务回滚。fixture清理，JUnit数不变；主仓RESULTSET_EDITABILITY_20260924.md含截图。错误摘要英文列为后续本地化项。
+
 Linux GUI539–552模型1613：实际查询混合*、计算amount、别名total；计算列内嵌/查看器editable=false且明确无表列提示，total正向editable=true。输入31保存后UI更新1行，独立gsql原表1|31、2|20，计算值32；保存禁用。专用表已删除、脚本恢复SELECT1。主仓RESULTSET_EDITABILITY_20260924.md含截图/版本hash，JUnit数量不变；不是客户桌面云或全部写回场景验收。
 
 通配尾部别名及多通配前后明确列新增8项。run-K8w75a4项按total错查实体列；去掉旧的仅通配前还原限制，使用已映射投影，run-CeOSu4全部1160/1136通过/24跳过/零失败错误，本类37项。主仓RESULTSET_EDITABILITY_20260924.md记录证据，GUI写回/多通配中间歧义仍待补；覆盖计划9.8更新为部分。临时grantee清理。
