@@ -1,6 +1,6 @@
 # 场景清单与层级
 
-最新执行摘要：连接生命周期批次 **860 项，847 通过、13 跳过、零失败/错误**；下文按时间保留各历史批次，不应将旧批次计数当最新总数。Linux GUI 变量修改/非法值拒绝/变量名监视/修改值参与 OUT 计算/回滚/F10 首次暂停终止的独立证据见 [GUI_PROGRESS.md](GUI_PROGRESS.md)，不并入 JUnit 数量。
+最新执行摘要：分布式批次在普通账号、临时监控管理员两个配置下，各 **865 项，850 通过、15 跳过、零失败/错误**。正反权限测试分别在对应配置通过，不能将两个计数相加。ROUNDROBIN 当前被服务端拒绝，仍未通过。下文按时间保留各历史批次，不应将旧批次计数当最新总数。Linux GUI 变量修改/非法值拒绝/变量名监视/修改值参与 OUT 计算/回滚/F10 首次暂停终止的独立证据见 [GUI_PROGRESS.md](GUI_PROGRESS.md)，不并入 JUnit 数量。
 
 最新新增真库方法：`closingConnectionRollsBackUncommittedRowsAndRejectsFurtherStatements`、`enablingAutocommitCommitsPendingRowsButLaterManualRollbackRemainsIsolated`、`readOnlyTransactionRejectsWritesAndNormalConnectionRemainsWritable`。分别验证关闭回滚及已关闭连接拒绝使用、自动提交切换的提交边界、只读事务 SQLSTATE 25006 与恢复后提交。均以其他连接观察实际数据，使用测试随机 schema 并清理。结果 `docs/gaussdb/test-results-20260923-connection-lifecycle.json`，本地执行 `results/run-fIxeiF`。不是连接池、SSL、异常认证或自动重连验收。
 
@@ -211,3 +211,15 @@ productionConstraintAndCompositeTypeSearchFindNamedCatalogObjects 验证真实�
 新增真库 productionSchemaSearchExecutesNamespaceIdBinding，验证生产 schema 查询能执行 mask/OID 参数绑定、返回目标 schema 类型和名称、不存在 mask 返回空。mock 测试证明过滤 SQL 与绑定，真库证明该 SQL 可执行及结果；未声称完整全局搜索 UI 已验收。
 
 完整回归 **857 项，844 通过、13 跳过、0 失败/错误**。证据 `docs/gaussdb/test-results-20260923-schema-search.json`，运行 `results/run-mNVHZn`。临时权限角色删除后计数 0。更多搜索对象类型、跨 catalog、结果上限组合及 UI 仍需覆盖。
+
+### 分布策略、跨节点读取与权限
+
+- `compositeHashKeysIncludingNullPreserveRowsAndAggregation`：复合 HASH 键包含 NULL、中文和单引号，40 行准确保留；count(id)=32、sum=50.00、两组各20行；目录 locator=H，删除 NULL 键后回滚、观察连接仍40行。
+- `replicatedLookupJoinDoesNotMultiplyRowsAcrossDataNodes`：复制维表2行与 HASH 事实表100行 JOIN，每组50行，不因多 DN 放大；目录 locator=R，独立查询维表仍2行。
+- `roundRobinDistributionReturnsEveryRowExactlyOnce`：保留101行唯一性、和、目录断言；当前创建返回 SQLSTATE 0A000，能力跳过，不算通过。初始红测记录 `results/run-HgeN6f`。
+- `ordinaryAccountCannotBypassCoordinatorWithExecuteDirect`：实际普通账号收到42501，随后连接仍可查询，通过 `results/run-xZvUBe`；不是向账号静默提权。
+- `executeDirectOnActualTableNodesReconstructsTheCoordinatorRows`：从测试表 nodeoids 枚举真实 DN，逐节点查询并排序，精确等于1至100，没有丢失或重复；授权配置通过 `results/run-KIRyep`。起初普通账号尝试被明确拒绝（`results/run-2sBV8G`），因此建立两种配置分别验证。
+
+完整回归两次各865项/850通过/15跳过/零失败错误。报告分别为 `test-results-20260923-distribution-ordinary.json` 和 `test-results-20260923-distribution-monitor.json`。两报告的权限正反用例互补，不能要求同一账号同时拥有和不拥有权限，也不能把环境跳过当通过。测试前确认专用账号 rolsystemadmin=false/rolmonitoradmin=false，授权配置临时 MONADMIN，结束 NOMONADMIN 后再次确认两个字段 false；临时 grantee 删除后计数0。随机 schema 自动清理。
+
+以上为真实厂商 JDBC/507 分布式 SQL 与结果验证，不证明分布策略 GUI 编辑、DDL 导出后重新建表或其他内核版本。ROUNDROBIN 仍是未覆盖能力约束，不能因本机拒绝而宣布历史场景全覆盖。

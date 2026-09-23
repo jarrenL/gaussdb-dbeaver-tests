@@ -53,7 +53,7 @@
 | 10.1–10.4 | Windows 文件/外部工具/配置 | 平台中立逻辑本地测；Windows 权限、路径、进程须 Windows 实机，不以 Linux 代替 | 待补 |
 | 11.1 | 类型 | numeric/bigint/Unicode/NULL/bytea/timestamp、整数数组含 NULL、JSON 嵌套、SQLXML、布尔 wasNull、闰日和 TIME 微秒已验证；复合、时区及 GUI 等继续补 | 部分 |
 | 11.2 | 函数 | 普通调用、聚合/窗口、中文字符串与引号处理、abs/ceil/floor/round/mod/power 已通过真实 JDBC 结果断言；系统及更多日期函数仍待扩展 | 部分 |
-| 11.3 | DML/DDL/分布式 SQL | MERGE 更新/插入/回滚、ON DUPLICATE KEY UPDATE、关联子查询含 NULL、JOIN/GROUP BY/HAVING 真库结果已验；更多分布键/分区/EXECUTE DIRECT 和 UI 仍待验 | 部分 |
+| 11.3 | DML/DDL/分布式 SQL | MERGE/UPSERT、子查询、JOIN/GROUP BY/HAVING 已验；复合 HASH 含 NULL/中文、复制表 JOIN 不放大、目录策略已真库验证。EXECUTE DIRECT 普通账号拒绝及监控权限逐 DN 合并100行已分配置验证。ROUNDROBIN 创建被507以0A000拒绝，未通过；更多分区、DDL往返及 UI 仍待验 | 部分 |
 | 12 | HA/升级/扩缩容/健康/故障注入 | 集群编排、kill、系统加固、Roach 不属客户端；仅提取客户端断线/取消/错误/恢复场景 | 范围外（集群操作）；客户端待补 |
 
 ## 补充清单登记
