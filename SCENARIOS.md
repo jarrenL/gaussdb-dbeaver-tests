@@ -1,5 +1,7 @@
 # 场景清单与层级
 
+编码预编译补6项真库：集中式/分布式各extended+threshold0/1/5，同语句8次INSERT及参数SELECT，中文/𠀀/特殊字符/NULL逐值/wasNull及独立连接8行验证，UTF8会话保持；run-CAtm7A1379项/1355通过/24跳过/零失败错误，grantee删除。当前驱动javap显示扩展参数硬编码Utils.encodeUTF8而会话流可改编码，记录GB18030扩展协议限制，不算修复。主仓JDBC_ENCODING_BOUNDARY_20260924.md及脱敏报告。
+
 麒麟GUI672–683补ONLY多语句：UPDATE确认、DELETE取消，独立查2行original，验证预执行确认未提前写入；再运行首框全部为是，UI Queries=2/Updated Rows=4，独立0行，覆盖ONLY正向执行。两截图已检视保存。schema精确清理目录0，未选不再询问，编辑器恢复SELECT；手动事务/混合DROP另验。主仓SQL_SAFETY_GUI_20260924.md。
 
 GUI657–671同步model.sql1858（SHA a4319ab1…b5cd，宿主/容器一致），正常退出后重启。UPDATE ONLY和DELETE FROM ONLY都出现真实确认，分别取消后独立查2行原值/2行，专用schema清理0，截图已存。通用“多行数据/SQL”提示无精确表名为展示限制；未测ONLY确定执行，其他最新插件未同步，不算全新包验收。主仓SQL_SAFETY_GUI_20260924.md。
