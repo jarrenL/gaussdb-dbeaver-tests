@@ -65,3 +65,11 @@ OUT 修复尚需新的产品打包与 GUI 回归，旧发布安装包不包含�
 1 项序列 RESTART 因当前服务端明确返回 0A000（只支持修改 MAXVALUE/OWNER）而跳过，不算通过；原失败记录保留。原组合测试拆成递增正向测试和独立 RESTART 能力测试。生产共享 PostgreSequenceManager 有生成 RESTART 的路径，尚需 GaussDB 能力门控核实，不能宣称该操作适配完成。
 
 完整回归 **773 项：760 通过、13 跳过、0 失败/错误**。历史 JDBC 类 39 项中 37 通过、2 服务端能力跳过。证据：`docs/gaussdb/test-results-20260923-objects-followup.json`。本批不替代对象编辑器、批量删除向导或其他部署形态验收。
+
+## 序列 DDL 导出边界
+
+确认 GaussDB 没有专属 sequence manager 注册，共享 PostgreSQL 模型/编辑链路。RESTART 的服务端能力门控尚未解决，不能据此关闭所有 PostgreSQL 或其他版本的编辑功能。
+
+源码审查发现 `PostgreSequence.getSequenceBody` 仅输出正增量和非负起点，且用默认边界替换已加载的负边界。修复为保留非零增量，以及已加载元数据中的实际 MINVALUE/MAXVALUE/START（含 0 和负值）。新增 4 项生产 DDL 生成测试：降序增量、负边界/起点、零上界、升序缓存与 CYCLE。首轮测试编译因监视器 API 使用错误失败，已修正；未声称首轮红测复现成功。
+
+完整回归 **777 项：764 通过、13 跳过、0 失败/错误**。新增 4 项通过。证据：`docs/gaussdb/test-results-20260923-sequence-ddl-followup.json`。这是 DDL 文本生成验证，尚未完成降序序列跨库重建或 UI 编辑验收。
