@@ -1,5 +1,7 @@
 # 场景清单与层级
 
+最新序列重启门控修复：998项，976通过、22跳过、零失败/错误，results/run-r7TVsA。Gauss扩展关闭RESTART能力，默认PostgreSQL保持开启；当前值查看保留、编辑/更新表达式受控，命令校验及SQL动作生成双重拒绝不支持的lastValue修改，混合属性不产生部分动作，其他属性正常。5项新增测试通过，报告test-results-20260923-sequence-restart-gate.json。详情和版本边界见SEQUENCE_CAPABILITY.md；GUI副本/发布包尚未更新验证。两条服务端RESTART正向仍为跳过，不算支持。
+
 最新序列管理器批次：993项，971通过、22跳过、零失败/错误，results/run-jQcTUO。新增4项生产修改SQL单测覆盖负步长/零上界/NULL当前值/仅循环修改/空修改；新增集中式和分布式2项生产CREATE/DROP真实执行，中文空格名、取号1/2、目录S、删除后42P01、重建从1起及删除无残留均通过。详见SEQUENCE_CAPABILITY.md；报告test-results-20260923-sequence-manager.json。已确认lastValue属性仍会生成GaussDB507不支持的RESTART，能力门控未修；不能将生成SQL测试当作GaussDB支持该语法。本轮无生产代码变更。
 
 最新集中式正向批次：987项，965通过、22跳过、零失败/错误，results/run-puJlJz。恢复507集中式并使用独立普通账号/专用库，月间隔分区生产DDL往返和自动扩展通过；复合外键生产DDL重建后的JDBC元数据、非法引用23503、更新/删除级联通过。集中式序列RESTART仍被服务端以0A000拒绝，未算通过；默认分布式的相应限制记录保留。明细见CENTRAL_ENVIRONMENT.md；报告test-results-20260923-central-partition-fk.json。随机schema/其他连接残留0，临时grantee删除；专用集中式测试库及窄范围密码认证规则保留供后续测试。并非GUI或全部历史场景已验收。
