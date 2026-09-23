@@ -1,5 +1,7 @@
 # 场景清单与层级
 
+原生工具复验run-cc4Ush：普通隔离账号实际gs_dump→gsql plain恢复（4MB级输出）及custom→gs_restore，生产输出重定向/密码管道、无PGPASSWORD、恢复count3/sum6通过。全1265/1242通过/23跳过/零失败错误，本轮未启用上轮六项review，不能混合计数。schema/grantee清理。主仓NATIVE_RECHECK_20260924.md与脱敏报告，GUI/Windows/dumpall空集群另验。
+
 review权限复验：一次性独立sysadmin+专用库/账号/网关窄HBA入口，普通账号不变。run-qwuWKN因HBA所有权未加载而6项连接失败；修正后run-3oeAQZ1265/1247通过/18跳过/零失败错误，断点并发/标记删除与其余5项真库全通过。账号/凭据/grantee删除、schema无残留、HBA恢复hash一致、普通账号systemadmin=false。主仓SKIPPED_REVIEW_AUDIT_20260924.md和复验报告。18跳过继续不算通过。
 
 跳过审计补跑review6项：入口兼容当前隔离central库命名+显式DDL允许，原规则保留。run-mNPloL1265/1246通过/18跳过/1错误，**不是全绿**。包编译诊断2项、重载与COMMIT故障3项新增真库通过；断点测试turn_on需system admin被普通账号拒绝，待独立调试账号，不提升普通账号。五schema无残留、grantee清理。主仓SKIPPED_REVIEW_AUDIT_20260924.md及脱敏结果。
