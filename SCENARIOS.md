@@ -177,3 +177,9 @@ PostgreStructureSearchTest 新增 5 项，通过生产 findObjectsByMask 入口�
 红测确认原逻辑将“过滤后没有 schema”转换为“不限制 schema”并打开查询会话。修复在启用过滤器且零匹配时直接返回空结果。这是客户端可见范围过滤，不是数据库访问权限控制。测试使用 mock JDBC 和元数据，不等于搜索 UI/真库搜索验收。
 
 完整回归 **843 项，830 通过、13 跳过、0 失败/错误**。证据 `docs/gaussdb/test-results-20260923-search-scope.json`，运行 `results/run-XIyhgq`。本次仍预建角色执行两项权限真库场景，结束删除并确认计数 0。搜索结果类型与对象解析、schema 搜索过滤、多类型选择、包/同义词支持情况仍需继续核实。
+
+### 关系类型与跳转目标
+
+新增 5 个关系类型参数化场景（r/p/f/v/m）及 1 个缺失 schema 场景。生产搜索入口必须保留结果类型和名称，通过 schema+OID 解析正确对象；对象随后被删除时抛 DBException；无法解析所属 schema 时不发布无效引用。最初红测证实 p（分区表）和 f（外部表）都被标为 PostgreMaterializedView，修复分别映射为 PostgreTable 与 PostgreTableForeign。r/v/m 原行为保持。
+
+搜索类 11 项全部通过；完整回归 **849 项，836 通过、13 跳过、0 失败/错误**。证据 `docs/gaussdb/test-results-20260923-search-types.json`，运行 `results/run-4zUrtE`。本组为 mock JDBC 目录行的生产搜索入口测试，尚非真库元数据或 GUI 跳转验收。权限回归临时角色已删除且计数 0。
