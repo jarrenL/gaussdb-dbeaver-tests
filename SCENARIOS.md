@@ -1,5 +1,7 @@
 # 场景清单与层级
 
+多语句确认GUI530–538：首条确定/第二条取消整批无执行，全部为是两条赋值再自增结果32，再执行仍警告且取消不改数据。fixture已清理，不等同数据库事务原子性，也不覆盖持久“不再询问”。详见主仓SQL_SAFETY_COVERAGE_20260923.md。
+
 危险查询提示修复：518–529新版SQL编辑器1537真实验证ONLY更新/删除和普通UPDATE，SQL预览、中文目标/类型完整，三次取消数据不变，fixture清理。完整回归run-ArZXkO1063/1039通过/24跳过/零失败错误。上一条UNKNOWN/missing argument缺陷已修，不覆盖偏好开关、多语句或其他静态规则。
 
 ONLY GUI链路：504–517新版模型实际普通账号操作，UPDATE/DELETE取消不改数据、确认执行符合2行更新/0行剩余，独立连接核实，fixture已清理。但弹窗UNKNOWN/missing argument缺陷新发现待修，不能标完整通过。详见主仓SQL_SAFETY_COVERAGE_20260923.md。JUnit数量未变。
