@@ -1,5 +1,7 @@
 # 场景清单与层级
 
+麒麟GUI672–683补ONLY多语句：UPDATE确认、DELETE取消，独立查2行original，验证预执行确认未提前写入；再运行首框全部为是，UI Queries=2/Updated Rows=4，独立0行，覆盖ONLY正向执行。两截图已检视保存。schema精确清理目录0，未选不再询问，编辑器恢复SELECT；手动事务/混合DROP另验。主仓SQL_SAFETY_GUI_20260924.md。
+
 GUI657–671同步model.sql1858（SHA a4319ab1…b5cd，宿主/容器一致），正常退出后重启。UPDATE ONLY和DELETE FROM ONLY都出现真实确认，分别取消后独立查2行原值/2行，专用schema清理0，截图已存。通用“多行数据/SQL”提示无精确表名为展示限制；未测ONLY确定执行，其他最新插件未同步，不算全新包验收。主仓SQL_SAFETY_GUI_20260924.md。
 
 麒麟GUI639–656补DELETE/DROP：隔离表2行，无WHERE DELETE中文确认取消后2行、重试确认后0行；DROP取消目录仍1表、重试确认后0表。两张截图核验保存，未选不再询问；schema清理目录0、编辑器恢复SELECT。主仓SQL_SAFETY_GUI_20260924.md追加证据，JUnit未增；多语句/手动事务/ONLY新包另验。
