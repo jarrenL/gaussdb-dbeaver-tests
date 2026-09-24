@@ -2,6 +2,8 @@
 
 ## 当前状态摘要（优先于下方按时间保留的旧结论）
 
+1.1/1.6/9.7 SELECT副作用门控：新加语法树检查函数/序列/窗口函数/FOR UPDATE/SHARE和嵌套，补ORDER/GROUP/QUALIFY/LIMIT/OFFSET/FETCH/DISTINCT ON。首18项红测全失败，修复并补8项后run-Oexw5t=1630/1607通过/23跳过/0失败。普通字段/常量分页保留恢复；GUI尚待更新，旧pg_sleep自动重试结论不适用于新版。视图内部函数/自定义运算符等仍未证明安全，见SELECT_REPLAY_BOUNDARIES_20260924.md。
+
 1.1/1.6/9.7外层重放修复GUI通过：更新model/SQL插件202609240207，1098 INSERT等待期间精确终止会话，1100错误面板57P01且active/行数0；1102同编辑器恢复中文SELECT=恢复验证中文/42；1104新INSERT VALUES(9)成功，独立仅9，无原值7。清理schema计数0。仅本INSERT执行中断连场景，不代表提交响应丢失/函数副作用/所有SQL恰好一次，见SQL_REPLAY_SAFETY_20260924.md。
 
 1.1/1.6/9.7重放修复复验仍失败：更新202609240158后1088–1090 INSERT仍被外层ResultSetJobDataRead自动重放，1091取消、数据/active均0并清理。已补DBExecUtils.preventAutomaticRecovery传递到整条嵌套恢复链，3项边界测试通过，run-Rjg8sa为1604/1581通过/23跳过/0失败。GUI待再次更新复验，不算修复验收完成。
