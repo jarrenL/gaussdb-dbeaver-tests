@@ -2,6 +2,8 @@
 
 ## 当前状态摘要（优先于下方按时间保留的旧结论）
 
+5.2 重复CASE误报修复：run-s8CdIs三条新增反例复现a AND b/aANDb、a IS NULL/aISNULL、NOT a/NOTa被getText拼接混淆；改为有序token列表后run-onr3O1=1802/1779通过/23跳过/0失败错误。双拓扑507只读返回2|2|2证明分支不同；GUI仍待验，见 SQL_REPEATED_EXPRESSION_20260924.md。
+
 5.2 重复WHEN与相同比较操作数新增31项通过：CASE作用域隔离、七种比较、注释/字符串/引号大小写反例；只提示文本重复，不宣称恒真/恒假或含函数分支必然不可达。run-KaRkN3=1799/1776通过/23跳过/0失败错误。双拓扑507只读结果first|t|t|f确认NULL语义；GUI、算术/逻辑二元运算及规范化仍待补，见 SQL_REPEATED_EXPRESSION_20260924.md。
 
 5.2 LIKE麒麟GUI通过：model.sql更新0439，1228实际中文WARNING offset28/length5准确覆盖模式；1229改显式百分号ESCAPE后1230/1231为0，无旧告警。实际快照verifier通过，验证器5项正反例通过（不并入JUnit），截图见 SQL_LIKE_DIAGNOSTIC_20260924.md。本轮仅编辑不执行；英文/悬停/扩展字面量等仍待验。
