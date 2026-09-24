@@ -2,6 +2,8 @@
 
 ## 当前状态摘要（优先于下方按时间保留的旧结论）
 
+5.2 NOT IN显式NULL第一阶段新增20项通过：列表/子查询投影/UNION及作用域、COALESCE、CASE反例；run-QOF6Io=1839/1816通过/23跳过/0失败错误。双拓扑507只读t|t|t|t|f确认空子查询及已有匹配值不能一概判UNKNOWN。GUI、列元数据/外连接/表达式可空性推导仍未完成，不标整条规则完成；见 SQL_NOT_IN_NULL_20260924.md。
+
 5.2 EXISTS自身WHERE作用域检查新增17项通过；run-pqjUxd=1819/1796通过/23跳过/0失败错误。双拓扑507只读结果t|f|f|t；麒麟GUI 1252中文WARNING offset15/length50，1254修正后0，实际两状态验证器通过，验证器6项独立测试通过。仅审查提示、不判定SQL非法；VALUES-only/不完整语法/其他方言等仍待专项验证。见 SQL_EXISTS_DIAGNOSTIC_20260924.md。
 
 5.2 重复表达式麒麟GUI通过：model.sql更新0450，1239第二WHEN与相同比较各一条中文WARNING且范围正确；1241/1242修正后0；1244/1245三个词法边界反例0。实际三状态verifier通过，验证器6项正反例通过（不并入JUnit）；只编辑未执行，见 SQL_REPEATED_EXPRESSION_20260924.md及截图。其余表达式类别/英文/悬停仍待验。
