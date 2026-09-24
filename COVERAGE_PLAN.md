@@ -2,6 +2,8 @@
 
 ## 当前状态摘要（优先于下方按时间保留的旧结论）
 
+1.1/1.6/9.7外层重放修复GUI通过：更新model/SQL插件202609240207，1098 INSERT等待期间精确终止会话，1100错误面板57P01且active/行数0；1102同编辑器恢复中文SELECT=恢复验证中文/42；1104新INSERT VALUES(9)成功，独立仅9，无原值7。清理schema计数0。仅本INSERT执行中断连场景，不代表提交响应丢失/函数副作用/所有SQL恰好一次，见SQL_REPLAY_SAFETY_20260924.md。
+
 1.1/1.6/9.7重放修复复验仍失败：更新202609240158后1088–1090 INSERT仍被外层ResultSetJobDataRead自动重放，1091取消、数据/active均0并清理。已补DBExecUtils.preventAutomaticRecovery传递到整条嵌套恢复链，3项边界测试通过，run-Rjg8sa为1604/1581通过/23跳过/0失败。GUI待再次更新复验，不算修复验收完成。
 
 1.1/1.6/9.7新增实际缺陷：1078 INSERT SELECT pg_sleep期间终止专用会话后仍重放，1081取消、active与行数均0并清理。旧自动恢复门控未识别类型默认允许，现改为成功PlainSelect且无INTO/WITH才允许；新增19项通过，run-I3dSGg为1601/1578通过/23跳过/0失败。GUI副本待更新复验；SELECT函数副作用和提交不确定仍待处理。见SQL_REPLAY_SAFETY_20260924.md，不标写操作端到端通过。
