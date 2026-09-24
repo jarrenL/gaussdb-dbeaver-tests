@@ -2,6 +2,8 @@
 
 ## 当前状态摘要（优先于下方按时间保留的旧结论）
 
+1.1/1.5/3.9表空间缓存异常传播：生产TablespaceCache取消吞掉全部异常的覆盖，恢复父类失败传播；7种SQLSTATE（含包装异常）红测全部失败→修复后通过。run-qzhcT3为1582/1559通过/23跳过/0失败。共享PG行为变化：权限/目录缺失同样显式报告，不再静默空列表。仅策略单测，GUI断连恢复复验仍待补，见TABLESPACE_CACHE_FAILURE_20260924.md。
+
 3.9 GUI修复复验：更新测试副本PostgreSQL插件至2.1.258.202609240113，正常重启后1049和1052分别显示pg_default/pg_global名称及可见DDL，无源码错误；1051刷新目录仍显示两对象。verify-tablespace-preview验证真实dump通过，验证器5项自测通过（不计入JUnit）。系统表空间未执行DDL；自定义对象创建/删除GUI、变更后刷新和未知OWNER所有权迁移仍待覆盖。
 
 3.9麒麟GUI新增证据：1030–1037发现元数据连接57P01后空树，SQL查询恢复返回2行，导航重新显示pg_default/pg_global；双击pg_default发现DDL预览所有者null导致NPE。已按PostgreSchema惯例省略未知OWNER子句，新增回归通过，run-came2H为1575/1552通过/23跳过/0失败。OWNER省略不保证原所有权等价复制；GUI副本尚未更新复验。详见主仓TABLESPACE_GUI_VALIDATION_20260924.md，不能标为完整GUI通过。
