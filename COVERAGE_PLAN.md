@@ -2,6 +2,8 @@
 
 ## 当前状态摘要（优先于下方按时间保留的旧结论）
 
+空bytea适配扩展到非NULL且确定长度0的JDBCContentBLOB，新增7项组件测试含真实空文件/缺失文件、未知长度/读长失败不误写、NULL/非空委托。run-Gketea=1882/1866通过/16跳过/0失败错误；缓存bytea真库原生回归仍通过，临时调试授权0。Blob文件GUI/真库端到端仍待验，不以组件替代；见 EMPTY_BYTEA_BINDING_20260924.md。
+
 空bytea写入修复：GaussDB专用handler对缓存空字节绑定参数化\\x/OTHER，其余值沿用原路径，新增5项单测；run-CG6GMY=1875/1859通过/16跳过/0失败错误。原生测试夹具通过生产provider/handler桥接真实JDBC写入再备份恢复，空值基线与恢复均通过；双拓扑独立协议对照一致。GUI、其他模式和BLOB容器仍未闭环，厂商直接setBytes(empty)未改变；见 EMPTY_BYTEA_BINDING_20260924.md。
 
 原生恢复增加零长度与1MiB+3字节bytea，备份前基线、各恢复检查点长度+SHA256均通过：run-MzXhjh=1870/1854通过/16跳过/0失败错误。初次run-Qhs9Ux暴露独立缺口：厂商JDBC setBytes(empty)写为SQL NULL，而服务端生成空bytea保持非NULL长度0；已独立临时表对照证实，写入兼容缺口仍未修复。恢复夹具改服务端生成不算修复绑定问题。见 NATIVE_RESTORE_PAYLOAD_20260924.md。
