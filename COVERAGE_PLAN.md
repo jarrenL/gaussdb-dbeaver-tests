@@ -2,6 +2,8 @@
 
 ## 当前状态摘要（优先于下方按时间保留的旧结论）
 
+原生单库工具再次启用并扩充bytea/布尔NULL数据断言：run-U8JtU5原用例通过，run-myQeSn新断言通过；1870/1854通过/16跳过/0失败错误，方法计数不变。实际gs_dump/gsql/gs_restore多格式/结构数据分离及失败重试逐字节验证00/01/7F/80/FF、TRUE/FALSE/NULL；结束6个测试schema及临时调试成员均0。GUI/分布式原生/空集群dumpall仍未通过，见 NATIVE_RESTORE_PAYLOAD_20260924.md。
+
 可选真库6项重新启用通过：首次run-RNo0TX断点项因无调试角色失败，其余5项通过；仅临时授gs_role_pldebugger后run-2qoXvE=1870/1853通过/17跳过/0失败错误，退出撤销授权，独立查询角色成员及5个schema均0。覆盖真包编译/诊断、断点、重载、提交响应丢失及取消；23→17不是删除测试。剩余17分类见 SKIP_AUDIT_20260924.md，既往TLS/编码独立批次不混计本轮。
 
 Unicode跨质量规则9项通过：SELECT/INSERT/ORDER/LIKE/比较/EXISTS/NOT IN/两种CASE精确范围；run-0Hjcqq=1870/1847通过/23跳过/0失败错误。GUI1276同脚本五类中文WARNING逐一通过全脚本UTF-16区间验证（未执行SQL，不增加JUnit数），见 SQL_UNICODE_RANGE_20260924.md；跨token导航等仍待补。
