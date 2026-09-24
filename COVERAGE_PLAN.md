@@ -2,6 +2,8 @@
 
 ## 当前状态摘要（优先于下方按时间保留的旧结论）
 
+5.2 LIKE麒麟GUI通过：model.sql更新0439，1228实际中文WARNING offset28/length5准确覆盖模式；1229改显式百分号ESCAPE后1230/1231为0，无旧告警。实际快照verifier通过，验证器5项正反例通过（不并入JUnit），截图见 SQL_LIKE_DIAGNOSTIC_20260924.md。本轮仅编辑不执行；英文/悬停/扩展字面量等仍待验。
+
 5.2 LIKE前导通配符告警新增26项通过：LIKE/ILIKE/NOT LIKE、中文、注释、单引号、ESCAPE以及动态模式反例；只对确定普通字符串字面量提示，不把未知模式当安全。run-8MTZO9=1768/1745通过/23跳过/0失败错误。集中式/分布式507只读验证自定义百分号/下划线转义与ILIKE均为true；GUI及扩展字符串仍待验，见 SQL_LIKE_DIAGNOSTIC_20260924.md。
 
 5.2 三条质量规则麒麟GUI通过：1216同脚本实际出现INSERT/SELECT星号/ORDER序号三条中文WARNING且范围精确；1218/1219修正后0。实际快照verifier通过，其6项正反例通过（不并入JUnit）。专用夹具始终0行，精确删表/schema后目录0；见 SQL_QUERY_QUALITY_20260924.md及截图。鼠标悬停/英文及更多方言仍待验。
