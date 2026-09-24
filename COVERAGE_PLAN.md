@@ -2,6 +2,8 @@
 
 ## 当前状态摘要（优先于下方按时间保留的旧结论）
 
+1.1/1.6/9.7重放修复复验仍失败：更新202609240158后1088–1090 INSERT仍被外层ResultSetJobDataRead自动重放，1091取消、数据/active均0并清理。已补DBExecUtils.preventAutomaticRecovery传递到整条嵌套恢复链，3项边界测试通过，run-Rjg8sa为1604/1581通过/23跳过/0失败。GUI待再次更新复验，不算修复验收完成。
+
 1.1/1.6/9.7新增实际缺陷：1078 INSERT SELECT pg_sleep期间终止专用会话后仍重放，1081取消、active与行数均0并清理。旧自动恢复门控未识别类型默认允许，现改为成功PlainSelect且无INTO/WITH才允许；新增19项通过，run-I3dSGg为1601/1578通过/23跳过/0失败。GUI副本待更新复验；SELECT函数副作用和提交不确定仍待处理。见SQL_REPLAY_SAFETY_20260924.md，不标写操作端到端通过。
 
 1.1/1.5/1.6/9.7运行中断连GUI：1069执行唯一标记pg_sleep，独立确认active后只终止目标SQL编辑器会话；实际自动重连并重试只读查询。1072点击Cancel、1073日志取消且active计数0；1074–1076同编辑器中文查询成功，结果文本逐值显示恢复验证中文/42。不是DML安全重试或网络分区验收，详见QUERY_INFLIGHT_DISCONNECT_GUI_20260924.md。
