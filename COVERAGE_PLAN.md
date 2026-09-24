@@ -2,6 +2,8 @@
 
 ## 当前状态摘要（优先于下方按时间保留的旧结论）
 
+原生恢复增加零长度与1MiB+3字节bytea，备份前基线、各恢复检查点长度+SHA256均通过：run-MzXhjh=1870/1854通过/16跳过/0失败错误。初次run-Qhs9Ux暴露独立缺口：厂商JDBC setBytes(empty)写为SQL NULL，而服务端生成空bytea保持非NULL长度0；已独立临时表对照证实，写入兼容缺口仍未修复。恢复夹具改服务端生成不算修复绑定问题。见 NATIVE_RESTORE_PAYLOAD_20260924.md。
+
 原生单库工具再次启用并扩充bytea/布尔NULL数据断言：run-U8JtU5原用例通过，run-myQeSn新断言通过；1870/1854通过/16跳过/0失败错误，方法计数不变。实际gs_dump/gsql/gs_restore多格式/结构数据分离及失败重试逐字节验证00/01/7F/80/FF、TRUE/FALSE/NULL；结束6个测试schema及临时调试成员均0。GUI/分布式原生/空集群dumpall仍未通过，见 NATIVE_RESTORE_PAYLOAD_20260924.md。
 
 可选真库6项重新启用通过：首次run-RNo0TX断点项因无调试角色失败，其余5项通过；仅临时授gs_role_pldebugger后run-2qoXvE=1870/1853通过/17跳过/0失败错误，退出撤销授权，独立查询角色成员及5个schema均0。覆盖真包编译/诊断、断点、重载、提交响应丢失及取消；23→17不是删除测试。剩余17分类见 SKIP_AUDIT_20260924.md，既往TLS/编码独立批次不混计本轮。
