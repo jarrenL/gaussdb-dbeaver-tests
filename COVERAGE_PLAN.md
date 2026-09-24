@@ -2,6 +2,8 @@
 
 ## 当前状态摘要（优先于下方按时间保留的旧结论）
 
+5.2 EXISTS自身WHERE作用域检查新增17项通过；run-pqjUxd=1819/1796通过/23跳过/0失败错误。双拓扑507只读结果t|f|f|t；麒麟GUI 1252中文WARNING offset15/length50，1254修正后0，实际两状态验证器通过，验证器6项独立测试通过。仅审查提示、不判定SQL非法；VALUES-only/不完整语法/其他方言等仍待专项验证。见 SQL_EXISTS_DIAGNOSTIC_20260924.md。
+
 5.2 重复表达式麒麟GUI通过：model.sql更新0450，1239第二WHEN与相同比较各一条中文WARNING且范围正确；1241/1242修正后0；1244/1245三个词法边界反例0。实际三状态verifier通过，验证器6项正反例通过（不并入JUnit）；只编辑未执行，见 SQL_REPEATED_EXPRESSION_20260924.md及截图。其余表达式类别/英文/悬停仍待验。
 
 5.2 重复CASE误报修复：run-s8CdIs三条新增反例复现a AND b/aANDb、a IS NULL/aISNULL、NOT a/NOTa被getText拼接混淆；改为有序token列表后run-onr3O1=1802/1779通过/23跳过/0失败错误。双拓扑507只读返回2|2|2证明分支不同；GUI仍待验，见 SQL_REPEATED_EXPRESSION_20260924.md。
