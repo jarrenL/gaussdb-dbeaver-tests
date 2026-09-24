@@ -2,6 +2,8 @@
 
 ## 当前状态摘要（优先于下方按时间保留的旧结论）
 
+1.1/1.5/3.9 GUI空闲连接恢复已验：插件更新202609240142，按专用Metadata的pid/账号/库/application/idle联合筛选终止，主连接保留；1063展开命中缓存不算通过，1065目录刷新后1066两系统表空间可见，独立确认Metadata新pid且Main不变、日志记录Invalidate恢复。此场景通过，不替代查询中途断连/网络分区/取消GUI验收，见TABLESPACE_CACHE_FAILURE_20260924.md。
+
 1.1/1.5/3.9表空间缓存异常传播：生产TablespaceCache取消吞掉全部异常的覆盖，恢复父类失败传播；7种SQLSTATE（含包装异常）红测全部失败→修复后通过。run-qzhcT3为1582/1559通过/23跳过/0失败。共享PG行为变化：权限/目录缺失同样显式报告，不再静默空列表。仅策略单测，GUI断连恢复复验仍待补，见TABLESPACE_CACHE_FAILURE_20260924.md。
 
 3.9 GUI修复复验：更新测试副本PostgreSQL插件至2.1.258.202609240113，正常重启后1049和1052分别显示pg_default/pg_global名称及可见DDL，无源码错误；1051刷新目录仍显示两对象。verify-tablespace-preview验证真实dump通过，验证器5项自测通过（不计入JUnit）。系统表空间未执行DDL；自定义对象创建/删除GUI、变更后刷新和未知OWNER所有权迁移仍待覆盖。
