@@ -2,6 +2,8 @@
 
 ## 当前状态摘要（优先于下方按时间保留的旧结论）
 
+Unicode跨质量规则9项通过：SELECT/INSERT/ORDER/LIKE/比较/EXISTS/NOT IN/两种CASE精确范围；run-0Hjcqq=1870/1847通过/23跳过/0失败错误。GUI1276同脚本五类中文WARNING逐一通过全脚本UTF-16区间验证（未执行SQL，不增加JUnit数），见 SQL_UNICODE_RANGE_20260924.md；跨token导航等仍待补。
+
 Unicode后续16项通过：Reader/字符串12项字符流坐标契约及4项引号标识符/扩展汉字语义定位；run-Mb1T5q=1861/1838通过/23跳过/0失败错误。GUI同SQL 1266旧offset25错误，LSM0527后1271为正确28/8，1273修正后0；实际三状态验证器及其6项测试通过。截图部分缺字不等于数据丢失，字体覆盖另验；跨token导航/其他规则矩阵仍待补。见 SQL_UNICODE_RANGE_20260924.md。
 
 SQL Unicode范围缺陷修复：新增6项严格原文范围断言，run-Z87Dnj中5项复现补充平面字符后偏移少算；STMSource字符串/Reader统一UTF-16输入，run-b54PWn=1845/1822通过/23跳过/0失败错误。双拓扑507只读😀🧪|2|t。GUI、Reader专项和标识符/导航范围矩阵仍待补，见 SQL_UNICODE_RANGE_20260924.md；共享解析器不能按单方言宣称完整验收。
