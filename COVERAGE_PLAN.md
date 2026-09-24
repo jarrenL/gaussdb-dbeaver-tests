@@ -2,6 +2,8 @@
 
 ## 当前状态摘要（优先于下方按时间保留的旧结论）
 
+5.2 NULL告警麒麟GUI三项通过：1203中文WARNING精确覆盖1 = NULL；1205/1206改IS NOT NULL后清除；1208中文三行脚本offset27/length8正确，截图有实际标记。verify-null-diagnostic-gui验证实际快照通过，验证器5项正反例通过（不并入JUnit）。model/lsm/sql验收副本已更新0410，鼠标悬停/英文/交付整包仍另验；见 SQL_NULL_DIAGNOSTIC_20260924.md。
+
 5.2 无FROM WHERE边界已补：标准语法新增非空WHERE起始分支，17个新增正反例含嵌套/UNION/ORDER BY+LIMIT通过；run-7ibMBk=1710/1687通过/23跳过/0失败错误。集中式和分布式507 gsql只读验证NULL比较UNKNOWN、WHERE过滤零行与正确空值判断返回行。GUI和其他无FROM子句组合仍未验，见 SQL_NULL_DIAGNOSTIC_20260924.md。
 
 5.2 NULL直接比较告警新增：生产语义识别器对七种比较运算符的直接NULL产生中英WARNING及源码区间，接入现有诊断传递路径；25个正反例通过。run-6LRM2D=1693/1670通过/23跳过/0失败错误。无FROM的WHERE解析缺口、CAST/可空性、其他质量规则及GUI仍未覆盖，不能以替换为带FROM用例消除缺口。详见 SQL_NULL_DIAGNOSTIC_20260924.md（含两轮测试依赖错误记录）。
