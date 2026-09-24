@@ -2,6 +2,8 @@
 
 ## 当前状态摘要（优先于下方按时间保留的旧结论）
 
+三类空内容真库绑定通过：生产provider/handler分别处理缓存bytea、实际SerialBlob、实际零字节文件BLOB，每次UPDATE后SQL非NULL/长度0/getBytes空数组断言通过，释放后文件仍在；随后全套原生恢复回归通过。run-ZwEbec=1882/1866通过/16跳过/0失败错误，方法数不变；测试schema及临时调试成员均0。GUI和其他模式仍未闭环，见 EMPTY_BYTEA_BINDING_20260924.md。
+
 空bytea适配扩展到非NULL且确定长度0的JDBCContentBLOB，新增7项组件测试含真实空文件/缺失文件、未知长度/读长失败不误写、NULL/非空委托。run-Gketea=1882/1866通过/16跳过/0失败错误；缓存bytea真库原生回归仍通过，临时调试授权0。Blob文件GUI/真库端到端仍待验，不以组件替代；见 EMPTY_BYTEA_BINDING_20260924.md。
 
 空bytea写入修复：GaussDB专用handler对缓存空字节绑定参数化\\x/OTHER，其余值沿用原路径，新增5项单测；run-CG6GMY=1875/1859通过/16跳过/0失败错误。原生测试夹具通过生产provider/handler桥接真实JDBC写入再备份恢复，空值基线与恢复均通过；双拓扑独立协议对照一致。GUI、其他模式和BLOB容器仍未闭环，厂商直接setBytes(empty)未改变；见 EMPTY_BYTEA_BINDING_20260924.md。
