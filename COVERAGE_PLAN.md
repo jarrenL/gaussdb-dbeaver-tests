@@ -2,6 +2,8 @@
 
 ## 当前状态摘要（优先于下方按时间保留的旧结论）
 
+5.2 新增SELECT星号、INSERT列名、ORDER BY序号三条中英WARNING及32个正反例，包含COUNT(*)/乘法/字符串/窗口常量不误报。INSERT语法补不带列名VALUES/SELECT/DEFAULT VALUES。run-RTgXAD=1742/1719通过/23跳过/0失败错误。双拓扑507临时表三种INSERT及排序得到1/2/7与汇总3/10，回滚后目录0；分布式ON COMMIT DROP拒绝单列记录。GUI尚待验，见 SQL_QUERY_QUALITY_20260924.md。
+
 5.2 NULL告警麒麟GUI三项通过：1203中文WARNING精确覆盖1 = NULL；1205/1206改IS NOT NULL后清除；1208中文三行脚本offset27/length8正确，截图有实际标记。verify-null-diagnostic-gui验证实际快照通过，验证器5项正反例通过（不并入JUnit）。model/lsm/sql验收副本已更新0410，鼠标悬停/英文/交付整包仍另验；见 SQL_NULL_DIAGNOSTIC_20260924.md。
 
 5.2 无FROM WHERE边界已补：标准语法新增非空WHERE起始分支，17个新增正反例含嵌套/UNION/ORDER BY+LIMIT通过；run-7ibMBk=1710/1687通过/23跳过/0失败错误。集中式和分布式507 gsql只读验证NULL比较UNKNOWN、WHERE过滤零行与正确空值判断返回行。GUI和其他无FROM子句组合仍未验，见 SQL_NULL_DIAGNOSTIC_20260924.md。
