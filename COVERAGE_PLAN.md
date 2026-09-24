@@ -2,6 +2,8 @@
 
 ## 当前状态摘要（优先于下方按时间保留的旧结论）
 
+5.2 三条质量规则麒麟GUI通过：1216同脚本实际出现INSERT/SELECT星号/ORDER序号三条中文WARNING且范围精确；1218/1219修正后0。实际快照verifier通过，其6项正反例通过（不并入JUnit）。专用夹具始终0行，精确删表/schema后目录0；见 SQL_QUERY_QUALITY_20260924.md及截图。鼠标悬停/英文及更多方言仍待验。
+
 5.2 新增SELECT星号、INSERT列名、ORDER BY序号三条中英WARNING及32个正反例，包含COUNT(*)/乘法/字符串/窗口常量不误报。INSERT语法补不带列名VALUES/SELECT/DEFAULT VALUES。run-RTgXAD=1742/1719通过/23跳过/0失败错误。双拓扑507临时表三种INSERT及排序得到1/2/7与汇总3/10，回滚后目录0；分布式ON COMMIT DROP拒绝单列记录。GUI尚待验，见 SQL_QUERY_QUALITY_20260924.md。
 
 5.2 NULL告警麒麟GUI三项通过：1203中文WARNING精确覆盖1 = NULL；1205/1206改IS NOT NULL后清除；1208中文三行脚本offset27/length8正确，截图有实际标记。verify-null-diagnostic-gui验证实际快照通过，验证器5项正反例通过（不并入JUnit）。model/lsm/sql验收副本已更新0410，鼠标悬停/英文/交付整包仍另验；见 SQL_NULL_DIAGNOSTIC_20260924.md。
