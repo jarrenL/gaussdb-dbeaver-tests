@@ -30,10 +30,13 @@ function run(bin, args) {
 }
 console.log('Focused output: ' + output);
 run('javac', ['--release', '21', '-cp', cp.join(':'), '-d', output,
+ root + '/plugins/org.jkiss.dbeaver.ext.postgresql/src/org/jkiss/dbeaver/ext/postgresql/tasks/PostgreDatabaseBackupHandler.java',
+ root + '/test/org.jkiss.dbeaver.ext.gaussdb.test/src/org/jkiss/dbeaver/ext/gaussdb/model/GaussDBBackupPublishTest.java',
  root + '/plugins/org.jkiss.dbeaver.ext.postgresql/src/org/jkiss/dbeaver/ext/postgresql/tasks/PostgreNativeToolHandler.java',
  root + '/plugins/org.jkiss.dbeaver.ext.postgresql/src/org/jkiss/dbeaver/ext/postgresql/tasks/PostgreDatabaseRestoreHandler.java',
  root + '/plugins/org.jkiss.dbeaver.ext.postgresql/src/org/jkiss/dbeaver/ext/postgresql/tasks/PostgreScriptExecuteHandler.java',
  root + '/test/org.jkiss.dbeaver.ext.gaussdb.test/src/org/jkiss/dbeaver/ext/gaussdb/model/GaussDBNativePasswordTest.java']);
 run('java', ['-javaagent:' + agent, '-Djava.awt.headless=true', '-cp', cp.join(':'),
  'org.junit.platform.console.ConsoleLauncher', 'execute', '--select-class',
- 'org.jkiss.dbeaver.ext.gaussdb.model.GaussDBNativePasswordTest', '--details=summary', '--disable-banner']);
+ 'org.jkiss.dbeaver.ext.gaussdb.model.GaussDBNativePasswordTest', '--select-class',
+ 'org.jkiss.dbeaver.ext.gaussdb.model.GaussDBBackupPublishTest', '--details=summary', '--disable-banner']);
