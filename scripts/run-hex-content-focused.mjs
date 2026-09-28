@@ -4,7 +4,8 @@ import {spawnSync} from 'node:child_process';
 const root = process.env.DBEAVER_REPO || '/Users/lj/Documents/GaussDB/dbeaver-icbc-26.1.5';
 const java = '/Library/Java/JavaVirtualMachines/jdk-25.jdk/Contents/Home/bin/';
 const output = fs.mkdtempSync('/tmp/hex-content-test-');
-const cp = [output, path.resolve('fixtures/mockito-inline'), '/Users/lj/Documents/GaussDB/dbeaver-common/modules/org.jkiss.utils/target/classes'];
+const editorTests = root + '/test/org.jkiss.dbeaver.ui.editors.data.test/src/';
+const cp = [output, editorTests, '/Users/lj/Documents/GaussDB/dbeaver-common/modules/org.jkiss.utils/target/classes'];
 for (const name of fs.readdirSync(root + '/plugins')) {
  const classes = path.join(root, 'plugins', name, 'target/classes');
  if (fs.existsSync(classes)) cp.push(classes);
@@ -33,10 +34,10 @@ run('javac', ['--release', '21', '-cp', cp.join(':'), '-d', output,
  root + '/plugins/org.jkiss.dbeaver.model.jdbc/src/org/jkiss/dbeaver/model/impl/jdbc/data/JDBCContentBytes.java',
  root + '/plugins/org.jkiss.dbeaver.ui.editors.data/src/org/jkiss/dbeaver/ui/data/managers/stream/TextEditorPart.java',
  root + '/plugins/org.jkiss.dbeaver.ui.editors.base/src/org/jkiss/dbeaver/ui/editors/text/FileRefDocumentProvider.java',
- path.resolve('fixtures/java/BinaryEditorContentReloadTest.java'),
+ editorTests + 'org/jkiss/dbeaver/acceptance/BinaryEditorContentReloadTest.java',
  root + '/test/org.jkiss.dbeaver.test.platform/src/org/jkiss/dbeaver/model/impl/jdbc/data/JDBCContentBytesReadTest.java',
- path.resolve('fixtures/java/TextEditorContentReloadTest.java'),
- path.resolve('fixtures/java/ContentEditorFileImportTest.java')]);
+ editorTests + 'org/jkiss/dbeaver/acceptance/TextEditorContentReloadTest.java',
+ editorTests + 'org/jkiss/dbeaver/ui/editors/content/ContentEditorFileImportTest.java']);
 run('java', ['-javaagent:' + agent, '-Djava.awt.headless=true', '-cp', cp.join(':'),
  'org.junit.platform.console.ConsoleLauncher', 'execute', '--select-class',
  'org.jkiss.dbeaver.acceptance.BinaryEditorContentReloadTest', '--fail-if-no-tests',

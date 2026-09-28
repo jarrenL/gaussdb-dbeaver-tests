@@ -3,8 +3,12 @@ import fs from 'node:fs';
 import {pathToFileURL} from 'node:url';
 
 export const requiredModules = ['org.jkiss.dbeaver.test.platform', 'org.jkiss.dbeaver.ext.gaussdb.test',
-    'org.jkiss.dbeaver.ext.gaussdb.debug.test', 'org.jkiss.dbeaver.ext.postgresql.test'];
+    'org.jkiss.dbeaver.ext.gaussdb.debug.test', 'org.jkiss.dbeaver.ext.postgresql.test',
+    'org.jkiss.dbeaver.ui.editors.data.test'];
 export const requiredClasses = [
+    ['org.jkiss.dbeaver.ui.editors.data.test', 'org.jkiss.dbeaver.ui.editors.content.ContentEditorFileImportTest'],
+    ...['BinaryEditorContentReloadTest', 'TextEditorContentReloadTest']
+        .map(name => ['org.jkiss.dbeaver.ui.editors.data.test', 'org.jkiss.dbeaver.acceptance.' + name]),
     ['org.jkiss.dbeaver.ext.gaussdb.test', 'org.jkiss.dbeaver.ext.gaussdb.model.data.GaussDBBinaryValueHandlerTest'],
     ['org.jkiss.dbeaver.test.platform', 'org.jkiss.dbeaver.model.sql.SQLQueryRecoveryPolicyTest'],
     ['org.jkiss.dbeaver.ext.gaussdb.test', 'org.jkiss.dbeaver.ext.gaussdb.model.GaussDBSQLSafetyTest'],
