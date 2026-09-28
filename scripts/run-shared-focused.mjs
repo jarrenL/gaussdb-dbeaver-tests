@@ -100,6 +100,8 @@ run('javac', ['--release', '21', '-cp', cp.join(':'), '-d', output, source, save
  root + '/test/org.jkiss.dbeaver.test.platform/src/org/jkiss/dbeaver/model/impl/jdbc/data/JDBCContentBytesReadTest.java',
  root + '/plugins/org.jkiss.dbeaver.model/src/org/jkiss/dbeaver/model/data/storage/BytesContentStorage.java',
  root + '/test/org.jkiss.dbeaver.test.platform/src/org/jkiss/dbeaver/model/data/storage/BytesContentStorageTest.java',
+ root + '/plugins/org.jkiss.dbeaver.model/src/org/jkiss/dbeaver/model/data/storage/StringContentStorage.java',
+ root + '/test/org.jkiss.dbeaver.test.platform/src/org/jkiss/dbeaver/model/data/storage/StringContentStorageTest.java',
  root + '/test/org.jkiss.dbeaver.ext.gaussdb.test/src/org/jkiss/dbeaver/ext/gaussdb/model/data/GaussDBBinaryValueHandlerTest.java',
  root + '/plugins/org.jkiss.dbeaver.model/src/org/jkiss/dbeaver/model/sql/SQLQueryRecoveryPolicy.java',
  root + '/plugins/org.jkiss.dbeaver.model/src/org/jkiss/dbeaver/model/sql/parser/SQLSemanticProcessor.java',
@@ -141,6 +143,7 @@ run('java', ['-javaagent:' + agent, '-Djava.awt.headless=true', '-cp', cp.join('
  '--select-class', 'org.jkiss.dbeaver.utils.VersionUtilsTest',
  '--select-class', 'org.jkiss.dbeaver.model.impl.jdbc.data.JDBCContentBytesReadTest',
  '--select-class', 'org.jkiss.dbeaver.model.data.storage.BytesContentStorageTest',
+ '--select-class', 'org.jkiss.dbeaver.model.data.storage.StringContentStorageTest',
  '--select-class', 'org.jkiss.dbeaver.runtime.qm.QueryHistoryStoreTest',
  ...['PersistentQueryHistoryTest', 'QueryHistoryEventMapperTest', 'QueryHistoryPersistenceServiceTest']
   .flatMap(name => ['--select-class', 'org.jkiss.dbeaver.runtime.qm.' + name]),
