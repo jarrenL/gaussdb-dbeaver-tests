@@ -2,6 +2,8 @@
 
 ## 当前状态摘要（优先于下方按时间保留的旧结论）
 
+2026-09-28别名/DML来源映射新增6项：UPDATE嵌套/关联、DELETE内外层同名别名/USING、INSERT SELECT、中文引号目标。生产SQLQuery正确识别DML类型及目标schema/table，未把读取来源当目标；原投影60项一并复跑。显式编译SQLQuery/SQLSelectItem/GaussDBDialect，联合505/505通过、0跳过，其中仅6项新增、60项原有测试首次纳入该联合脚本；不与历史全量叠加。正式门控加入投影类。非真库DML执行或补全/编辑器GUI，见PROJECTION_DML_TARGETS_20260928.md。
+
 2026-09-28旧版网络凭据迁移新增5项：正常＋第二handler枚举/用户/密码/属性读取失败。修正不支持静态模拟的夹具后，4项红测复现先前handler已部分更新；改先在副本加载、全体成功后更新原handler，联合439/439通过。直接调用迁移方法非应用分支/真实密钥库验收。完整run-M0GyL5仍缓存锁超时，真库6项连接权限失败0通过。见NETWORK_PROFILE_CONTRACTS_20260928.md。
 
 2026-09-28网络凭据损坏输入新增13项：10种错误根/handlers/字段/嵌套属性/截断JSON红测失败后，修复DBWNetworkProfile先整份验证再更新、不回显解析原文；既有凭据保留且同实例修正后重试通过。3种合法空记录继续无修改。联合434/434通过、0跳过；网络配置类共19项，不是实际密钥库、旧版加载、SSH/TLS或GUI验收。见NETWORK_PROFILE_CONTRACTS_20260928.md。
