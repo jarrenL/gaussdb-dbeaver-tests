@@ -2,6 +2,8 @@
 
 ## 当前状态摘要（优先于下方按时间保留的旧结论）
 
+2026-09-28文本页刷新已修复：TextEditorPart接入IRefreshablePart，UI线程resetDocument并检查被provider吞掉的错误状态。新增接口1项＋真实FileRefDocumentProvider/字符串存储3个场景（空/普通/中文特殊文本、读取失败保留文档、重试、disconnect忽略），联合19/19、0跳过。独立Linux副本补丁SHAd1deb0e2…062e52，71稳定快照显示导入中文/引号/反斜杠/换行，72/73保存后75/76服务端查询非NULL，实际UTF8十六进制与源文件字节自动断言一致，正常路径GUI通过。该环境两端UTF8但三个长度函数均23，未将其算作字符数语义验证；空值/编码切换/取消/读取失败GUI及完整构建仍待。见TEXT_FILE_IMPORT_20260928.md最新章节，未增加JUnit GUI计数。
+
 2026-09-28文本导入Linux GUI未通过：独立副本更新data补丁SHA06f3b028…75ab83后，普通账号新建专用schema表、插入original并读回；刷新连接解决新schema初始只读入口后，通过真实文件选择器导入UTF8中文/引号/反斜杠/换行文本，稳定61快照仍显示original、未保存星号存在。定位TextEditorPart/BaseTextEditor没有IRefreshablePart，文档未重载；尚未修复，不以15项组件通过替代。未保存导入，测试表保留待复验清理。完整构建HSaZEP(Java11版本错误)、yCiwsC(JDK25下Tycho缓存锁超时)均未进入测试。详见TEXT_FILE_IMPORT_20260928.md最新章节。
 
 2026-09-28二进制输入替换新增5项有效红测全部失败：缺失/目录惰性接受、更新拒绝及原文件/符号链接导入提前删除旧临时文件。生产导入先验证常规文件/可读性与同文件身份，更新成功后才释放旧输入，同文件不删除。真实临时文件/链接，旧内容与路径保护、失败后重试、成功清理及外部文件保留断言通过；联合15/15、0跳过，含此前10项，不叠加。模拟DBDContent和workbench，未部署GUI，不证明外部竞态或更新后副作用回滚；见TEXT_FILE_IMPORT_20260928.md后续章节。
