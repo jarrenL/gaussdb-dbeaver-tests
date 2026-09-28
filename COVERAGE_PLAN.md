@@ -2,6 +2,8 @@
 
 ## 当前状态摘要（优先于下方按时间保留的旧结论）
 
+2026-09-28网络凭据损坏输入新增13项：10种错误根/handlers/字段/嵌套属性/截断JSON红测失败后，修复DBWNetworkProfile先整份验证再更新、不回显解析原文；既有凭据保留且同实例修正后重试通过。3种合法空记录继续无修改。联合434/434通过、0跳过；网络配置类共19项，不是实际密钥库、旧版加载、SSH/TLS或GUI验收。见NETWORK_PROFILE_CONTRACTS_20260928.md。
+
 2026-09-28网络配置共享基类影响回归新增6项：全局/指定主体凭据范围、属性输入隔离、handler按ID替换保留其他项及顺序、多handler凭据往返仅恢复已配置项、读写失败保留运行时状态。真实配置模型配合模拟凭据控制器，联合421/421通过、0跳过；正式门控新增NetworkProfileContractsTest。不是SSH/TLS连接、磁盘加密或GUI验收，未新增生产修复。见NETWORK_PROFILE_CONTRACTS_20260928.md。
 
 2026-09-28认证配置集合/复制隔离增5项，红测4失败复现共享输入集合和不可变集合不能编辑。共享DBPConfigurationProfile setter改LinkedHashMap副本；配置复制保留元数据/凭据且编辑不改原对象通过。联合415/415通过、0跳过；非GUI或磁盘持久化，其他共享配置类型实际回归仍待，见AUTH_SECRET_CORRUPTION_BOUNDARIES_20260928.md。
