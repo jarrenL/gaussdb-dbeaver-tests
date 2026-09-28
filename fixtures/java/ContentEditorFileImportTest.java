@@ -42,6 +42,42 @@ import static org.mockito.Mockito.*;
 class ContentEditorFileImportTest {
     @TempDir Path directory;
 
+    @ParameterizedTest
+    @ValueSource(ints = {0, 4, 65537})
+    void binaryImportDoesNotPublishBeforeExplicitSave(int size) throws Exception {
+        var controller = mock(IValueController.class);
+        var input = input(controller, "UTF-8");
+        var content = mock(DBDContent.class);
+        when(controller.getValue()).thenReturn(content);
+        field(input, "stringStorage", null);
+        var original = directory.resolve("original.bin");
+        Files.write(original, new byte[] {1, 2, 3});
+        field(input, "contentFile", original.toFile());
+        field(input, "contentDetached", true);
+        var selected = directory.resolve("selected.bin");
+        var bytes = new byte[size];
+        for (int i = 0; i < size; i++) bytes[i] = (byte) i;
+        Files.write(selected, bytes);
+        var workbenchField = DBWorkbench.class.getDeclaredField("applicationWorkbench");
+        workbenchField.setAccessible(true);
+        var originalWorkbench = workbenchField.get(null);
+        var workbench = mock(DBPApplicationWorkbench.class);
+        when(workbench.getPlatform()).thenReturn(mock(DBPPlatform.class));
+        workbenchField.set(null, workbench);
+        try {
+            input.loadFromExternalFile(selected.toFile(), new NullProgressMonitor());
+        } finally {
+            workbenchField.set(null, originalWorkbench);
+        }
+        verify(content, never()).updateContents(any(), any());
+        verify(controller, never()).updateValue(any(), anyBoolean());
+        assertEquals(size, input.getContentLength());
+        input.release();
+        verify(content, never()).updateContents(any(), any());
+        assertArrayEquals(new byte[] {1, 2, 3}, Files.readAllBytes(original));
+        assertArrayEquals(bytes, Files.readAllBytes(selected));
+    }
+
     @Test
     void importingTextDoesNotModifyResultSetBeforeExplicitSave() throws Exception {
         var controller = mock(IValueController.class);
@@ -64,6 +100,54 @@ class ContentEditorFileImportTest {
         field(input, "stringStorage", new StringEditorInput("text", "original", false, charset).getStorage());
         when(controller.getValue()).thenReturn("original");
         return input;
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {0, 4, 65537})
+    void binaryExplicitSavePublishesSelectedFileAndRetriesAfterRejection(int size) throws Exception {
+        var workbenchField = DBWorkbench.class.getDeclaredField("applicationWorkbench");
+        workbenchField.setAccessible(true);
+        var originalWorkbench = workbenchField.get(null);
+        var workbench = mock(DBPApplicationWorkbench.class);
+        when(workbench.getPlatform()).thenReturn(mock(DBPPlatform.class));
+        workbenchField.set(null, workbench);
+        try {
+            var controller = mock(IValueController.class);
+            var input = input(controller, "UTF-8");
+            var content = mock(DBDContent.class);
+            when(controller.getValue()).thenReturn(content);
+            field(input, "stringStorage", null);
+            var original = directory.resolve("before.bin");
+            Files.write(original, new byte[] {1, 2, 3});
+            field(input, "contentFile", original.toFile());
+            field(input, "contentDetached", true);
+            var selected = directory.resolve("after.bin");
+            var bytes = new byte[size];
+            for (int i = 0; i < size; i++) bytes[i] = (byte) i;
+            Files.write(selected, bytes);
+            input.loadFromExternalFile(selected.toFile(), new NullProgressMonitor());
+            verify(content, never()).updateContents(any(), any());
+            var rejection = new DBException("Rejected save");
+            when(content.updateContents(any(), any())).thenThrow(rejection).thenReturn(true);
+            assertSame(rejection, assertThrows(DBException.class,
+                () -> input.updateContentFromFile(new VoidProgressMonitor(), content)));
+            assertEquals(selected.toString(), input.getPath().toOSString());
+            input.updateContentFromFile(new VoidProgressMonitor(), content);
+            var storage = ArgumentCaptor.forClass(DBDContentStorage.class);
+            verify(content, times(2)).updateContents(any(), storage.capture());
+            verify(content, never()).getContents(any()); // Do not save stale original local storage.
+            for (var attempt : storage.getAllValues()) {
+                assertEquals("UTF-8", attempt.getCharset());
+                try (var stream = attempt.getContentStream()) {
+                    assertArrayEquals(bytes, stream.readAllBytes());
+                }
+            }
+            input.release();
+            assertArrayEquals(bytes, Files.readAllBytes(selected));
+            assertArrayEquals(new byte[] {1, 2, 3}, Files.readAllBytes(original));
+        } finally {
+            workbenchField.set(null, originalWorkbench);
+        }
     }
 
     private static void field(ContentEditorInput input, String name, Object value) throws Exception {
@@ -151,7 +235,7 @@ class ContentEditorFileImportTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"missing", "directory", "rejected", "same", "alias"})
+    @ValueSource(strings = {"missing", "directory", "same", "alias"})
     void binaryImportPreservesOwnedFileUntilReplacementSucceeds(String scenario) throws Exception {
         var workbenchField = DBWorkbench.class.getDeclaredField("applicationWorkbench");
         workbenchField.setAccessible(true);
@@ -181,6 +265,8 @@ class ContentEditorFileImportTest {
                 }
                 input.loadFromExternalFile(selected.toFile(), new NullProgressMonitor());
                 assertArrayEquals(originalBytes, Files.readAllBytes(original));
+                verify(content, never()).updateContents(any(), any());
+                input.updateContentFromFile(new VoidProgressMonitor(), content);
                 var storage = ArgumentCaptor.forClass(DBDContentStorage.class);
                 verify(content).updateContents(any(), storage.capture());
                 try (var stream = storage.getValue().getContentStream()) {
@@ -191,16 +277,12 @@ class ContentEditorFileImportTest {
             } else {
                 var selected = scenario.equals("missing") ? directory.resolve("missing.bin")
                     : scenario.equals("directory") ? directory : replacement;
-                if (scenario.equals("rejected")) {
-                    when(content.updateContents(any(), any())).thenThrow(new DBException("Rejected binary update"))
-                        .thenReturn(true);
-                }
                 assertThrows(CoreException.class,
                     () -> input.loadFromExternalFile(selected.toFile(), new NullProgressMonitor()));
                 assertArrayEquals(originalBytes, Files.readAllBytes(original));
                 assertEquals(original.toString(), input.getPath().toOSString());
                 assertEquals(false, field(input, "contentDetached"));
-                if (!scenario.equals("rejected")) verify(content, never()).updateContents(any(), any());
+                verify(content, never()).updateContents(any(), any());
                 input.loadFromExternalFile(replacement.toFile(), new NullProgressMonitor());
                 assertFalse(Files.exists(original), "Successful replacement releases the old owned file");
                 assertEquals(replacement.toString(), input.getPath().toOSString());
