@@ -27,18 +27,27 @@ cp.push(consoleJar);
 const source = root + '/test/org.jkiss.dbeaver.ext.postgresql.test/src/org/jkiss/dbeaver/ext/postgresql/model/plan/PostgreXmlPlanHierarchyTest.java';
 const savedSource = root + '/test/org.jkiss.dbeaver.ext.postgresql.test/src/org/jkiss/dbeaver/ext/postgresql/model/plan/PostgreSavedPlanTest.java';
 const coreSourceRoot = root + '/test/org.jkiss.dbeaver.ext.gaussdb.test/src';
-const liveOnly = new Set(['GaussDBReviewLiveTest.java', 'GaussDBDumpAllLiveTest.java', 'GaussDBNativeLiveTest.java']);
+const liveOnly = new Set(['GaussDBReviewLiveTest.java', 'GaussDBDumpAllLiveTest.java', 'GaussDBNativeLiveTest.java',
+ 'GaussDBSessionLiveTest.java', 'GaussDBHistoricalJdbcLiveTest.java']);
 function javaSources(directory) {
  return fs.readdirSync(directory, {withFileTypes: true}).flatMap(entry => {
   const file = path.join(directory, entry.name);
   return entry.isDirectory() ? javaSources(file) : entry.name.endsWith('.java') && !liveOnly.has(entry.name) ? [file] : [];
  });
 }
-const additionalSources = process.argv.includes('--gauss-core') ? javaSources(coreSourceRoot) : [];
-const additionalClasses = additionalSources.filter(file => file.endsWith('Test.java'))
- .map(file => path.relative(coreSourceRoot, file).replace(/\.java$/, '').split(path.sep).join('.'));
+const additionalSources = [
+ ...(process.argv.includes('--gauss-core') ? javaSources(coreSourceRoot) : []),
+ ...(process.argv.includes('--gauss-debug') ? [
+  ...javaSources(root + '/test/org.jkiss.dbeaver.ext.gaussdb.debug.test/src'),
+  ...javaSources(root + '/plugins/org.jkiss.dbeaver.ext.gaussdb.debug.core/src'),
+  ...javaSources(root + '/plugins/org.jkiss.dbeaver.ext.gaussdb.debug.ui/src'),
+  ...javaSources(root + '/plugins/org.jkiss.dbeaver.debug.core/src')
+ ] : [])
+];
+const additionalClasses = additionalSources.filter(file => file.startsWith(root + '/test/') && file.endsWith('Test.java'))
+ .map(file => file.slice(file.indexOf('/src/') + 5).replace(/\.java$/, '').split(path.sep).join('.'));
 if (additionalSources.length) {
- console.log('GaussDB core classes selected: ' + additionalClasses.length);
+ console.log('Additional GaussDB test classes selected: ' + additionalClasses.length);
  console.log('Live-only classes not executed in this mode: ' + [...liveOnly].join(', '));
 }
 function run(bin, args) {
@@ -109,6 +118,10 @@ run('javac', ['--release', '21', '-cp', cp.join(':'), '-d', output, source, save
  root + '/plugins/org.jkiss.dbeaver.ext.postgresql/src/org/jkiss/dbeaver/ext/postgresql/model/plan/PostgrePlanNodeText.java',
  root + '/plugins/org.jkiss.dbeaver.ext.postgresql/src/org/jkiss/dbeaver/ext/postgresql/model/plan/PostgrePlanNodeBase.java',
  ...additionalSources]);
+if (process.argv.includes('--compile-only')) {
+ console.log('Compilation only; no tests executed. Use compiled-sources.json with the OSGi runner.');
+ process.exit(0);
+}
 run('java', ['-javaagent:' + agent, '-Djava.awt.headless=true', '-cp', cp.join(':'),
  'org.junit.platform.console.ConsoleLauncher', 'execute', '--select-class',
  'org.jkiss.dbeaver.ext.postgresql.model.plan.PostgreXmlPlanHierarchyTest', '--select-class',

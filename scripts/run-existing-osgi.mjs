@@ -6,7 +6,12 @@ import {spawnSync} from 'node:child_process';
 // This is an OSGi regression runner, not a replacement for Maven/Tycho compilation.
 const compiled = path.resolve(process.argv[2] || '');
 const {root, sources} = JSON.parse(fs.readFileSync(path.join(compiled, 'compiled-sources.json'), 'utf8'));
-const base = path.join(root, 'test/org.jkiss.dbeaver.ext.gaussdb.test/target');
+const module = process.argv.find(value => value.startsWith('--module='))?.slice('--module='.length)
+ || 'org.jkiss.dbeaver.ext.gaussdb.test';
+if (!['org.jkiss.dbeaver.ext.gaussdb.test', 'org.jkiss.dbeaver.ext.gaussdb.debug.test'].includes(module)) {
+ throw new Error('Unsupported test module: ' + module);
+}
+const base = path.join(root, 'test', module, 'target');
 const output = fs.mkdtempSync('/tmp/gauss-existing-osgi-');
 const configuration = path.join(output, 'configuration');
 fs.mkdirSync(configuration);
@@ -35,9 +40,9 @@ fs.writeFileSync(path.join(configuration, 'config.ini'), config);
 let properties = fs.readFileSync(path.join(base, 'surefire.properties'), 'utf8')
  .split(/\r?\n/).filter(line => !line.startsWith('__provider.tc.')).join('\n');
 properties = properties.replace(/^reportsdirectory=.*$/m, 'reportsdirectory=' + path.join(output, 'reports'))
- .replace(/^testclassesdirectory=.*$/m, 'testclassesdirectory=' + path.join(output, 'classes/org.jkiss.dbeaver.ext.gaussdb.test'));
-const testPrefix = path.join(root, 'test/org.jkiss.dbeaver.ext.gaussdb.test/src') + path.sep;
-const classes = process.argv.includes('--all-core')
+ .replace(/^testclassesdirectory=.*$/m, 'testclassesdirectory=' + path.join(output, 'classes', module));
+const testPrefix = path.join(root, 'test', module, 'src') + path.sep;
+const classes = process.argv.includes('--all-core') || process.argv.includes('--all-module')
  ? sources.filter(source => source.startsWith(testPrefix) && source.endsWith('Test.java'))
    .map(source => source.slice(testPrefix.length).replace(/\.java$/, '').split(path.sep).join('.')).sort()
  : ['GaussDBDialectTest', 'GaussDBInsertFromDataTest', 'GaussDBPredicateScannerTest']
@@ -72,7 +77,8 @@ if (result.status === 0) {
  });
  fs.writeFileSync(path.join(output, 'verified-results.json'), JSON.stringify({
   scope: 'existing OSGi bundles with explicit compiled overlays; not a full build or live-database run',
-  excludedLiveClasses: ['GaussDBReviewLiveTest', 'GaussDBDumpAllLiveTest', 'GaussDBNativeLiveTest'],
+  excludedLiveClasses: module.endsWith('.debug.test') ? ['GaussDBSessionLiveTest', 'GaussDBHistoricalJdbcLiveTest']
+   : ['GaussDBReviewLiveTest', 'GaussDBDumpAllLiveTest', 'GaussDBNativeLiveTest'],
   classes: outcomes, total: outcomes.reduce((sum, entry) => sum + entry.tests, 0)
  }, null, 2));
  console.log('Verified reports: ' + outcomes.length + ' classes, ' + outcomes.reduce((sum, entry) => sum + entry.tests, 0) + ' tests');

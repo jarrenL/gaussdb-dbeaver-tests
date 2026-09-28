@@ -2,6 +2,8 @@
 
 ## 当前状态摘要（优先于下方按时间保留的旧结论）
 
+2026-09-28同批编译核心+调试49个非Live类，显式编译GaussDB调试core/ui及共享debug.core；新增--compile-only不执行普通classpath测试，再分别真实OSGi运行：核心34类629/629，调试15类112/112，均0失败错误跳过、逐类门控通过、退出0。本批741次执行不与旧结果叠加。5个Live类明确未执行，非数据库附着/快捷键/GUI验收，完整构建及交付仍待。见SHARED_COMPONENT_REGRESSION_20260928.md最新章节。
+
 2026-09-28真实OSGi复验已补：run-existing-osgi.mjs按compiled-sources.json隔离各bundle新编译类，只读使用旧解析依赖，独立临时配置启动Equinox/headless。先前三个失败类118项通过；全部34个非Live核心类最终629/629通过、0跳过，逐类报告门控34类均完成。首次全类运行SIGABRT，加无图形AWT参数后正常，未确定原生根因。日志/tmp/existing-osgi-all-core-verified-20260928.log。不是完整新构建或真库/GUI，不与654专项及931普通classpath执行叠加；详见SHARED_COMPONENT_REGRESSION_20260928.md。
 
 2026-09-28扩大回归未通过：run-shared-focused.mjs新增--gauss-core，编译并选择全部34个非Live核心测试类（明确列出三个未执行真库类），同共享专项执行931项：818通过、113失败、0跳过。失败逐项归为Dialect 27项未初始化OSGi workbench、InsertFromData 52及PredicateScanner 34项Platform.getBundle为null。没有排除失败重算通过，也不替代完整Tycho。较小范围654/654结果仍仅属专项，不能与本轮叠加。日志/tmp/shared-gauss-core-expanded-20260928.log；见SHARED_COMPONENT_REGRESSION_20260928.md。
