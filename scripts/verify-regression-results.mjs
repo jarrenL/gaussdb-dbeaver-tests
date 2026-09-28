@@ -11,6 +11,7 @@ export const requiredClasses = [
     ['org.jkiss.dbeaver.test.platform', 'org.jkiss.dbeaver.model.ConnectionFilterSerializationTest'],
     ['org.jkiss.dbeaver.test.platform', 'org.jkiss.dbeaver.registry.UserFilterExportRoundTripTest'],
     ['org.jkiss.dbeaver.test.platform', 'org.jkiss.dbeaver.model.AuthProfileSecretStorageTest'],
+    ['org.jkiss.dbeaver.test.platform', 'org.jkiss.dbeaver.model.NetworkProfileContractsTest'],
     ['org.jkiss.dbeaver.test.platform', 'org.jkiss.dbeaver.utils.DatabaseExceptionContractTest'],
     ['org.jkiss.dbeaver.test.platform', 'org.jkiss.dbeaver.utils.ProgressMonitorContractTest'],
     ['org.jkiss.dbeaver.test.platform', 'org.jkiss.dbeaver.model.impl.data.formatters.DateTimeDataFormatterLocaleTest'],
