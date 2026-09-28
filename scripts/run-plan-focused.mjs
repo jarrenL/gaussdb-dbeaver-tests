@@ -25,14 +25,18 @@ cp.push('/Users/lj/.m2/repository/p2/osgi/bundle/org.objenesis/3.2.0/org.objenes
 const consoleJar = '/Users/lj/.m2/repository/org/junit/platform/junit-platform-console-standalone/1.13.1/junit-platform-console-standalone-1.13.1.jar';
 cp.push(consoleJar);
 const source = root + '/test/org.jkiss.dbeaver.ext.postgresql.test/src/org/jkiss/dbeaver/ext/postgresql/model/plan/PostgreXmlPlanHierarchyTest.java';
+const savedSource = root + '/test/org.jkiss.dbeaver.ext.postgresql.test/src/org/jkiss/dbeaver/ext/postgresql/model/plan/PostgreSavedPlanTest.java';
 function run(bin, args) {
  const result = spawnSync(java + bin, args, {stdio: 'inherit'});
  if (result.status !== 0) process.exit(result.status ?? 1);
 }
 console.log('Focused output: ' + output);
-run('javac', ['--release', '21', '-cp', cp.join(':'), '-d', output, source,
+run('javac', ['--release', '21', '-cp', cp.join(':'), '-d', output, source, savedSource,
+ root + '/plugins/org.jkiss.dbeaver.ext.postgresql/src/org/jkiss/dbeaver/ext/postgresql/model/plan/PostgreQueryPlaner.java',
+ root + '/plugins/org.jkiss.dbeaver.ext.postgresql/src/org/jkiss/dbeaver/ext/postgresql/model/plan/PostgrePlanNodeExternal.java',
  root + '/plugins/org.jkiss.dbeaver.ext.postgresql/src/org/jkiss/dbeaver/ext/postgresql/model/plan/PostgrePlanNodeXML.java',
  root + '/plugins/org.jkiss.dbeaver.ext.postgresql/src/org/jkiss/dbeaver/ext/postgresql/model/plan/PostgrePlanNodeBase.java']);
 run('java', ['-javaagent:' + agent, '-Djava.awt.headless=true', '-cp', cp.join(':'),
  'org.junit.platform.console.ConsoleLauncher', 'execute', '--select-class',
- 'org.jkiss.dbeaver.ext.postgresql.model.plan.PostgreXmlPlanHierarchyTest', '--details=summary', '--disable-banner']);
+ 'org.jkiss.dbeaver.ext.postgresql.model.plan.PostgreXmlPlanHierarchyTest', '--select-class',
+ 'org.jkiss.dbeaver.ext.postgresql.model.plan.PostgreSavedPlanTest', '--details=summary', '--disable-banner']);
