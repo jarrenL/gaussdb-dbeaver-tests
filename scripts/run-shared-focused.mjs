@@ -36,6 +36,9 @@ function javaSources(directory) {
  });
 }
 const additionalSources = [
+ ...(process.argv.includes('--sql-editor') ? [
+  root + '/plugins/org.jkiss.dbeaver.ui.editors.sql/src/org/jkiss/dbeaver/ui/editors/sql/SQLEditor.java'
+ ] : []),
  ...(process.argv.includes('--gauss-core') ? javaSources(coreSourceRoot) : []),
  ...(process.argv.includes('--gauss-debug') ? [
   ...javaSources(root + '/test/org.jkiss.dbeaver.ext.gaussdb.debug.test/src'),
@@ -129,6 +132,8 @@ run('javac', ['--release', '21', '-cp', cp.join(':'), '-d', output, source, save
  root + '/test/org.jkiss.dbeaver.test.platform/src/org/jkiss/dbeaver/utils/DatabaseExceptionContractTest.java',
  root + '/test/org.jkiss.dbeaver.test.platform/src/org/jkiss/dbeaver/utils/ProgressMonitorContractTest.java',
  root + '/test/org.jkiss.dbeaver.test.platform/src/org/jkiss/dbeaver/model/impl/data/formatters/DateTimeDataFormatterLocaleTest.java',
+ root + '/plugins/org.jkiss.dbeaver.model/src/org/jkiss/dbeaver/model/exec/DBExecUtils.java',
+ root + '/test/org.jkiss.dbeaver.test.platform/src/org/jkiss/dbeaver/model/exec/ExecutionContextReplacementTest.java',
  root + '/test/org.jkiss.dbeaver.ext.postgresql.test/src/org/jkiss/dbeaver/ext/postgresql/model/plan/PostgrePlanResponseTest.java',
  root + '/test/org.jkiss.dbeaver.ext.postgresql.test/src/org/jkiss/dbeaver/ext/postgresql/model/plan/PostgrePlanTransactionTest.java',
  root + '/plugins/org.jkiss.dbeaver.ext.postgresql/src/org/jkiss/dbeaver/ext/postgresql/model/plan/PostgreExecutionPlan.java',
@@ -170,6 +175,7 @@ run('java', ['-javaagent:' + agent, '-Djava.awt.headless=true', '-cp', cp.join('
  '--select-class', 'org.jkiss.dbeaver.utils.DatabaseExceptionContractTest',
  '--select-class', 'org.jkiss.dbeaver.utils.ProgressMonitorContractTest',
  '--select-class', 'org.jkiss.dbeaver.model.impl.data.formatters.DateTimeDataFormatterLocaleTest',
+ '--select-class', 'org.jkiss.dbeaver.model.exec.ExecutionContextReplacementTest',
  '--select-class', 'org.jkiss.dbeaver.ext.gaussdb.model.GaussDBExcelExportTest',
  '--select-class', 'org.jkiss.dbeaver.ext.gaussdb.model.GaussDBCSVReplacementTest',
  '--select-class', 'org.jkiss.dbeaver.ext.gaussdb.model.GaussDBStreamExportFailureTest',
