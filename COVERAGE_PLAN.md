@@ -2,6 +2,8 @@
 
 ## 当前状态摘要（优先于下方按时间保留的旧结论）
 
+2026-09-28二进制降级新增4项：256/65537字节×驱动拒绝前读取0/7字节。修正进度监视器夹具后2项红测复现剩余流截断；共享JDBCContentBLOB字节数组降级前重新打开存储流，联合652/652通过、0跳过。驱动为替身，非真实厂商故障、其他重载/Blob分支、2GB或GUI验收，见EMPTY_BYTEA_BINDING_20260924.md。
+
 2026-09-28二进制非空文件新增6项：1/256/65537字节×正常/驱动首次读完抛错后重试，实际中文空格文件和生产BLOB/handler、模拟PreparedStatement逐字节读取，检查编号、异常cause、重试完整、流释放及原文件保留。修正模拟上下文夹具后联合648/648通过；包含既有12项binary测试，本轮无生产修复。正式门控加入该类。Docker API仍权限拒绝，GUI空bytea仍未验收，见EMPTY_BYTEA_BINDING_20260924.md后续记录。
 
 2026-09-28共享SQLQuery影响扩大回归：加入已有SQLQueryRecoveryPolicyTest/GaussDBSQLSafetyTest，共96项既有场景，并新增6项简单SELECT已获重试许可→写入/函数/锁/集合/写入CTE/错误SQL→reset的判断。显式编译当前恢复策略及SQLSemanticProcessor，联合630/630通过、0跳过；本轮无新增生产修复。两类纳入正式门控。不是实际网络断线自动重试、危险确认GUI或其他数据库真库验收，见PROJECTION_DML_TARGETS_20260928.md。
