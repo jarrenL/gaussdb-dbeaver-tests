@@ -2,6 +2,8 @@
 
 ## 当前状态摘要（优先于下方按时间保留的旧结论）
 
+2026-09-29JOIN未限定/未解析/重复别名及GaussDB大小写引用补12项，红测7项复现合法别名丢失来源、歧义别名取首表。SQLQuery按方言唯一匹配当前层FROM/JOIN，派生来源参与歧义检查但不可作为物理目标，SQLSelectItem接入；投影113/113。73模块2558项：2384通过173跳过1Rest错误，门禁拒绝；无本轮真实JDBC/GUI结论。见ALIAS_SCOPE_MATCHING_20260929.md。
+
 2026-09-29真库专项门禁独立化并补13项自测，与原门禁7项共20/20、零跳过。精确核对set-query四项/plan六项身份、无重复、时间、实际结果/汇总一致及非零完整执行；拒绝缺项/错身份/跳过/损坏/旧报告。实际四项JDBC权限错误XML亦被正确拒绝。不增加DBeaver功能通过数，真库四项仍0通过，见LIVE_SELECTION_VALIDATION.md。
 
 2026-09-29括号普通/锁定SELECT补6项，红测均UNKNOWN；SQLQuery补包装PlainSelect分类、内部FOR/INTO标记，保留原AST和非plain边界，setText/reset验证元数据不残留。投影101/101，507六条只读字面量语法对照成功（无真实锁竞争）。73模块2546项：2372通过173跳过1Rest错误，门禁拒绝；真实JDBC/GUI仍待。见PARENTHESIZED_SELECT_LOCKING_20260929.md。
