@@ -26,6 +26,7 @@ import org.jkiss.dbeaver.model.app.DBPApplicationWorkbench;
 import org.jkiss.dbeaver.model.app.DBPPlatform;
 import org.jkiss.dbeaver.model.data.DBDContent;
 import org.jkiss.dbeaver.model.data.DBDContentStorage;
+import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.mockito.ArgumentCaptor;
 import org.junit.jupiter.api.Test;
@@ -40,6 +41,20 @@ import static org.mockito.Mockito.*;
 
 class ContentEditorFileImportTest {
     @TempDir Path directory;
+
+    @Test
+    void importingTextDoesNotModifyResultSetBeforeExplicitSave() throws Exception {
+        var controller = mock(IValueController.class);
+        var input = input(controller, "UTF-8");
+        var path = directory.resolve("pending.txt");
+        Files.writeString(path, "pending replacement");
+        input.loadFromExternalFile(path.toFile(), new NullProgressMonitor());
+        assertEquals("pending replacement", ((StringEditorInput.StringStorage) field(input, "stringStorage")).getString());
+        verify(controller, never()).updateValue(any(), anyBoolean());
+        input.release(); // Closing without saving must only release editor-local content.
+        verify(controller, never()).updateValue(any(), anyBoolean());
+        assertEquals("pending replacement", Files.readString(path));
+    }
 
     private ContentEditorInput input(IValueController controller, String charset) throws Exception {
         var input = mock(ContentEditorInput.class, CALLS_REAL_METHODS);
@@ -74,7 +89,7 @@ class ContentEditorFileImportTest {
         Files.writeString(path, expected, Charset.forName(charset));
         var bytes = Files.readAllBytes(path);
         input.loadFromExternalFile(path.toFile(), new NullProgressMonitor());
-        verify(controller).updateValue(expected, false);
+        verify(controller, never()).updateValue(any(), anyBoolean());
         assertSame(storage, field(input, "stringStorage"));
         assertEquals(expected, ((StringEditorInput.StringStorage) storage).getString());
         assertEquals(expected.length(), input.getContentLength());
@@ -82,9 +97,11 @@ class ContentEditorFileImportTest {
         var empty = directory.resolve("empty.txt");
         Files.write(empty, new byte[0]);
         input.loadFromExternalFile(empty.toFile(), new NullProgressMonitor());
-        verify(controller).updateValue("", false);
+        verify(controller, never()).updateValue(any(), anyBoolean());
         assertEquals("", ((StringEditorInput.StringStorage) storage).getString());
         assertEquals(0, input.getContentLength());
+        input.updateContentFromFile(new VoidProgressMonitor(), input.getValue());
+        verify(controller).updateValue("", false);
         input.release();
         assertArrayEquals(bytes, Files.readAllBytes(path));
         assertTrue(Files.exists(empty));
@@ -107,24 +124,27 @@ class ContentEditorFileImportTest {
         var valid = directory.resolve("retry.txt");
         Files.writeString(valid, "retry");
         input.loadFromExternalFile(valid.toFile(), new NullProgressMonitor());
-        verify(controller).updateValue("retry", false);
+        verify(controller, never()).updateValue(any(), anyBoolean());
         assertEquals("retry", ((StringEditorInput.StringStorage) storage).getString());
         assertEquals(5, input.getContentLength());
     }
 
     @Test
-    void rejectedControllerUpdatePreservesTextAndAllowsRetry() throws Exception {
+    void rejectedExplicitSavePreservesPendingTextAndAllowsRetry() throws Exception {
         var controller = mock(IValueController.class);
         var input = input(controller, "UTF-8");
         var storage = field(input, "stringStorage");
         var path = directory.resolve("valid.txt");
         Files.writeString(path, "replacement");
         doThrow(new IllegalStateException("Rejected update")).doNothing().when(controller).updateValue("replacement", false);
-        assertThrows(CoreException.class, () -> input.loadFromExternalFile(path.toFile(), new NullProgressMonitor()));
-        assertSame(storage, field(input, "stringStorage"));
-        assertEquals("original", ((StringEditorInput.StringStorage) storage).getString());
-        assertEquals(8, input.getContentLength());
         input.loadFromExternalFile(path.toFile(), new NullProgressMonitor());
+        verify(controller, never()).updateValue(any(), anyBoolean());
+        assertThrows(IllegalStateException.class,
+            () -> input.updateContentFromFile(new VoidProgressMonitor(), input.getValue()));
+        assertSame(storage, field(input, "stringStorage"));
+        assertEquals("replacement", ((StringEditorInput.StringStorage) storage).getString());
+        assertEquals(11, input.getContentLength());
+        input.updateContentFromFile(new VoidProgressMonitor(), input.getValue());
         verify(controller, times(2)).updateValue("replacement", false);
         assertEquals("replacement", ((StringEditorInput.StringStorage) storage).getString());
         assertEquals(11, input.getContentLength());
