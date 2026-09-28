@@ -76,6 +76,8 @@ function run(bin, args) {
 }
 console.log('Focused output: ' + output);
 run('javac', ['--release', '21', '-cp', cp.join(':'), '-d', output, source, savedSource,
+ root + '/plugins/org.jkiss.dbeaver.model.jdbc/src/org/jkiss/dbeaver/model/impl/jdbc/data/JDBCCollection.java',
+ root + '/test/org.jkiss.dbeaver.test.platform/src/org/jkiss/dbeaver/model/impl/jdbc/data/JDBCCollectionCloneTest.java',
  root + '/plugins/org.jkiss.dbeaver.ext.postgresql/src/org/jkiss/dbeaver/ext/postgresql/model/data/PostgreStructValueHandler.java',
  root + '/plugins/org.jkiss.dbeaver.ext.gaussdb/src/org/jkiss/dbeaver/ext/gaussdb/model/data/GaussDBValueHandlerProvider.java',
  root + '/test/org.jkiss.dbeaver.ext.gaussdb.test/src/org/jkiss/dbeaver/ext/gaussdb/model/data/GaussDBCompositeBindingTest.java',
@@ -206,6 +208,7 @@ run('java', ['-javaagent:' + agent, '-Djava.awt.headless=true', '-cp', cp.join('
  '--select-class', 'org.jkiss.dbeaver.ext.postgresql.PostgreNumericPrecisionTest',
  '--select-class', 'org.jkiss.dbeaver.ext.postgresql.PostgreCompositeArrayRoundTripTest',
  '--select-class', 'org.jkiss.dbeaver.ext.gaussdb.model.data.GaussDBCompositeBindingTest',
+ '--select-class', 'org.jkiss.dbeaver.model.impl.jdbc.data.JDBCCollectionCloneTest',
  '--select-class', 'org.jkiss.dbeaver.ext.postgresql.PostgreArrayNullSyntaxTest',
  '--select-class', 'org.jkiss.dbeaver.ext.gaussdb.model.GaussDBExcelExportTest',
  '--select-class', 'org.jkiss.dbeaver.ext.gaussdb.model.GaussDBCSVReplacementTest',
