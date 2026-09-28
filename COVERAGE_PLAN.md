@@ -2,6 +2,8 @@
 
 ## 当前状态摘要（优先于下方按时间保留的旧结论）
 
+2026-09-28 6.3/9.7进度基础设施补5项：单/双/三层done正确恢复父状态、阻塞栈LIFO与快照隔离、子任务完成不结束父及取消状态读取。红测3失败复现恢复已结束任务的同一缺陷；DefaultProgressMonitor改恢复剩余栈顶后5/5通过。组件调用顺序非真实任务取消/GUI，详见PROGRESS_MONITOR_CONTRACTS_20260928.md。
+
 2026-09-28 1.2/1.6/6.3异常封装补10项通过：六类SQLSTATE中文/扩展字符与错误码、cause/next/suppressed，缺消息/状态两项，嵌套上下文/数据源及SQL独立保存。直接编译共享DBDatabaseException/DBCException/DBSQLException，无新增生产修复；非真实服务器报错、错误分类或GUI取消。见EXCEPTION_CONTRACTS_20260928.md。
 
 2026-09-28 6.3/1.2版本选择补18项：比较正反性/数字边界/分隔后缀、稳定优先/预发布回退/反序不变/输入不变/空候选。3项红测复现超32/64位数字退化字典序导致最新版误选，同一根因改BigInteger比较后18/18通过。共享生产VersionUtils直接编译，非服务端版本识别/下载GUI/完整构建；见VERSION_SELECTION_BOUNDARIES_20260928.md。
