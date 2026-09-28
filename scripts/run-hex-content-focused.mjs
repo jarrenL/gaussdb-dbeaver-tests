@@ -34,6 +34,10 @@ run('javac', ['--release', '21', '-cp', cp.join(':'), '-d', output,
  root + '/plugins/org.jkiss.dbeaver.ui.editors.data/src/org/jkiss/dbeaver/ui/editors/content/ContentEditorInput.java',
  root + '/plugins/org.jkiss.dbeaver.ui.editors.data/src/org/jkiss/dbeaver/ui/editors/content/ContentEditorContributor.java',
  root + '/plugins/org.jkiss.dbeaver.model.jdbc/src/org/jkiss/dbeaver/model/impl/jdbc/data/JDBCContentBytes.java',
+ ...['JDBCContentBLOB', 'JDBCContentCLOB', 'JDBCContentXML'].map(name =>
+  root + '/plugins/org.jkiss.dbeaver.model.jdbc/src/org/jkiss/dbeaver/model/impl/jdbc/data/' + name + '.java'),
+ ...['BytesContentStorage', 'StringContentStorage', 'TemporaryContentStorage'].map(name =>
+  root + '/plugins/org.jkiss.dbeaver.model/src/org/jkiss/dbeaver/model/data/storage/' + name + '.java'),
  root + '/plugins/org.jkiss.dbeaver.ui.editors.data/src/org/jkiss/dbeaver/ui/data/managers/stream/TextEditorPart.java',
  root + '/plugins/org.jkiss.dbeaver.ui.editors.base/src/org/jkiss/dbeaver/ui/editors/text/FileRefDocumentProvider.java',
  editorTests + 'org/jkiss/dbeaver/acceptance/BinaryEditorContentReloadTest.java',
