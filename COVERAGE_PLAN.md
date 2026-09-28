@@ -2,6 +2,8 @@
 
 ## 当前状态摘要（优先于下方按时间保留的旧结论）
 
+2026-09-29会话大PID补6项：5种编号的模型/取消终止SQL保真及低32位相同对象身份，红测4失败；共享PostgreSession改long读取/存储/getter。首次增量5个旧签名NoSuchMethodError，73模块clean verify后6/6及Gauss会话6/6通过。总2681：2507通过173跳过1Rest权限错误，门禁拒绝、自测7/7。返回类型二进制不兼容需统一重打包；未发真实取消/终止请求、Docker拒绝，无真库/GUI新增。见主仓SESSION_PID_WIDTH_20260929.md。
+
 2026-09-29核对9.9会话监控实际继承adapter入口，新增6项生产会话manager测试：空闲过滤、模型映射/IPv6回退及prepare/execute/next/close异常传播和资源所有权，6/6；非DN运维面板，无生产修改。73模块2675项：2501通过173跳过1Rest权限错误，门禁拒绝、自测7/7。真实权限/GUI及大于32位PID另验，见主仓SESSION_MANAGER_COVERAGE_20260929.md。
 
 2026-09-29历史1.2补provider完整URL入口7项：原生/PG结构化混合端点、手工URL保留、认证优先与失败不回退、null/空串认证回退、非法主机异常包装。Provider14/14，生产未改并加入必跑类。73模块2669项：2495通过173跳过1Rest权限错误，门禁拒绝、自测7/7。非真实认证/故障切换或GUI，见主仓PROVIDER_URL_ROUTING_20260929.md。

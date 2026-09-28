@@ -6,6 +6,7 @@ export const requiredModules = ['org.jkiss.dbeaver.test.platform', 'org.jkiss.db
     'org.jkiss.dbeaver.ext.gaussdb.debug.test', 'org.jkiss.dbeaver.ext.postgresql.test',
     'org.jkiss.dbeaver.ui.editors.data.test'];
 export const requiredClasses = [
+    ['org.jkiss.dbeaver.ext.postgresql.test', 'org.jkiss.dbeaver.ext.postgresql.model.session.PostgreSessionIdentityTest'],
     ['org.jkiss.dbeaver.ext.gaussdb.test', 'org.jkiss.dbeaver.ext.gaussdb.model.GaussDBSessionManagerTest'],
     ['org.jkiss.dbeaver.ext.gaussdb.test', 'org.jkiss.dbeaver.ext.gaussdb.GaussDBDataSourceProviderTest'],
     ['org.jkiss.dbeaver.ext.gaussdb.test', 'org.jkiss.dbeaver.ext.gaussdb.model.GaussDBPackageCompilerTest'],
