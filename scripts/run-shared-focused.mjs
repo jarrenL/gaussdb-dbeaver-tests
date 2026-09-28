@@ -32,6 +32,14 @@ function run(bin, args) {
 }
 console.log('Focused output: ' + output);
 run('javac', ['--release', '21', '-cp', cp.join(':'), '-d', output, source, savedSource,
+ root + '/plugins/org.jkiss.dbeaver.tasks.native/src/org/jkiss/dbeaver/tasks/nativetool/AbstractNativeToolHandler.java',
+ root + '/plugins/org.jkiss.dbeaver.ext.postgresql/src/org/jkiss/dbeaver/ext/postgresql/tasks/PostgreNativeToolHandler.java',
+ root + '/plugins/org.jkiss.dbeaver.ext.postgresql/src/org/jkiss/dbeaver/ext/postgresql/tasks/PostgreDatabaseBackupHandler.java',
+ root + '/plugins/org.jkiss.dbeaver.ext.postgresql/src/org/jkiss/dbeaver/ext/postgresql/tasks/PostgreDatabaseRestoreHandler.java',
+ root + '/plugins/org.jkiss.dbeaver.ext.postgresql/src/org/jkiss/dbeaver/ext/postgresql/tasks/PostgreScriptExecuteHandler.java',
+ root + '/test/org.jkiss.dbeaver.ext.gaussdb.test/src/org/jkiss/dbeaver/ext/gaussdb/model/GaussDBNativePasswordTest.java',
+ root + '/test/org.jkiss.dbeaver.ext.gaussdb.test/src/org/jkiss/dbeaver/ext/gaussdb/model/GaussDBBackupPublishTest.java',
+ root + '/test/org.jkiss.dbeaver.ext.gaussdb.test/src/org/jkiss/dbeaver/ext/gaussdb/model/GaussDBNativeOutputTest.java',
  root + '/test/org.jkiss.dbeaver.ext.gaussdb.test/src/org/jkiss/dbeaver/ext/gaussdb/model/GaussDBExcelExportTest.java',
  root + '/test/org.jkiss.dbeaver.ext.gaussdb.test/src/org/jkiss/dbeaver/ext/gaussdb/model/GaussDBCSVReplacementTest.java',
  root + '/test/org.jkiss.dbeaver.ext.gaussdb.test/src/org/jkiss/dbeaver/ext/gaussdb/model/GaussDBStreamExportFailureTest.java',
@@ -72,4 +80,7 @@ run('java', ['-javaagent:' + agent, '-Djava.awt.headless=true', '-cp', cp.join('
  '--select-class', 'org.jkiss.dbeaver.ext.gaussdb.model.GaussDBExcelExportTest',
  '--select-class', 'org.jkiss.dbeaver.ext.gaussdb.model.GaussDBCSVReplacementTest',
  '--select-class', 'org.jkiss.dbeaver.ext.gaussdb.model.GaussDBStreamExportFailureTest',
+ '--select-class', 'org.jkiss.dbeaver.ext.gaussdb.model.GaussDBNativePasswordTest',
+ '--select-class', 'org.jkiss.dbeaver.ext.gaussdb.model.GaussDBBackupPublishTest',
+ '--select-class', 'org.jkiss.dbeaver.ext.gaussdb.model.GaussDBNativeOutputTest',
  '--fail-if-no-tests', '--reports-dir', output + '/reports', '--details=summary', '--disable-banner']);
