@@ -2,6 +2,10 @@
 
 ## 当前状态摘要（优先于下方按时间保留的旧结论）
 
+2026-09-28 9.2 XLSX追加新增9项执行：公式保留两策略2项、全满旧表追加2/5/8行3项、混合容量与未使用尾表1项、无表头上限1/2/3行3项。先在生产导出器复现全满表未切换，修复仅复用初始导入表且跳过满表；最新整类69/69通过，逐格/公式计算及输入字节不变断言。使用既有只读依赖直接编译、JUnit Console运行，非Tycho完整构建；标准构建run-3ijysI缓存锁失败、Docker权限拒绝，GUI及真库未续验。详细证据见主仓 XLSX_APPEND_BOUNDARIES_20260928.md，专项脚本 scripts/run-xlsx-focused.mjs；不得叠加到旧1882统计。
+
+2026-09-28 GUI证据校验器补10项正反例（五规则Unicode范围、重复CASE位置、缺失/重复规则、错误严重性、截断、源文本变化等）；node --test scripts/*.test.mjs 共78项通过。这是验证器自测，不是新增78个真实GUI场景。
+
 三类空内容真库绑定通过：生产provider/handler分别处理缓存bytea、实际SerialBlob、实际零字节文件BLOB，每次UPDATE后SQL非NULL/长度0/getBytes空数组断言通过，释放后文件仍在；随后全套原生恢复回归通过。run-ZwEbec=1882/1866通过/16跳过/0失败错误，方法数不变；测试schema及临时调试成员均0。GUI和其他模式仍未闭环，见 EMPTY_BYTEA_BINDING_20260924.md。
 
 空bytea适配扩展到非NULL且确定长度0的JDBCContentBLOB，新增7项组件测试含真实空文件/缺失文件、未知长度/读长失败不误写、NULL/非空委托。run-Gketea=1882/1866通过/16跳过/0失败错误；缓存bytea真库原生回归仍通过，临时调试授权0。Blob文件GUI/真库端到端仍待验，不以组件替代；见 EMPTY_BYTEA_BINDING_20260924.md。
