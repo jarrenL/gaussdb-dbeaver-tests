@@ -2,6 +2,8 @@
 
 ## 当前状态摘要（优先于下方按时间保留的旧结论）
 
+2026-09-29真实保存器旧凭据替换补3项：按registry实际流程每次新建serializer，改名/删除/关闭密码保存后解密检查实际写入字节；旧名称键或密码不残留、删最后配置写null清理请求、原内存和旧输出不变。配置类53/53，无生产修复；非磁盘删除/原子写/失败恢复。完整73模块2512项中2342通过、169跳过、1项Rest网络权限错误，门控仍拒绝。见NETWORK_PROFILE_METADATA_20260929.md及NETWORK_CREDENTIAL_CLEANUP_REACTOR_20260929.json。
+
 2026-09-29不受信任handler导出补4项：SSH/PG SSL×安全标志，验证主JSON无handler用户/密码/私钥/host/保存密码开关且独立凭据表为空；实际解析后仅保留handler及启用状态，原配置不变。配置类50/50，无生产修改。完整73模块2509项：2339通过、169跳过、1项Rest网络权限错误，门控仍拒绝。非磁盘/共享权限/实际连接验收，Docker拒绝未动现场。见NETWORK_PROFILE_METADATA_20260929.md顶部及NETWORK_UNTRUSTED_EXPORT_REACTOR_20260929.json。
 
 2026-09-29实际注册SSH/PG SSL handler凭据往返补8项：handler×保存密码×安全配置/独立凭据分支，改名后再保存解析，检查稳定ID、凭据关联键、密码不保存、普通/安全属性及状态。平台测试显式依赖SSH插件，缺失不跳过；配置类46/46通过，无生产修改。完整73模块2505项：2335通过、169跳过、1项Rest网络权限错误，门控仍拒绝。内存存储无实际隧道/TLS连接，不等于磁盘加密/secret-storage/旧键清理通过。详见NETWORK_PROFILE_METADATA_20260929.md和NETWORK_HANDLER_CREDENTIAL_REACTOR_20260929.json。
