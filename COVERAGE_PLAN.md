@@ -2,6 +2,8 @@
 
 ## 当前状态摘要（优先于下方按时间保留的旧结论）
 
+2026-09-28正式回归接入复核：platform模块在reactor清单内，父test/pom.xml的**/*Test.java包含新增VersionUtilsTest、DatabaseExceptionContractTest、ProgressMonitorContractTest；这仅证明配置，不代表OSGi已经执行。重跑run-1SXggQ在Tycho .m2缓存锁10000ms超时处失败，没有新JUnit结果。run-dbeaver-tests.sh新增verify-regression-results门控：四模块必须有执行通过项，七个新增/受影响计划及工具测试类必须出现且全部通过，报告新鲜度/逐项总计一致/失败为0；可选跳过仍单列，不能替代后续验收。新增7项验证器正反例，全体Node自测85/85通过（非客户端新增85场景），日志/tmp/regression-gates-node-20260928.log。
+
 2026-09-28 6.3进度代理写接口补3项：1/2/3层代理经Eclipse接口取消true/false往返、中文任务名、小数及零进度原值传递。红测3失败复现setCanceled空实现；补三个写接口转发后进度专项8/8通过（含旧5项）。真实NullProgressMonitor组件，不是GUI点击取消或JDBC中断。见PROGRESS_MONITOR_CONTRACTS_20260928.md。
 
 2026-09-28 6.3/9.7进度基础设施补5项：单/双/三层done正确恢复父状态、阻塞栈LIFO与快照隔离、子任务完成不结束父及取消状态读取。红测3失败复现恢复已结束任务的同一缺陷；DefaultProgressMonitor改恢复剩余栈顶后5/5通过。组件调用顺序非真实任务取消/GUI，详见PROGRESS_MONITOR_CONTRACTS_20260928.md。
