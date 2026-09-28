@@ -2,6 +2,8 @@
 
 ## 当前状态摘要（优先于下方按时间保留的旧结论）
 
+2026-09-28 6.3进度代理写接口补3项：1/2/3层代理经Eclipse接口取消true/false往返、中文任务名、小数及零进度原值传递。红测3失败复现setCanceled空实现；补三个写接口转发后进度专项8/8通过（含旧5项）。真实NullProgressMonitor组件，不是GUI点击取消或JDBC中断。见PROGRESS_MONITOR_CONTRACTS_20260928.md。
+
 2026-09-28 6.3/9.7进度基础设施补5项：单/双/三层done正确恢复父状态、阻塞栈LIFO与快照隔离、子任务完成不结束父及取消状态读取。红测3失败复现恢复已结束任务的同一缺陷；DefaultProgressMonitor改恢复剩余栈顶后5/5通过。组件调用顺序非真实任务取消/GUI，详见PROGRESS_MONITOR_CONTRACTS_20260928.md。
 
 2026-09-28 1.2/1.6/6.3异常封装补10项通过：六类SQLSTATE中文/扩展字符与错误码、cause/next/suppressed，缺消息/状态两项，嵌套上下文/数据源及SQL独立保存。直接编译共享DBDatabaseException/DBCException/DBSQLException，无新增生产修复；非真实服务器报错、错误分类或GUI取消。见EXCEPTION_CONTRACTS_20260928.md。
