@@ -2,6 +2,8 @@
 
 ## 当前状态摘要（优先于下方按时间保留的旧结论）
 
+2026-09-28文本GUI继续补验：83–85文件选择器Cancel后中文原文及干净状态保持（非导入后放弃修改）；86–88导入实际零字节文件，文本清空，89–91双层保存完成。92/94新查询返回SQL NULL；95/96只读对照确认当前ORA且空varchar字面量本身为NULL，故与服务器语义一致，不算非NULL空字符串保留或其他模式通过。新增GUI证据，不增加JUnit计数。截图与范围见TEXT_FILE_IMPORT_20260928.md最新章节；编码切换、读取失败及完整产品等仍待。
+
 2026-09-28文本页刷新已修复：TextEditorPart接入IRefreshablePart，UI线程resetDocument并检查被provider吞掉的错误状态。新增接口1项＋真实FileRefDocumentProvider/字符串存储3个场景（空/普通/中文特殊文本、读取失败保留文档、重试、disconnect忽略），联合19/19、0跳过。独立Linux副本补丁SHAd1deb0e2…062e52，71稳定快照显示导入中文/引号/反斜杠/换行，72/73保存后75/76服务端查询非NULL，实际UTF8十六进制与源文件字节自动断言一致，正常路径GUI通过。该环境两端UTF8但三个长度函数均23，未将其算作字符数语义验证；空值/编码切换/取消/读取失败GUI及完整构建仍待。见TEXT_FILE_IMPORT_20260928.md最新章节，未增加JUnit GUI计数。
 
 2026-09-28文本导入Linux GUI未通过：独立副本更新data补丁SHA06f3b028…75ab83后，普通账号新建专用schema表、插入original并读回；刷新连接解决新schema初始只读入口后，通过真实文件选择器导入UTF8中文/引号/反斜杠/换行文本，稳定61快照仍显示original、未保存星号存在。定位TextEditorPart/BaseTextEditor没有IRefreshablePart，文档未重载；尚未修复，不以15项组件通过替代。未保存导入，测试表保留待复验清理。完整构建HSaZEP(Java11版本错误)、yCiwsC(JDK25下Tycho缓存锁超时)均未进入测试。详见TEXT_FILE_IMPORT_20260928.md最新章节。
