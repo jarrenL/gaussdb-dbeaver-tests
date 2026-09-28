@@ -2,6 +2,8 @@
 
 ## 当前状态摘要（优先于下方按时间保留的旧结论）
 
+2026-09-29真库专项门禁独立化并补13项自测，与原门禁7项共20/20、零跳过。精确核对set-query四项/plan六项身份、无重复、时间、实际结果/汇总一致及非零完整执行；拒绝缺项/错身份/跳过/损坏/旧报告。实际四项JDBC权限错误XML亦被正确拒绝。不增加DBeaver功能通过数，真库四项仍0通过，见LIVE_SELECTION_VALIDATION.md。
+
 2026-09-29括号普通/锁定SELECT补6项，红测均UNKNOWN；SQLQuery补包装PlainSelect分类、内部FOR/INTO标记，保留原AST和非plain边界，setText/reset验证元数据不残留。投影101/101，507六条只读字面量语法对照成功（无真实锁竞争）。73模块2546项：2372通过173跳过1Rest错误，门禁拒绝；真实JDBC/GUI仍待。见PARENTHESIZED_SELECT_LOCKING_20260929.md。
 
 2026-09-29集合查询JDBC补4个只读用例（集合运算/中文列名及类型/NULL/顺序/重复行/连接复用），生产SQLQuery+真实厂商JDBC。修正专项运行器旧临时依赖和独立连接driverClass环境回退后，实际建连仍全部SocketException权限拒绝：0通过4失败0跳过。常规73模块2540项为2366通过173跳过1Rest错误，新增4项未启用真库不算通过。复跑入口run-live-plan-focused.mjs --set-queries，无DDL；增加XML拒绝跳过门控，成功分支仍待真库验证。见SET_QUERY_JDBC_PENDING_20260929.md。

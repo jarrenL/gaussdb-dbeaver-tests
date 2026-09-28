@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
+import {expectedLiveCases, verifyLiveSelection} from './verify-live-selection.mjs';
 const setQueries = process.argv.includes('--set-queries');
 if (!setQueries && process.env.GAUSSDB_HISTORY_ALLOW_DDL !== 'YES') {
  console.error('Isolated live-plan tests require GAUSSDB_HISTORY_ALLOW_DDL=YES.');
@@ -64,6 +65,7 @@ run('javac', ['--release', '21', '-cp', cp.join(':'), '-d', output, source,
  root + '/plugins/org.jkiss.dbeaver.ext.postgresql/src/org/jkiss/dbeaver/ext/postgresql/model/plan/PostgrePlanNodeExternal.java',
  root + '/plugins/org.jkiss.dbeaver.ext.postgresql/src/org/jkiss/dbeaver/ext/postgresql/model/plan/PostgrePlanNodeXML.java',
  root + '/plugins/org.jkiss.dbeaver.ext.postgresql/src/org/jkiss/dbeaver/ext/postgresql/model/plan/PostgrePlanNodeBase.java']);
+const startedAt = Date.now();
 run('java', ['-javaagent:' + agent, '-Djava.awt.headless=true', '-cp', cp.join(':'),
  'org.junit.platform.console.ConsoleLauncher', 'execute', ...(setQueries ? [
  'parenthesizedSetResultsPreserveLabelsTypesNullsAndOrder(java.lang.String)'
@@ -76,19 +78,9 @@ run('java', ['-javaagent:' + agent, '-Djava.awt.headless=true', '-cp', cp.join('
  ]).flatMap(name => ['--select-method', 'org.jkiss.dbeaver.ext.gaussdb.debug.core.GaussDBHistoricalJdbcLiveTest#' + name]),
  '--reports-dir', path.join(output, 'reports'), '--fail-if-no-tests',
  '--details=summary', '--disable-banner']);
-let executed = 0;
-for (const name of fs.readdirSync(path.join(output, 'reports')).filter(name => name.endsWith('.xml'))) {
- const xml = fs.readFileSync(path.join(output, 'reports', name), 'utf8');
- const header = xml.match(/<testsuite\b([^>]*)>/)?.[1];
- if (!header) throw new Error('Missing JUnit suite header');
- const fields = Object.fromEntries([...header.matchAll(/([\w-]+)="([^"]*)"/g)].map(match => [match[1], match[2]]));
- for (const key of ['tests', 'failures', 'errors', 'skipped']) {
-  if (!/^\d+$/.test(fields[key] ?? '')) throw new Error('Invalid report counter: ' + key);
- }
- if (Number(fields.failures) || Number(fields.errors) || Number(fields.skipped)) {
-  throw new Error('Live selection has failures, errors, or skipped tests');
- }
- executed += Number(fields.tests);
-}
-if (executed === 0 || setQueries && executed !== 4) throw new Error('Incomplete live test selection: ' + executed);
+const reports = fs.readdirSync(path.join(output, 'reports')).filter(name => name.endsWith('.xml')).map(name => {
+ const file = path.join(output, 'reports', name);
+ return {xml: fs.readFileSync(file, 'utf8'), modified: fs.statSync(file).mtimeMs};
+});
+const executed = verifyLiveSelection(reports, expectedLiveCases(setQueries), startedAt);
 console.log('Verified live tests without skips: ' + executed);
