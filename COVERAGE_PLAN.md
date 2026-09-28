@@ -2,6 +2,8 @@
 
 ## 当前状态摘要（优先于下方按时间保留的旧结论）
 
+2026-09-29凭据写入/清理失败传播补4项，修复前全部红测复现异常被日志吞掉、保存正常返回；生产saveSecureCredentialsFile改为传播原始DBException/IOException，上层已具备记录路径。同保存器显式重试及加密输出/清理请求通过，配置类57/57。明确主配置可能已写，不宣称双文件原子性、真实磁盘失败或GUI提示。完整73模块2516项：2346通过、169跳过、1项Rest网络权限错误，门控仍拒绝。见CREDENTIAL_WRITE_FAILURE_20260929.md及逐项JSON。
+
 2026-09-29真实保存器旧凭据替换补3项：按registry实际流程每次新建serializer，改名/删除/关闭密码保存后解密检查实际写入字节；旧名称键或密码不残留、删最后配置写null清理请求、原内存和旧输出不变。配置类53/53，无生产修复；非磁盘删除/原子写/失败恢复。完整73模块2512项中2342通过、169跳过、1项Rest网络权限错误，门控仍拒绝。见NETWORK_PROFILE_METADATA_20260929.md及NETWORK_CREDENTIAL_CLEANUP_REACTOR_20260929.json。
 
 2026-09-29不受信任handler导出补4项：SSH/PG SSL×安全标志，验证主JSON无handler用户/密码/私钥/host/保存密码开关且独立凭据表为空；实际解析后仅保留handler及启用状态，原配置不变。配置类50/50，无生产修改。完整73模块2509项：2339通过、169跳过、1项Rest网络权限错误，门控仍拒绝。非磁盘/共享权限/实际连接验收，Docker拒绝未动现场。见NETWORK_PROFILE_METADATA_20260929.md顶部及NETWORK_UNTRUSTED_EXPORT_REACTOR_20260929.json。
