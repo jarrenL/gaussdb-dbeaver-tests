@@ -2,6 +2,8 @@
 
 ## 当前状态摘要（优先于下方按时间保留的旧结论）
 
+2026-09-28集合查询新增8项，红测复现UNION/ALL/INTERSECT/EXCEPT（含同表、CTE、中文别名ORDER、混合）被SQLQuery归UNKNOWN。补SetOperationList→SELECT，保留非plain、无单一目标/星号元数据；联合513/513通过、0跳过。生产执行准备及统计页焦点调用点已源码检查，非GUI或真库验收。见PROJECTION_DML_TARGETS_20260928.md。
+
 2026-09-28别名/DML来源映射新增6项：UPDATE嵌套/关联、DELETE内外层同名别名/USING、INSERT SELECT、中文引号目标。生产SQLQuery正确识别DML类型及目标schema/table，未把读取来源当目标；原投影60项一并复跑。显式编译SQLQuery/SQLSelectItem/GaussDBDialect，联合505/505通过、0跳过，其中仅6项新增、60项原有测试首次纳入该联合脚本；不与历史全量叠加。正式门控加入投影类。非真库DML执行或补全/编辑器GUI，见PROJECTION_DML_TARGETS_20260928.md。
 
 2026-09-28旧版网络凭据迁移新增5项：正常＋第二handler枚举/用户/密码/属性读取失败。修正不支持静态模拟的夹具后，4项红测复现先前handler已部分更新；改先在副本加载、全体成功后更新原handler，联合439/439通过。直接调用迁移方法非应用分支/真实密钥库验收。完整run-M0GyL5仍缓存锁超时，真库6项连接权限失败0通过。见NETWORK_PROFILE_CONTRACTS_20260928.md。
