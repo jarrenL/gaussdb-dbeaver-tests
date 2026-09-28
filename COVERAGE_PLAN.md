@@ -2,6 +2,8 @@
 
 ## 当前状态摘要（优先于下方按时间保留的旧结论）
 
+2026-09-29会话取消/终止接口补9种非法编号，均红测复现未拒绝。生产先校验ASCII正整数及long范围，创建语句前失败；每项取消/终止两分支均验证无SQL交互。Identity15/15、Gauss会话10/10；73模块2694项：2520通过173跳过1Rest权限错误，门禁拒绝、自测7/7。API边界防护，非已证实GUI漏洞或真实会话操作验收，见主仓SESSION_ID_VALIDATION_20260929.md。
+
 2026-09-29会话PID读取失败新增4项：第二行08006/42501/22003/NULL均红测复现伪造0编号。PostgreSession改直接getLong+wasNull，SQLException传播/NULL拒绝，显式刷新恢复断言通过。Gauss会话10/10、64位身份6/6；73模块clean verify共2685项：2511通过173跳过1Rest权限错误，独立门禁拒绝、自测7/7。非真库连接恢复/GUI或整包，见主仓SESSION_PID_READ_FAILURE_20260929.md。
 
 2026-09-29会话大PID补6项：5种编号的模型/取消终止SQL保真及低32位相同对象身份，红测4失败；共享PostgreSession改long读取/存储/getter。首次增量5个旧签名NoSuchMethodError，73模块clean verify后6/6及Gauss会话6/6通过。总2681：2507通过173跳过1Rest权限错误，门禁拒绝、自测7/7。返回类型二进制不兼容需统一重打包；未发真实取消/终止请求、Docker拒绝，无真库/GUI新增。见主仓SESSION_PID_WIDTH_20260929.md。
