@@ -2,6 +2,8 @@
 
 ## 当前状态摘要（优先于下方按时间保留的旧结论）
 
+2026-09-28属性长度源码修复：ColumnInfoPanel重新收集当前值，ContentEditor内容变更在UI线程更新属性并finally保留dirty通知；Java21目标编译通过。data插件已在本地打成待验证补丁，但停止独立GUI进程被权限拒绝且复查仍运行，未覆盖运行副本。属性长度GUI/行为测试尚未通过，无新增通过计数，见BYTEA_GUI_PENDING_20260928.md最新章节。
+
 2026-09-28独立麒麟GUI副本部署hex补丁并校验SHA256，实际LOB编辑器文件导入0→4字节→0，稳定快照08/11及截图确认十六进制/字符区更新，内容区刷新通过。另发现属性树长度仍显示0（非空时错误），保存与数据库空值区分尚待。副本保留未保存状态，原进程未改，非最新整包、无新增JUnit数。见BYTEA_GUI_PENDING_20260928.md最新GUI章节。
 
 2026-09-28二进制刷新加载组件4/4通过、0跳过：接口注册及0/2/65537字节真实文件替换、失败不安装内容、有效文件重试，生产BinaryEditor/BinaryContent显式编译，HexManager和输入为替身。独立fixtures/java测试及run-hex-content-focused.mjs，不代表SWT线程/屏幕刷新/数据库保存，不并入705计数，尚未进入Tycho门控。见BYTEA_GUI_PENDING_20260928.md最新组件章节。
