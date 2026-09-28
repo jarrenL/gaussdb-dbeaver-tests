@@ -2,6 +2,8 @@
 
 ## 当前状态摘要（优先于下方按时间保留的旧结论）
 
+2026-09-28导入开始前取消修复：文本/二进制两项红测均未抛中断，输入层新增任何读取/释放前取消检查，InterruptedException绕开错误包装；工具栏任务中断增加一项不导入/标脏/刷新断言。联合43/43、真实OSGi三类34/34均0跳过且逐类门控通过。仅开始前取消，读取途中/GUI取消及最新整包仍待，运行GUI副本未安装此补丁。见TEXT_FILE_IMPORT_20260928.md顶部。
+
 2026-09-28 UI fragment真实OSGi接入已验：编译源码归属清单、独立配置追加hex/test fragment与testpluginname、UI限定agent，三个类4+4+23=31/31、0失败错误跳过，逐类门控通过；平台运行器回归14类282/282亦通过。普通classpath40/40含同组，不累加。日志editor-osgi-first-20260928、platform-runner-regression-20260928；完整Tycho锁失败仍未解决，也不是GUI/最新整包。详见TEXT_FILE_IMPORT_20260928.md顶部，更新上一条OSGi未验状态。
 
 2026-09-28 UI正式模块迁移：31项编辑器用例迁入主仓ui.editors.data.test fragment，原三个Java/inline副本删除，专项编译引用同一源码，联合9项JDBC仍40/40、0跳过。父模块/reactor/汇总/必需类门控均加入，校验器7/7。正式run-Ncu1z1识别模块后Tycho缓存锁超时，未进入测试；新fragment OSGi/instrumentation及完整构建未验证，不算正式运行通过。详见TEXT_FILE_IMPORT_20260928.md顶部及模块README。
