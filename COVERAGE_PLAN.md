@@ -2,6 +2,8 @@
 
 ## 当前状态摘要（优先于下方按时间保留的旧结论）
 
+2026-09-28二进制刷新加载组件4/4通过、0跳过：接口注册及0/2/65537字节真实文件替换、失败不安装内容、有效文件重试，生产BinaryEditor/BinaryContent显式编译，HexManager和输入为替身。独立fixtures/java测试及run-hex-content-focused.mjs，不代表SWT线程/屏幕刷新/数据库保存，不并入705计数，尚未进入Tycho门控。见BYTEA_GUI_PENDING_20260928.md最新组件章节。
+
 2026-09-28空bytea GUI续验取得2103结果：动作OK但LOB未保存；菜单保存2104关闭LOB，表格保存2105出现08003连接关闭，最终数据库值仍待核验。BinaryEditor补IRefreshablePart及UI线程当前文件重载，空文件不沿用旧缓冲，加载失败不返回成功；仅Java21目标编译通过，未安装验收副本、无新增行为测试通过项。见BYTEA_GUI_PENDING_20260928.md后续进展。
 
 2026-09-28 Linux空bytea GUI续验：运行中历史副本LOB编辑器导入实测零字节文件后仍显示01 02和长度2、出现未保存标记。源码BinaryEditor缺少内容刷新接口为可疑点，尚未确认数据库最终值。已发2103保存+dump后Docker再次权限拒绝，未取得结果，不可重复保存或算通过。快照和截图见BYTEA_GUI_PENDING_20260928.md；未增加JUnit数，非最新整包验收。
