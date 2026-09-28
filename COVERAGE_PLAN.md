@@ -2,6 +2,8 @@
 
 ## 当前状态摘要（优先于下方按时间保留的旧结论）
 
+2026-09-28 3.15/9.7备份任务循环补4项：生产doExecute成功执行两对象、首对象取消/IO失败/中断停止后续，异常身份与cause、无失败完成通知和无备份刷新。执行子进程部分为确定性替身；脚本同时编译当前AbstractNativeToolHandler，原生专项27/27通过（含旧23项及三个实际受控进程），无新生产修复，非真库/GUI取消。见NATIVE_COMMAND_CONTRACTS_20260928.md。
+
 2026-09-28 3.15备份发布补3项：实际本机true/false进程、生产executeProcess成功/取消/非零退出。红测确认取消仍返回成功并覆盖既有备份；改为成功且未取消才复制发布，finally清理不变。原生专项23/23通过、0跳过，非真实gs_dump/网络/GUI/Windows；复制已开始后取消及中途失败原子保护仍待。见NATIVE_COMMAND_CONTRACTS_20260928.md。
 
 2026-09-28 3.15恢复暂存泄漏修复：CUSTOM/DIRECTORY两项进入生产fillProcessParameters，源缺失时红测复现未登记临时路径残留；复制失败立即清理并重抛，修正源后同处理器重试成功。原生专项20/20通过（含旧18项）。暂存分支/工厂测试限定TempDir，其余实际IO；非远程中断/子进程取消/Windows，见NATIVE_COMMAND_CONTRACTS_20260928.md。
