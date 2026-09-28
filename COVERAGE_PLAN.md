@@ -2,6 +2,8 @@
 
 ## 当前状态摘要（优先于下方按时间保留的旧结论）
 
+2026-09-28共享SQLQuery影响扩大回归：加入已有SQLQueryRecoveryPolicyTest/GaussDBSQLSafetyTest，共96项既有场景，并新增6项简单SELECT已获重试许可→写入/函数/锁/集合/写入CTE/错误SQL→reset的判断。显式编译当前恢复策略及SQLSemanticProcessor，联合630/630通过、0跳过；本轮无新增生产修复。两类纳入正式门控。不是实际网络断线自动重试、危险确认GUI或其他数据库真库验收，见PROJECTION_DML_TARGETS_20260928.md。
+
 2026-09-28SQL安全影响回归新增8项：文本切换后UPDATE/DELETE有无WHERE、DROP及reset；FOR UPDATE/INTO修改标记。增强既有8项集合查询断言，复现前次分类修复遗漏导致isModifying=true，明确SetOperationList返回false。联合528/528通过、0跳过；刷新修改标记调用点已源码核查，非GUI。Hermes初始化权限失败无报告。见PROJECTION_DML_TARGETS_20260928.md。
 
 2026-09-28SQL文本替换/reset新增7项：5种切换红测复现缓存保留；setText清空派生解析状态、reset经同入口恢复，另验实际参数填充两轮及JOIN派生名称清理。修正依赖OSGi的测试夹具后联合520/520通过、0跳过；参数、执行标识、位置/长度及限制保留。非GUI/翻译向导/JDBC执行，见PROJECTION_DML_TARGETS_20260928.md。
