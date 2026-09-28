@@ -46,6 +46,74 @@ class ContentEditorFileImportTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {false, true})
+    void textSaveRechecksReadOnlyAfterImport(boolean discard) throws Exception {
+        var controller = mock(IValueController.class);
+        var input = input(controller, "UTF-8");
+        var selected = directory.resolve("read-only-text.txt");
+        Files.writeString(selected, "中文 pending");
+        input.loadFromExternalFile(selected.toFile(), new NullProgressMonitor());
+        when(controller.isReadOnly()).thenReturn(true);
+        assertThrows(DBException.class,
+            () -> input.updateContentFromFile(new VoidProgressMonitor(), "original"));
+        verify(controller, never()).updateValue(any(), anyBoolean());
+        assertEquals("中文 pending", ((StringEditorInput.StringStorage) field(input, "stringStorage")).getString());
+        if (discard) {
+            input.release();
+            verify(controller, never()).updateValue(any(), anyBoolean());
+        } else {
+            when(controller.isReadOnly()).thenReturn(false);
+            input.updateContentFromFile(new VoidProgressMonitor(), "original");
+            verify(controller).updateValue("中文 pending", false);
+            input.release();
+        }
+        assertEquals("中文 pending", Files.readString(selected));
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {false, true})
+    void binarySaveRechecksReadOnlyAfterImport(boolean discard) throws Exception {
+        var controller = mock(IValueController.class);
+        var input = input(controller, "UTF-8");
+        var original = new byte[] {1, 2, 3};
+        var content = spy(new JDBCContentBytes(mock(DBCExecutionContext.class), original));
+        when(controller.getValue()).thenReturn(content);
+        field(input, "stringStorage", null);
+        var oldFile = directory.resolve("read-only-original.bin");
+        Files.write(oldFile, original);
+        field(input, "contentFile", oldFile.toFile());
+        field(input, "contentDetached", true);
+        var selected = directory.resolve("read-only-selected.bin");
+        var replacement = new byte[] {0, -1, 7, 9};
+        Files.write(selected, replacement);
+        try (var workbench = mockStatic(DBWorkbench.class)) {
+            workbench.when(DBWorkbench::getPlatform).thenReturn(mock(DBPPlatform.class));
+            input.loadFromExternalFile(selected.toFile(), new NullProgressMonitor());
+            when(controller.isReadOnly()).thenReturn(true);
+            assertThrows(DBException.class,
+                () -> input.updateContentFromFile(new VoidProgressMonitor(), content));
+            verify(content, never()).updateContents(any(), any());
+            assertArrayEquals(original, content.getContentStream().readAllBytes());
+            assertEquals(Boolean.TRUE, field(input, "externalContentPending"));
+            if (discard) {
+                input.release();
+                verify(content, never()).updateContents(any(), any());
+                assertArrayEquals(original, content.getContentStream().readAllBytes());
+            } else {
+                when(controller.isReadOnly()).thenReturn(false);
+                input.updateContentFromFile(new VoidProgressMonitor(), content);
+                verify(content).updateContents(any(), any());
+                assertArrayEquals(replacement, content.getContentStream().readAllBytes());
+                assertEquals(Boolean.FALSE, field(input, "externalContentPending"));
+                input.release();
+            }
+        }
+        verify(controller, never()).updateValue(any(), anyBoolean());
+        assertArrayEquals(original, Files.readAllBytes(oldFile));
+        assertArrayEquals(replacement, Files.readAllBytes(selected));
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {false, true})
     void toolbarImportOnlyMarksEditorDirtyAndNeverPublishes(boolean cancel) throws Exception {
         var contributor = mock(ContentEditorContributor.class);
         var editor = mock(ContentEditor.class);
