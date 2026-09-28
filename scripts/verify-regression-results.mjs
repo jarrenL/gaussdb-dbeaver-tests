@@ -24,6 +24,7 @@ export const requiredClasses = [
     ['org.jkiss.dbeaver.test.platform', 'org.jkiss.dbeaver.utils.ProgressMonitorContractTest'],
     ['org.jkiss.dbeaver.test.platform', 'org.jkiss.dbeaver.model.impl.jdbc.data.JDBCContentBytesReadTest'],
     ['org.jkiss.dbeaver.test.platform', 'org.jkiss.dbeaver.model.impl.jdbc.data.JDBCContentXMLReadTest'],
+    ['org.jkiss.dbeaver.test.platform', 'org.jkiss.dbeaver.model.impl.jdbc.data.JDBCContentCLOBReadTest'],
     ['org.jkiss.dbeaver.test.platform', 'org.jkiss.dbeaver.model.data.storage.BytesContentStorageTest'],
     ['org.jkiss.dbeaver.test.platform', 'org.jkiss.dbeaver.model.data.storage.StringContentStorageTest'],
     ['org.jkiss.dbeaver.test.platform', 'org.jkiss.dbeaver.model.impl.data.formatters.DateTimeDataFormatterLocaleTest'],
