@@ -2,6 +2,8 @@
 
 ## 当前状态摘要（优先于下方按时间保留的旧结论）
 
+2026-09-28 3.15/9.7有界原生取消补2项：实际普通/忽略TERM进程就绪后取消，红测复现IOException误分类及无限轮询。取消改为终止→最多1秒宽限→必要时强制终止→InterruptedException，备份取消保护同步按中断断言。专项31/31通过，测试确认进程/线程退出；非真库/GUI/Windows/进程树，见NATIVE_COMMAND_CONTRACTS_20260928.md。
+
 2026-09-28 3.15/9.7原生进程回收补2项：实际/bin/sleep启动后回调IO失败/等待中断，红测复现任务退出仍留子进程。共享AbstractNativeToolHandler finally仅终止自有仍存活进程、保留原错误；专项29/29通过，测试finally兜底清理且确认退出。非真库服务器/Windows/GUI/进程树，见NATIVE_COMMAND_CONTRACTS_20260928.md。
 
 2026-09-28 3.15/9.7备份任务循环补4项：生产doExecute成功执行两对象、首对象取消/IO失败/中断停止后续，异常身份与cause、无失败完成通知和无备份刷新。执行子进程部分为确定性替身；脚本同时编译当前AbstractNativeToolHandler，原生专项27/27通过（含旧23项及三个实际受控进程），无新生产修复，非真库/GUI取消。见NATIVE_COMMAND_CONTRACTS_20260928.md。
