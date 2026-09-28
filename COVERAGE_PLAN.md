@@ -2,6 +2,8 @@
 
 ## 当前状态摘要（优先于下方按时间保留的旧结论）
 
+2026-09-29数组文本补18项：首尾ASCII空白6项红测复现未引用；生产PostgreArrayValueHandler补tab/LF/CR/FF/VT引用（GaussDB复用）。另验NULL/空串/字面NULL、引号反斜杠、中文扩展字、嵌套/空数组及自定义分隔符。共享816/816，PG OSGi5类98/98、门控7/7通过，零跳过。不与旧计数相加；模拟JDBC绑定非真库写回，Docker API仍拒绝。见ARRAY_TEXT_BOUNDARIES_20260929.md，数组整体仍部分覆盖。
+
 2026-09-29当前59aadfcbe2五模块重编译OSGi复验：核心629、调试112、平台366、PG计划80、编辑器43，共77类1230项全部通过，零失败错误跳过。前置59和共享798有重叠不累加。编辑器专项亦去除对临时GUI jar目录的依赖。完整入口run-LPALys仍Tycho缓存锁超时、测试未执行；Docker API拒绝、辅助审核日志初始化失败。逐类JSON和范围见主仓COMPONENT_REGRESSION_20260929.md；不是完整构建、真库、GUI或整包验收。
 
 2026-09-29连续刷新补4项：库名精确匹配、空缓存恢复、连续替换后重新绑定、歧义消除。首轮Mockito嵌套stubbing修正后，共享798/798、OSGi平台21类366/366，零失败错误跳过；仅方法快照顺序测试，非并发/实际OpenContextJob/事务。专项脚本不再依赖缺失jar的临时GUI目录，改读已解析OSGi配置并排除source包。Docker API本轮拒绝，待保存行GUI未完成，不增加真库/GUI通过数。详见TEXT_SAVE_RECONNECT_FINDING_20260928.md顶部。
