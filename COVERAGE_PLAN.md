@@ -2,6 +2,8 @@
 
 ## 当前状态摘要（优先于下方按时间保留的旧结论）
 
+2026-09-28实际异步日志新增3项：真实进程已退出但日志线程被锁存器阻塞时，红测复现提前返回；共享基类join日志完成后判定，并轮询取消。stdout/stderr释放后结果与日志正确，取消等待2秒内InterruptedException；联合338/338通过、0跳过。测试finally释放阻塞并确认线程退出，不作为产品强制回收证据；取消后立即重试隔离仍待。详见NATIVE_COMMAND_CONTRACTS_20260928.md。
+
 2026-09-28原生日志重试新增2项，实际shell stderr＋生产LogReaderJob同步完成后判定。红测复现无换行末行丢失和旧错误污染成功重试；补EOF末行与每次进程执行状态清空后联合335/335通过、0跳过。非异步线程完成时序/警告分类/真库/GUI验收；异步日志生命周期仍待。见NATIVE_COMMAND_CONTRACTS_20260928.md。
 
 2026-09-28原生准备阶段取消新增3项：进入前/命令生成中/参数配置中置取消，红测均仍启动受控true进程。共享AbstractNativeToolHandler补三个取消检查后联合333/333通过、0跳过；已有330项全部复跑。验证InterruptedException、阶段调用次数与monitor.done；不证明start竞态完全消除或已启动恢复可回滚，非Windows/真库/GUI。证据NATIVE_COMMAND_CONTRACTS_20260928.md。
