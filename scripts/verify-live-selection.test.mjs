@@ -3,6 +3,12 @@ import assert from 'node:assert/strict';
 import {expectedLiveCases, verifyLiveSelection} from './verify-live-selection.mjs';
 
 const expected = expectedLiveCases(true);
+test('accepts only the dedicated session case and rejects conflicting modes', () => {
+    const sessions = expectedLiveCases(false, true);
+    assert.equal(verifyLiveSelection([fixture(sessions)], sessions, 1000), 1);
+    assert.throws(() => verifyLiveSelection([fixture()], sessions, 1000), /selection/);
+    assert.throws(() => expectedLiveCases(true, true), /Conflicting/);
+});
 function fixture(identities = expected, body = '', overrides = {}) {
     const counts = {tests: identities.length, errors: 0, failures: 0, skipped: 0, ...overrides};
     return {modified: 2000, xml: `<testsuite ${Object.entries(counts).map(([k,v]) => `${k}="${v}"`).join(' ')}>`

@@ -3,7 +3,9 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import {expectedLiveCases, verifyLiveSelection} from './verify-live-selection.mjs';
 const setQueries = process.argv.includes('--set-queries');
-if (!setQueries && process.env.GAUSSDB_HISTORY_ALLOW_DDL !== 'YES') {
+const sessions = process.argv.includes('--sessions');
+if (setQueries && sessions) throw new Error('Choose only one focused live selection');
+if (!setQueries && !sessions && process.env.GAUSSDB_HISTORY_ALLOW_DDL !== 'YES') {
  console.error('Isolated live-plan tests require GAUSSDB_HISTORY_ALLOW_DDL=YES.');
  process.exit(2);
 }
@@ -59,6 +61,8 @@ function run(bin, args) {
 }
 console.log('Focused output: ' + output);
 run('javac', ['--release', '21', '-cp', cp.join(':'), '-d', output, source,
+ root + '/plugins/org.jkiss.dbeaver.ext.postgresql/src/org/jkiss/dbeaver/ext/postgresql/model/session/PostgreSession.java',
+ root + '/plugins/org.jkiss.dbeaver.ext.postgresql/src/org/jkiss/dbeaver/ext/postgresql/model/session/PostgreSessionManager.java',
  root + '/plugins/org.jkiss.dbeaver.model/src/org/jkiss/dbeaver/model/sql/SQLQuery.java',
  root + '/plugins/org.jkiss.dbeaver.ext.postgresql/src/org/jkiss/dbeaver/ext/postgresql/model/plan/PostgreExecutionPlan.java',
  root + '/plugins/org.jkiss.dbeaver.ext.postgresql/src/org/jkiss/dbeaver/ext/postgresql/model/plan/PostgreQueryPlaner.java',
@@ -67,7 +71,9 @@ run('javac', ['--release', '21', '-cp', cp.join(':'), '-d', output, source,
  root + '/plugins/org.jkiss.dbeaver.ext.postgresql/src/org/jkiss/dbeaver/ext/postgresql/model/plan/PostgrePlanNodeBase.java']);
 const startedAt = Date.now();
 run('java', ['-javaagent:' + agent, '-Djava.awt.headless=true', '-cp', cp.join(':'),
- 'org.junit.platform.console.ConsoleLauncher', 'execute', ...(setQueries ? [
+ 'org.junit.platform.console.ConsoleLauncher', 'execute', ...(sessions ? [
+ 'realOwnSessionPreservesBackendIdentityAndDatabase'
+ ] : setQueries ? [
  'parenthesizedSetResultsPreserveLabelsTypesNullsAndOrder(java.lang.String)'
  ] : [
  'realRecursivePlanPreservesWorkTableAndCteNodes',
@@ -82,5 +88,5 @@ const reports = fs.readdirSync(path.join(output, 'reports')).filter(name => name
  const file = path.join(output, 'reports', name);
  return {xml: fs.readFileSync(file, 'utf8'), modified: fs.statSync(file).mtimeMs};
 });
-const executed = verifyLiveSelection(reports, expectedLiveCases(setQueries), startedAt);
+const executed = verifyLiveSelection(reports, expectedLiveCases(setQueries, sessions), startedAt);
 console.log('Verified live tests without skips: ' + executed);

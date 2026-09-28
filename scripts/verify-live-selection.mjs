@@ -1,8 +1,9 @@
 import assert from 'node:assert/strict';
 
 const testClass = 'org.jkiss.dbeaver.ext.gaussdb.debug.core.GaussDBHistoricalJdbcLiveTest';
-export function expectedLiveCases(setQueries) {
-    const names = setQueries
+export function expectedLiveCases(setQueries, sessions = false) {
+    assert(!(setQueries && sessions), 'Conflicting live selections');
+    const names = sessions ? ['realOwnSessionPreservesBackendIdentityAndDatabase()'] : setQueries
         ? [1, 2, 3, 4].map(i => `parenthesizedSetResultsPreserveLabelsTypesNullsAndOrder(String)[${i}]`)
         : [
             'realRecursivePlanPreservesWorkTableAndCteNodes()',
