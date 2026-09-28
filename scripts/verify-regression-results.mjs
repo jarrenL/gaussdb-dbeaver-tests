@@ -5,6 +5,8 @@ import {pathToFileURL} from 'node:url';
 export const requiredModules = ['org.jkiss.dbeaver.test.platform', 'org.jkiss.dbeaver.ext.gaussdb.test',
     'org.jkiss.dbeaver.ext.gaussdb.debug.test', 'org.jkiss.dbeaver.ext.postgresql.test'];
 export const requiredClasses = [
+    ...['GaussDBExcelExportTest', 'GaussDBCSVReplacementTest', 'GaussDBStreamExportFailureTest']
+        .map(name => ['org.jkiss.dbeaver.ext.gaussdb.test', 'org.jkiss.dbeaver.ext.gaussdb.model.' + name]),
     ['org.jkiss.dbeaver.test.platform', 'org.jkiss.dbeaver.utils.VersionUtilsTest'],
     ['org.jkiss.dbeaver.test.platform', 'org.jkiss.dbeaver.utils.DatabaseExceptionContractTest'],
     ['org.jkiss.dbeaver.test.platform', 'org.jkiss.dbeaver.utils.ProgressMonitorContractTest'],
