@@ -2,6 +2,8 @@
 
 ## 当前状态摘要（优先于下方按时间保留的旧结论）
 
+2026-09-29包编译部分诊断读取补4项：读取第二行/字段、关闭结果集/语句失败后保留首条BODY诊断、原始cause及调用者session所有权。Compiler21/21，生产未改；73模块2660项：2486通过173跳过1Rest网络权限错误，独立门禁拒绝，门禁自测7/7。Docker仍拒绝，非真库/GUI验收，见主仓PACKAGE_PARTIAL_DIAGNOSTICS_20260929.md。
+
 2026-09-29批量包编译追加8项：三target×异常/同时取消保留失败对象自身诊断和准确归属、对象间取消、结果列表独立只读。生产调度器+注入Compiler，Batch15/15，未改生产；门禁自测7/7。73模块2656项：2482通过173跳过1Rest权限错误，门禁拒绝。completed非编译成功数，同名对象模型不等于跨schema真库验收；无真库/GUI新增通过，见主仓PACKAGE_BATCH_DIAGNOSTICS_20260929.md。
 
 2026-09-29包状态字段失败再补4项：先读成功SPEC，再在BODY的type/valid读取失败（42703/08006），红测4项复现部分状态发布/异常吞掉。两列改直接getter，未知有效性和最后已知BODY存在性保留，连接错误传播；StateRefresh10/10。73模块2648项：2474通过173跳过1Rest权限错误，门禁拒绝。Docker拒绝，无真库/GUI新增通过；见主仓PACKAGE_STATE_REFRESH_20260929.md追加节及PACKAGE_STATE_FIELD_REACTOR证据。
