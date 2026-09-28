@@ -2,6 +2,8 @@
 
 ## 当前状态摘要（优先于下方按时间保留的旧结论）
 
+2026-09-29基线814d6322b6数组系列修复跨模块复验：Gauss核心638、调试112、平台375、PG159、编辑器43，共84类1327项，零失败错误跳过，逐类门控通过。源码联合重编译，前置59/共享888不累加。完整入口run-CgFUha依然Tycho锁失败未执行，Docker拒绝、辅助审核日志路径拒绝；没有完整产品/真库/GUI通过结论。见主仓COMPONENT_REGRESSION_20260929.md顶部及ARRAY_FAMILY_REGRESSION_20260929.json。
+
 2026-09-29集合显式复制补9项，2项红测复现子值复制失败被吞掉并借用原值；cloneValue改为成功才返回、失败清理已创建副本并传播异常，附加清理失败及identity clone保护。共享888/888、平台OSGi22类375/375、PG9类159/159、门控7/7通过。初始公开构造器兼容策略未改，任意非cloneable可变对象与GUI撤销仍待，不是真库或整包验收。见COLLECTION_CLONE_ISOLATION_20260929.md。
 
 2026-09-29复合类型实际绑定补9项：Gauss provider路由、0→1参数编号、Types.OTHER字面量内容、Java/对象NULL、异常cause及同对象重试、两种不支持值。1项红测复现非JDBC复合对象静默不绑定，handler明确拒绝后共享879/879、Gauss核心OSGi35类638/638、PG OSGi9类159/159、门控7/7通过。statement为替身，非数据库执行/GUI/自动SQL重放验证。详见COMPOSITE_ARRAY_ROUNDTRIP_20260929.md顶部。
