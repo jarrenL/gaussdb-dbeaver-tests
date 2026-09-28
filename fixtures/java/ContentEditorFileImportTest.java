@@ -21,6 +21,13 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.ui.IEditorPart;
 import org.jkiss.dbeaver.ui.data.IValueController;
 import org.jkiss.dbeaver.ui.editors.StringEditorInput;
+import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.model.app.DBPApplicationWorkbench;
+import org.jkiss.dbeaver.model.app.DBPPlatform;
+import org.jkiss.dbeaver.model.data.DBDContent;
+import org.jkiss.dbeaver.model.data.DBDContentStorage;
+import org.jkiss.dbeaver.runtime.DBWorkbench;
+import org.mockito.ArgumentCaptor;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -121,5 +128,68 @@ class ContentEditorFileImportTest {
         verify(controller, times(2)).updateValue("replacement", false);
         assertEquals("replacement", ((StringEditorInput.StringStorage) storage).getString());
         assertEquals(11, input.getContentLength());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"missing", "directory", "rejected", "same", "alias"})
+    void binaryImportPreservesOwnedFileUntilReplacementSucceeds(String scenario) throws Exception {
+        var workbenchField = DBWorkbench.class.getDeclaredField("applicationWorkbench");
+        workbenchField.setAccessible(true);
+        var originalWorkbench = workbenchField.get(null);
+        var workbench = mock(DBPApplicationWorkbench.class);
+        when(workbench.getPlatform()).thenReturn(mock(DBPPlatform.class));
+        workbenchField.set(null, workbench);
+        try {
+            var controller = mock(IValueController.class);
+            var input = input(controller, "UTF-8");
+            var content = mock(DBDContent.class);
+            when(controller.getValue()).thenReturn(content);
+            field(input, "stringStorage", null);
+            var original = directory.resolve("owned.bin");
+            var originalBytes = new byte[] {1, 2, 3};
+            Files.write(original, originalBytes);
+            field(input, "contentFile", original.toFile());
+            field(input, "contentDetached", false);
+            var replacement = directory.resolve("new.bin");
+            Files.write(replacement, new byte[] {9, 8});
+            boolean same = scenario.equals("same") || scenario.equals("alias");
+            if (same) {
+                var selected = original;
+                if (scenario.equals("alias")) {
+                    selected = directory.resolve("link.bin");
+                    Files.createSymbolicLink(selected, original);
+                }
+                input.loadFromExternalFile(selected.toFile(), new NullProgressMonitor());
+                assertArrayEquals(originalBytes, Files.readAllBytes(original));
+                var storage = ArgumentCaptor.forClass(DBDContentStorage.class);
+                verify(content).updateContents(any(), storage.capture());
+                try (var stream = storage.getValue().getContentStream()) {
+                    assertArrayEquals(originalBytes, stream.readAllBytes());
+                }
+                input.release();
+                assertArrayEquals(originalBytes, Files.readAllBytes(original));
+            } else {
+                var selected = scenario.equals("missing") ? directory.resolve("missing.bin")
+                    : scenario.equals("directory") ? directory : replacement;
+                if (scenario.equals("rejected")) {
+                    when(content.updateContents(any(), any())).thenThrow(new DBException("Rejected binary update"))
+                        .thenReturn(true);
+                }
+                assertThrows(CoreException.class,
+                    () -> input.loadFromExternalFile(selected.toFile(), new NullProgressMonitor()));
+                assertArrayEquals(originalBytes, Files.readAllBytes(original));
+                assertEquals(original.toString(), input.getPath().toOSString());
+                assertEquals(false, field(input, "contentDetached"));
+                if (!scenario.equals("rejected")) verify(content, never()).updateContents(any(), any());
+                input.loadFromExternalFile(replacement.toFile(), new NullProgressMonitor());
+                assertFalse(Files.exists(original), "Successful replacement releases the old owned file");
+                assertEquals(replacement.toString(), input.getPath().toOSString());
+                assertEquals(2, input.getContentLength());
+                input.release();
+                assertArrayEquals(new byte[] {9, 8}, Files.readAllBytes(replacement));
+            }
+        } finally {
+            workbenchField.set(null, originalWorkbench);
+        }
     }
 }
