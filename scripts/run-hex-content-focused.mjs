@@ -34,11 +34,13 @@ run('javac', ['--release', '21', '-cp', cp.join(':'), '-d', output,
  root + '/plugins/org.jkiss.dbeaver.ui.editors.data/src/org/jkiss/dbeaver/ui/data/managers/stream/TextEditorPart.java',
  root + '/plugins/org.jkiss.dbeaver.ui.editors.base/src/org/jkiss/dbeaver/ui/editors/text/FileRefDocumentProvider.java',
  path.resolve('fixtures/java/BinaryEditorContentReloadTest.java'),
+ root + '/test/org.jkiss.dbeaver.test.platform/src/org/jkiss/dbeaver/model/impl/jdbc/data/JDBCContentBytesReadTest.java',
  path.resolve('fixtures/java/TextEditorContentReloadTest.java'),
  path.resolve('fixtures/java/ContentEditorFileImportTest.java')]);
 run('java', ['-javaagent:' + agent, '-Djava.awt.headless=true', '-cp', cp.join(':'),
  'org.junit.platform.console.ConsoleLauncher', 'execute', '--select-class',
  'org.jkiss.dbeaver.acceptance.BinaryEditorContentReloadTest', '--fail-if-no-tests',
  '--select-class', 'org.jkiss.dbeaver.ui.editors.content.ContentEditorFileImportTest',
+ '--select-class', 'org.jkiss.dbeaver.model.impl.jdbc.data.JDBCContentBytesReadTest',
  '--select-class', 'org.jkiss.dbeaver.acceptance.TextEditorContentReloadTest',
  '--reports-dir', output + '/reports', '--details=summary', '--disable-banner']);

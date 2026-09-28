@@ -97,6 +97,7 @@ run('javac', ['--release', '21', '-cp', cp.join(':'), '-d', output, source, save
  root + '/plugins/org.jkiss.dbeaver.ext.gaussdb/src/org/jkiss/dbeaver/ext/gaussdb/model/data/GaussDBValueHandlerProvider.java',
  root + '/plugins/org.jkiss.dbeaver.model.jdbc/src/org/jkiss/dbeaver/model/impl/jdbc/data/JDBCContentBLOB.java',
  root + '/plugins/org.jkiss.dbeaver.model.jdbc/src/org/jkiss/dbeaver/model/impl/jdbc/data/JDBCContentBytes.java',
+ root + '/test/org.jkiss.dbeaver.test.platform/src/org/jkiss/dbeaver/model/impl/jdbc/data/JDBCContentBytesReadTest.java',
  root + '/test/org.jkiss.dbeaver.ext.gaussdb.test/src/org/jkiss/dbeaver/ext/gaussdb/model/data/GaussDBBinaryValueHandlerTest.java',
  root + '/plugins/org.jkiss.dbeaver.model/src/org/jkiss/dbeaver/model/sql/SQLQueryRecoveryPolicy.java',
  root + '/plugins/org.jkiss.dbeaver.model/src/org/jkiss/dbeaver/model/sql/parser/SQLSemanticProcessor.java',
@@ -136,6 +137,7 @@ run('java', ['-javaagent:' + agent, '-Djava.awt.headless=true', '-cp', cp.join('
  'org.jkiss.dbeaver.ext.postgresql.model.plan.PostgrePlanResponseTest', '--select-class',
  'org.jkiss.dbeaver.ext.postgresql.model.plan.PostgrePlanTransactionTest',
  '--select-class', 'org.jkiss.dbeaver.utils.VersionUtilsTest',
+ '--select-class', 'org.jkiss.dbeaver.model.impl.jdbc.data.JDBCContentBytesReadTest',
  '--select-class', 'org.jkiss.dbeaver.runtime.qm.QueryHistoryStoreTest',
  ...['PersistentQueryHistoryTest', 'QueryHistoryEventMapperTest', 'QueryHistoryPersistenceServiceTest']
   .flatMap(name => ['--select-class', 'org.jkiss.dbeaver.runtime.qm.' + name]),
