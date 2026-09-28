@@ -2,6 +2,8 @@
 
 ## 当前状态摘要（优先于下方按时间保留的旧结论）
 
+2026-09-28 6.3日期配置复用补7项：三时区切换/清除与locale替换、无效时区后重新初始化四项通过；三种引号文本红测复现JDBC日期显示noon→foof等改写，修复只替换引号外n。日期专项43/43通过（含旧36项），非GUI/真库；见DATETIME_ZONE_BOUNDARIES_20260928.md后续记录。
+
 2026-09-28 6.3/11.1–11.2时间格式补10项：DATE/TIME×UTC/上海/纽约6项红测复现显式时区调用toInstant异常，按LocalDate/LocalTime修复；纽约春跳时/秋重复小时4项在Timestamp/Offset/Zoned输入下偏移和微秒往返通过。现有格式类专项36/36通过（含旧26项）；真实Java值对象但非JDBC取数/GUI，见DATETIME_ZONE_BOUNDARIES_20260928.md。该类加入正式回归必需类门控。
 
 2026-09-28正式回归接入复核：platform模块在reactor清单内，父test/pom.xml的**/*Test.java包含新增VersionUtilsTest、DatabaseExceptionContractTest、ProgressMonitorContractTest；这仅证明配置，不代表OSGi已经执行。重跑run-1SXggQ在Tycho .m2缓存锁10000ms超时处失败，没有新JUnit结果。run-dbeaver-tests.sh新增verify-regression-results门控：四模块必须有执行通过项，七个新增/受影响计划及工具测试类必须出现且全部通过，报告新鲜度/逐项总计一致/失败为0；可选跳过仍单列，不能替代后续验收。新增7项验证器正反例，全体Node自测85/85通过（非客户端新增85场景），日志/tmp/regression-gates-node-20260928.log。
