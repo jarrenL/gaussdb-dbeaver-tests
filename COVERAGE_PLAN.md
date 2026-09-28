@@ -2,6 +2,8 @@
 
 ## 当前状态摘要（优先于下方按时间保留的旧结论）
 
+2026-09-28 3.15/10.2原生命令补7项：CR/NUL认证拒绝、管道write/flush/close失败cause保留且destroy、PLAIN/CUSTOM的中文空格特殊字符完整argv。显式编译三个生产handler，GaussDBNativePasswordTest 12/12通过（含旧5项），无新生产修复。不执行shell/备份恢复，不当作Windows验收；见NATIVE_COMMAND_CONTRACTS_20260928.md。加入正式回归必需测试类。
+
 2026-09-28近期共享修复联合回归：run-shared-focused.mjs同次编译当前相关生产类与11个测试类，同一JUnit进程292/292通过、0跳过；计划80/版本18/异常10/进度8/日期43/XLSX74/CSV10/流式49。是既有用例复跑，非新增292或完整1882基线更新；其他依赖仍使用已有产物。正式门控纳入三类导出测试，现要求11类。见SHARED_COMPONENT_REGRESSION_20260928.md及/tmp/shared-export-regression-20260928.log；完整构建/真库/GUI/Hermes/推送仍待。
 
 2026-09-28 6.3日期配置复用补7项：三时区切换/清除与locale替换、无效时区后重新初始化四项通过；三种引号文本红测复现JDBC日期显示noon→foof等改写，修复只替换引号外n。日期专项43/43通过（含旧36项），非GUI/真库；见DATETIME_ZONE_BOUNDARIES_20260928.md后续记录。
