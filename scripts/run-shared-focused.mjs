@@ -58,6 +58,8 @@ function run(bin, args) {
 }
 console.log('Focused output: ' + output);
 run('javac', ['--release', '21', '-cp', cp.join(':'), '-d', output, source, savedSource,
+ root + '/plugins/org.jkiss.dbeaver.model/src/org/jkiss/dbeaver/runtime/qm/QueryHistoryStore.java',
+ root + '/test/org.jkiss.dbeaver.test.platform/src/org/jkiss/dbeaver/runtime/qm/QueryHistoryStoreTest.java',
  root + '/plugins/org.jkiss.dbeaver.registry/src/org/jkiss/dbeaver/registry/FilterSerializer.java',
  root + '/plugins/org.jkiss.dbeaver.model/src/org/jkiss/dbeaver/model/access/DBAAuthProfile.java',
  root + '/plugins/org.jkiss.dbeaver.model/src/org/jkiss/dbeaver/model/net/DBWNetworkProfile.java',
@@ -129,6 +131,7 @@ run('java', ['-javaagent:' + agent, '-Djava.awt.headless=true', '-cp', cp.join('
  'org.jkiss.dbeaver.ext.postgresql.model.plan.PostgrePlanResponseTest', '--select-class',
  'org.jkiss.dbeaver.ext.postgresql.model.plan.PostgrePlanTransactionTest',
  '--select-class', 'org.jkiss.dbeaver.utils.VersionUtilsTest',
+ '--select-class', 'org.jkiss.dbeaver.runtime.qm.QueryHistoryStoreTest',
  '--select-class', 'org.jkiss.dbeaver.ext.gaussdb.model.GaussDBProjectionMetadataTest',
  '--select-class', 'org.jkiss.dbeaver.ext.gaussdb.model.data.GaussDBBinaryValueHandlerTest',
  '--select-class', 'org.jkiss.dbeaver.model.sql.SQLQueryRecoveryPolicyTest',
