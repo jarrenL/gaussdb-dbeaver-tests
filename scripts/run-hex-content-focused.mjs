@@ -28,8 +28,11 @@ console.log('Component output: ' + output);
 const source = root + '/plugins/org.jkiss.dbeaver.ui.editors.hex/src/org/jkiss/dbeaver/ui/editors/binary/';
 run('javac', ['--release', '21', '-cp', cp.join(':'), '-d', output,
  source + 'BinaryEditor.java', source + 'BinaryContent.java',
- path.resolve('fixtures/java/BinaryEditorContentReloadTest.java')]);
+ root + '/plugins/org.jkiss.dbeaver.ui.editors.data/src/org/jkiss/dbeaver/ui/editors/content/ContentEditorInput.java',
+ path.resolve('fixtures/java/BinaryEditorContentReloadTest.java'),
+ path.resolve('fixtures/java/ContentEditorFileImportTest.java')]);
 run('java', ['-javaagent:' + agent, '-Djava.awt.headless=true', '-cp', cp.join(':'),
  'org.junit.platform.console.ConsoleLauncher', 'execute', '--select-class',
  'org.jkiss.dbeaver.acceptance.BinaryEditorContentReloadTest', '--fail-if-no-tests',
+ '--select-class', 'org.jkiss.dbeaver.ui.editors.content.ContentEditorFileImportTest',
  '--reports-dir', output + '/reports', '--details=summary', '--disable-banner']);
