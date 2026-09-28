@@ -2,6 +2,8 @@
 
 ## 当前状态摘要（优先于下方按时间保留的旧结论）
 
+2026-09-29会话执行器补18项异常矩阵：取消/终止各8个create/execute/next/value/wasNull/关闭/组合故障位置，以及false响应同时两处关闭失败，验证主cause/suppressed、资源所有权和单次调用不重发。Ack26/26、生产未改。73模块2723：2548通过174跳过1Rest权限错误，门禁拒绝、自测7/7。非真实断网/手动重试/PID复用或GUI，见主仓SESSION_OPERATION_FAILURE_MATRIX_20260929.md。
+
 2026-09-29会话错误汉化补2项实际资源检查，红测2失败复现新加invalid/null错误缺少NLS；改资源字段并补中英翻译，资源2/2、Identity15/15（新增消息引用断言）通过。73模块2705：2530通过174跳过1Rest权限错误，门禁拒绝、自测7/7。非语言切换GUI/最终包验收；辅助审核仅核实无独立日志CLI参数，没有新报告，见主仓SESSION_ERROR_LOCALIZATION_20260929.md。
 
 2026-09-29会话操作响应新增8项：取消/终止×true/false/NULL/无行，旧execute未读取Boolean，8项红测；改executeQuery仅显式true正常返回，新增中英错误提示，8/8及身份15/15通过。73模块2703项：2528通过174跳过1Rest权限错误，门禁拒绝、自测7/7。true不证明线程已经退出，真实请求/权限/GUI和线程池双标识仍待，见主仓SESSION_OPERATION_ACK_20260929.md。
