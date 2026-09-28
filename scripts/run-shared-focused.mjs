@@ -96,6 +96,7 @@ run('javac', ['--release', '21', '-cp', cp.join(':'), '-d', output, source, save
  root + '/plugins/org.jkiss.dbeaver.ext.gaussdb/src/org/jkiss/dbeaver/ext/gaussdb/model/data/GaussDBBinaryValueHandler.java',
  root + '/plugins/org.jkiss.dbeaver.ext.gaussdb/src/org/jkiss/dbeaver/ext/gaussdb/model/data/GaussDBValueHandlerProvider.java',
  root + '/plugins/org.jkiss.dbeaver.model.jdbc/src/org/jkiss/dbeaver/model/impl/jdbc/data/JDBCContentBLOB.java',
+ root + '/plugins/org.jkiss.dbeaver.model.jdbc/src/org/jkiss/dbeaver/model/impl/jdbc/data/JDBCContentBytes.java',
  root + '/test/org.jkiss.dbeaver.ext.gaussdb.test/src/org/jkiss/dbeaver/ext/gaussdb/model/data/GaussDBBinaryValueHandlerTest.java',
  root + '/plugins/org.jkiss.dbeaver.model/src/org/jkiss/dbeaver/model/sql/SQLQueryRecoveryPolicy.java',
  root + '/plugins/org.jkiss.dbeaver.model/src/org/jkiss/dbeaver/model/sql/parser/SQLSemanticProcessor.java',
