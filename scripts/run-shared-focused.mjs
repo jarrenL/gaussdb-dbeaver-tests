@@ -33,6 +33,7 @@ function run(bin, args) {
 console.log('Focused output: ' + output);
 run('javac', ['--release', '21', '-cp', cp.join(':'), '-d', output, source, savedSource,
  root + '/plugins/org.jkiss.dbeaver.registry/src/org/jkiss/dbeaver/registry/FilterSerializer.java',
+ root + '/plugins/org.jkiss.dbeaver.registry/src/org/jkiss/dbeaver/registry/UserDBSObjectFilterUtils.java',
  root + '/test/org.jkiss.dbeaver.test.platform/src/org/jkiss/dbeaver/model/ConnectionFilterSerializationTest.java',
  root + '/plugins/org.jkiss.dbeaver.tasks.native/src/org/jkiss/dbeaver/tasks/nativetool/AbstractNativeToolHandler.java',
  root + '/plugins/org.jkiss.dbeaver.ext.postgresql/src/org/jkiss/dbeaver/ext/postgresql/tasks/PostgreNativeToolHandler.java',

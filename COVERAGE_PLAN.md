@@ -2,6 +2,8 @@
 
 ## 当前状态摘要（优先于下方按时间保留的旧结论）
 
+2026-09-28过滤器作用域/开关及用户导入入口增10项：6种错误字段类型红测接受后改明确拒绝，2种旧布尔字符串兼容，实际UserDBSObjectFilterUtils入口2项验证作用域/用户标记及同一数组非法后项不产生任何应用调用。描述符为替身，非完整连接文件或GUI原子性。联合375/375通过、0跳过；见CONNECTION_FILTER_IMPORT_BOUNDARIES_20260928.md。
+
 2026-09-28连接过滤器导入新增9项：6种非法成员/条件结构红测复现空指针、字符串化或静默忽略；生产FilterSerializer改为明确JsonParseException，3种旧空条件表示继续合法。类18项加原347联合365/365通过、0跳过；此处过滤为导航显示范围，不是数据库授权。完整导入文件/GUI/配置升级仍待。正式门控纳入本类；见CONNECTION_FILTER_IMPORT_BOUNDARIES_20260928.md。
 
 2026-09-28日志写出故障增2项：真实PrintStream底层write/flush抛错均红测误报成功，生产收尾checkError记录本轮失败后联合347/347通过、0跳过。PrintStream无法提供原始cause，明确报日志失败；不等于数据库事务回滚，不可自动重试副作用操作。非实际磁盘满/GUI，见NATIVE_COMMAND_CONTRACTS_20260928.md。
