@@ -27,6 +27,8 @@ import org.jkiss.dbeaver.model.app.DBPPlatform;
 import org.jkiss.dbeaver.model.data.DBDContent;
 import org.jkiss.dbeaver.model.data.DBDContentStorage;
 import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
+import org.jkiss.dbeaver.model.exec.DBCExecutionContext;
+import org.jkiss.dbeaver.model.impl.jdbc.data.JDBCContentBytes;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.mockito.ArgumentCaptor;
 import org.junit.jupiter.api.Test;
@@ -41,6 +43,56 @@ import static org.mockito.Mockito.*;
 
 class ContentEditorFileImportTest {
     @TempDir Path directory;
+
+    @ParameterizedTest
+    @ValueSource(ints = {1, 7, 64})
+    void binaryValueReadsCompleteChunkedStreams(int chunk) throws Exception {
+        var content = new JDBCContentBytes(mock(DBCExecutionContext.class), new byte[] {9});
+        var expected = new byte[257];
+        for (int i = 0; i < expected.length; i++) expected[i] = (byte) i;
+        var closed = new java.util.concurrent.atomic.AtomicBoolean();
+        var stream = new java.io.ByteArrayInputStream(expected) {
+            @Override public synchronized int read(byte[] b, int off, int len) {
+                return super.read(b, off, Math.min(chunk, len));
+            }
+            @Override public void close() { closed.set(true); }
+        };
+        var storage = mock(DBDContentStorage.class);
+        when(storage.getContentStream()).thenReturn(stream);
+        when(storage.getContentLength()).thenReturn((long) expected.length);
+        content.updateContents(new VoidProgressMonitor(), storage);
+        assertTrue(closed.get());
+        assertArrayEquals(expected, content.getContentStream().readAllBytes());
+    }
+
+    @Test
+    void truncatedBinaryStreamDoesNotReplaceOriginalValue() throws Exception {
+        var original = new byte[] {9, 8, 7};
+        var content = new JDBCContentBytes(mock(DBCExecutionContext.class), original);
+        var storage = mock(DBDContentStorage.class);
+        when(storage.getContentStream()).thenReturn(new java.io.ByteArrayInputStream(new byte[] {1}));
+        when(storage.getContentLength()).thenReturn(3L);
+        assertThrows(DBException.class, () -> content.updateContents(new VoidProgressMonitor(), storage));
+        assertArrayEquals(original, content.getContentStream().readAllBytes());
+        when(storage.getContentStream()).thenReturn(new java.io.ByteArrayInputStream(new byte[] {1, 2, 3}));
+        content.updateContents(new VoidProgressMonitor(), storage);
+        assertArrayEquals(new byte[] {1, 2, 3}, content.getContentStream().readAllBytes());
+    }
+
+    @ParameterizedTest
+    @ValueSource(longs = {-1L, 2147483648L})
+    void unsupportedByteArrayLengthsFailWithoutReplacingValue(long length) throws Exception {
+        var original = new byte[] {9, 8, 7};
+        var content = new JDBCContentBytes(mock(DBCExecutionContext.class), original);
+        var stream = mock(java.io.InputStream.class);
+        var storage = mock(DBDContentStorage.class);
+        when(storage.getContentStream()).thenReturn(stream);
+        when(storage.getContentLength()).thenReturn(length);
+        assertThrows(DBException.class, () -> content.updateContents(new VoidProgressMonitor(), storage));
+        verify(stream).close();
+        verify(stream, never()).readNBytes(anyInt());
+        assertArrayEquals(original, content.getContentStream().readAllBytes());
+    }
 
     @ParameterizedTest
     @ValueSource(ints = {0, 4, 65537})
@@ -114,7 +166,8 @@ class ContentEditorFileImportTest {
         try {
             var controller = mock(IValueController.class);
             var input = input(controller, "UTF-8");
-            var content = mock(DBDContent.class);
+            var originalBytes = new byte[] {1, 2, 3};
+            var content = spy(new JDBCContentBytes(mock(DBCExecutionContext.class), originalBytes));
             when(controller.getValue()).thenReturn(content);
             field(input, "stringStorage", null);
             var original = directory.resolve("before.bin");
@@ -127,12 +180,16 @@ class ContentEditorFileImportTest {
             Files.write(selected, bytes);
             input.loadFromExternalFile(selected.toFile(), new NullProgressMonitor());
             verify(content, never()).updateContents(any(), any());
+            assertArrayEquals(originalBytes, content.getContentStream().readAllBytes());
             var rejection = new DBException("Rejected save");
-            when(content.updateContents(any(), any())).thenThrow(rejection).thenReturn(true);
+            doThrow(rejection).doCallRealMethod().when(content).updateContents(any(), any());
             assertSame(rejection, assertThrows(DBException.class,
                 () -> input.updateContentFromFile(new VoidProgressMonitor(), content)));
             assertEquals(selected.toString(), input.getPath().toOSString());
+            assertArrayEquals(originalBytes, content.getContentStream().readAllBytes());
             input.updateContentFromFile(new VoidProgressMonitor(), content);
+            assertFalse(content.isNull(), "Zero-byte content must remain distinct from SQL NULL");
+            assertArrayEquals(bytes, content.getContentStream().readAllBytes());
             var storage = ArgumentCaptor.forClass(DBDContentStorage.class);
             verify(content, times(2)).updateContents(any(), storage.capture());
             verify(content, never()).getContents(any()); // Do not save stale original local storage.
@@ -143,6 +200,9 @@ class ContentEditorFileImportTest {
                 }
             }
             input.release();
+            assertArrayEquals(bytes, content.getContentStream().readAllBytes());
+            content.resetContents();
+            assertArrayEquals(originalBytes, content.getContentStream().readAllBytes());
             assertArrayEquals(bytes, Files.readAllBytes(selected));
             assertArrayEquals(new byte[] {1, 2, 3}, Files.readAllBytes(original));
         } finally {
