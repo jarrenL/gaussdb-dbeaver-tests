@@ -2,6 +2,8 @@
 
 ## 当前状态摘要（优先于下方按时间保留的旧结论）
 
+2026-09-28扩大回归未通过：run-shared-focused.mjs新增--gauss-core，编译并选择全部34个非Live核心测试类（明确列出三个未执行真库类），同共享专项执行931项：818通过、113失败、0跳过。失败逐项归为Dialect 27项未初始化OSGi workbench、InsertFromData 52及PredicateScanner 34项Platform.getBundle为null。没有排除失败重算通过，也不替代完整Tycho。较小范围654/654结果仍仅属专项，不能与本轮叠加。日志/tmp/shared-gauss-core-expanded-20260928.log；见SHARED_COMPONENT_REGRESSION_20260928.md。
+
 2026-09-28二进制带长度重载新增2项，实际257字节文件在普通/long重载先消费后拒绝，红测最终long/int仅254/249字节。storage分支每次重载前关闭并重新打开流，联合654/654通过、0跳过，所有流释放及原文件保持。非真实驱动、服务器Blob、2GB或GUI验收，见EMPTY_BYTEA_BINDING_20260924.md。
 
 2026-09-28二进制降级新增4项：256/65537字节×驱动拒绝前读取0/7字节。修正进度监视器夹具后2项红测复现剩余流截断；共享JDBCContentBLOB字节数组降级前重新打开存储流，联合652/652通过、0跳过。驱动为替身，非真实厂商故障、其他重载/Blob分支、2GB或GUI验收，见EMPTY_BYTEA_BINDING_20260924.md。
