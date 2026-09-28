@@ -44,6 +44,8 @@ if (additionalSources.length) {
 function run(bin, args) {
  const result = spawnSync(java + bin, args, {stdio: 'inherit'});
  if (result.status !== 0) process.exit(result.status ?? 1);
+ if (bin === 'javac') fs.writeFileSync(path.join(output, 'compiled-sources.json'),
+  JSON.stringify({root, sources: [...new Set(args.filter(value => value.endsWith('.java')))]}, null, 2));
 }
 console.log('Focused output: ' + output);
 run('javac', ['--release', '21', '-cp', cp.join(':'), '-d', output, source, savedSource,
