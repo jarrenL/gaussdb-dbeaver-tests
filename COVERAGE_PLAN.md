@@ -2,6 +2,8 @@
 
 ## 当前状态摘要（优先于下方按时间保留的旧结论）
 
+2026-09-28 3.15/10文件传输补6项：实际TempDir中0/7/65537字节、中文嵌套与空目录、缺失源/父路径文件冲突，调用生产复制与清理，原文件和无关文件保留。原生命令专项18/18通过（含旧12项），无新生产修复；非远程恢复/任务级取消回收/Windows。见NATIVE_COMMAND_CONTRACTS_20260928.md后续记录。
+
 2026-09-28 3.15/10.2原生命令补7项：CR/NUL认证拒绝、管道write/flush/close失败cause保留且destroy、PLAIN/CUSTOM的中文空格特殊字符完整argv。显式编译三个生产handler，GaussDBNativePasswordTest 12/12通过（含旧5项），无新生产修复。不执行shell/备份恢复，不当作Windows验收；见NATIVE_COMMAND_CONTRACTS_20260928.md。加入正式回归必需测试类。
 
 2026-09-28近期共享修复联合回归：run-shared-focused.mjs同次编译当前相关生产类与11个测试类，同一JUnit进程292/292通过、0跳过；计划80/版本18/异常10/进度8/日期43/XLSX74/CSV10/流式49。是既有用例复跑，非新增292或完整1882基线更新；其他依赖仍使用已有产物。正式门控纳入三类导出测试，现要求11类。见SHARED_COMPONENT_REGRESSION_20260928.md及/tmp/shared-export-regression-20260928.log；完整构建/真库/GUI/Hermes/推送仍待。
