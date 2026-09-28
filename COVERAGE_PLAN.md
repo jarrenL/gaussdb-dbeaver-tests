@@ -2,6 +2,8 @@
 
 ## 当前状态摘要（优先于下方按时间保留的旧结论）
 
+2026-09-29当前59aadfcbe2五模块重编译OSGi复验：核心629、调试112、平台366、PG计划80、编辑器43，共77类1230项全部通过，零失败错误跳过。前置59和共享798有重叠不累加。编辑器专项亦去除对临时GUI jar目录的依赖。完整入口run-LPALys仍Tycho缓存锁超时、测试未执行；Docker API拒绝、辅助审核日志初始化失败。逐类JSON和范围见主仓COMPONENT_REGRESSION_20260929.md；不是完整构建、真库、GUI或整包验收。
+
 2026-09-29连续刷新补4项：库名精确匹配、空缓存恢复、连续替换后重新绑定、歧义消除。首轮Mockito嵌套stubbing修正后，共享798/798、OSGi平台21类366/366，零失败错误跳过；仅方法快照顺序测试，非并发/实际OpenContextJob/事务。专项脚本不再依赖缺失jar的临时GUI目录，改读已解析OSGi配置并排除source包。Docker API本轮拒绝，待保存行GUI未完成，不增加真库/GUI通过数。详见TEXT_SAVE_RECONNECT_FINDING_20260928.md顶部。
 
 2026-09-29独立Linux GUI已安装1d91968695的model/SQL编辑器补丁并核对SHA，正常退出旧进程时放弃专用待保存测试值、独立gsql确认原中文未变。刷新后日志明确创建新Script-4上下文；SELECT正常后只终止经身份/空闲/SQL确认的测试会话，57P01复现，手动重连日志现含Main/Metadata/SQLEditor三条，随后新SELECT成功返回42（实际快照断言通过）。编号复用不作变化断言。原先纯SELECT重连失败路径通过，带待保存行的恢复/显式保存/事务和完整产品仍待。详见TEXT_SAVE_RECONNECT_FINDING_20260928.md最新GUI章节与截图；不增加JUnit数。

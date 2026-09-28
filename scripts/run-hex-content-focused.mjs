@@ -10,9 +10,15 @@ for (const name of fs.readdirSync(root + '/plugins')) {
  const classes = path.join(root, 'plugins', name, 'target/classes');
  if (fs.existsSync(classes)) cp.push(classes);
 }
-const bundles = '/tmp/history-bot-build.IP5Su0/plugins';
-for (const name of fs.readdirSync(bundles)) {
- if (name.endsWith('.jar') && !/junit|mockito|byte.buddy|opentest4j/i.test(name)) cp.push(path.join(bundles, name));
+const config = fs.readFileSync(path.join(root,
+ 'test/org.jkiss.dbeaver.ext.gaussdb.debug.test/target/work/configuration/config.ini'), 'utf8');
+const framework = config.split(/\r?\n/).find(line => line.startsWith('osgi.framework='));
+const bundles = config.split(/\r?\n/).find(line => line.startsWith('osgi.bundles='));
+if (!framework || !bundles) throw new Error('Resolved OSGi framework or bundle list is missing');
+for (const entry of [framework.slice('osgi.framework='.length), ...bundles.slice('osgi.bundles='.length).split(',')]) {
+ const file = entry.replaceAll('\\:', ':').replace(/^(?:reference:)?file:/, '').replace(/@\d+(?::start)?$/, '');
+ if (!path.isAbsolute(file) || !fs.existsSync(file)) throw new Error('Missing resolved bundle: ' + file);
+ if (!/\.source-|junit|mockito|byte.buddy|opentest4j/i.test(path.basename(file))) cp.push(file);
 }
 const m2 = '/Users/lj/.m2/repository/';
 const agent = m2 + 'p2/osgi/bundle/net.bytebuddy.byte-buddy-agent/1.18.8/net.bytebuddy.byte-buddy-agent-1.18.8.jar';
