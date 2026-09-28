@@ -10,8 +10,23 @@ for (const name of fs.readdirSync(root + '/plugins')) {
     if (fs.existsSync(classes)) cp.push(classes);
 }
 cp.push('/Users/lj/Documents/GaussDB/dbeaver-common/modules/org.jkiss.utils/target/classes');
+// Use the resolved platform, not a disposable GUI installation in /tmp.
+for (const module of ['org.jkiss.dbeaver.test.platform', 'org.jkiss.dbeaver.ext.gaussdb.debug.test']) {
+const resolvedConfig = fs.readFileSync(path.join(root,
+ 'test', module, 'target/work/configuration/config.ini'), 'utf8');
+const bundlesLine = resolvedConfig.split(/\r?\n/).find(line => line.startsWith('osgi.bundles='));
+if (!bundlesLine) throw new Error('Resolved OSGi bundle list is missing');
+const frameworkLine = resolvedConfig.split(/\r?\n/).find(line => line.startsWith('osgi.framework='));
+if (!frameworkLine) throw new Error('Resolved OSGi framework is missing');
+const resolvedEntries = [frameworkLine.slice('osgi.framework='.length),
+ ...bundlesLine.slice('osgi.bundles='.length).split(',')];
+for (const entry of resolvedEntries) {
+ const file = entry.replaceAll('\\:', ':').replace(/^(?:reference:)?file:/, '').replace(/@\d+(?::start)?$/, '');
+ if (!path.isAbsolute(file) || !fs.existsSync(file)) throw new Error('Missing resolved bundle: ' + file);
+ if (!/\.source-|junit|mockito|byte.buddy|opentest4j/i.test(path.basename(file)) && !cp.includes(file)) cp.push(file);
+}
+}
 const dirs = [
- '/tmp/history-bot-build.IP5Su0/plugins',
  root + '/test/org.jkiss.dbeaver.ext.gaussdb.test/target/work/plugins/org.jkiss.bundle.apache.poi_5.4.2/lib'
 ];
 for (const dir of dirs) for (const name of fs.readdirSync(dir)) {
