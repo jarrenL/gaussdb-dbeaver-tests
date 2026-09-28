@@ -9,6 +9,7 @@ const {root, sources} = JSON.parse(fs.readFileSync(path.join(compiled, 'compiled
 const module = process.argv.find(value => value.startsWith('--module='))?.slice('--module='.length)
  || 'org.jkiss.dbeaver.ext.gaussdb.test';
 if (!['org.jkiss.dbeaver.ext.gaussdb.test', 'org.jkiss.dbeaver.ext.gaussdb.debug.test',
+ 'org.jkiss.dbeaver.ext.postgresql.test',
  'org.jkiss.dbeaver.test.platform', 'org.jkiss.dbeaver.ui.editors.data.test'].includes(module)) {
  throw new Error('Unsupported test module: ' + module);
 }
@@ -90,7 +91,8 @@ if (result.status === 0) {
  });
  fs.writeFileSync(path.join(output, 'verified-results.json'), JSON.stringify({
   scope: 'existing OSGi bundles with explicit compiled overlays; not a full build or live-database run',
-  excludedLiveClasses: module === 'org.jkiss.dbeaver.test.platform' || editorModule ? []
+  excludedLiveClasses: module === 'org.jkiss.dbeaver.test.platform' || editorModule
+   || module === 'org.jkiss.dbeaver.ext.postgresql.test' ? []
    : module.endsWith('.debug.test') ? ['GaussDBSessionLiveTest', 'GaussDBHistoricalJdbcLiveTest']
     : ['GaussDBReviewLiveTest', 'GaussDBDumpAllLiveTest', 'GaussDBNativeLiveTest'],
   classes: outcomes, total: outcomes.reduce((sum, entry) => sum + entry.tests, 0)
