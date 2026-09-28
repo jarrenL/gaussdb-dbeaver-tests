@@ -38,6 +38,7 @@ export const requiredClasses = [
     ['org.jkiss.dbeaver.test.platform', 'org.jkiss.dbeaver.model.data.storage.StringContentStorageTest'],
     ['org.jkiss.dbeaver.test.platform', 'org.jkiss.dbeaver.model.data.storage.TemporaryContentStorageTest'],
     ['org.jkiss.dbeaver.test.platform', 'org.jkiss.dbeaver.model.impl.data.formatters.DateTimeDataFormatterLocaleTest'],
+    ['org.jkiss.dbeaver.test.platform', 'org.jkiss.dbeaver.model.impl.data.transformers.EpochTimeAttributeTransformerTest'],
     ['org.jkiss.dbeaver.test.platform', 'org.jkiss.dbeaver.model.exec.ExecutionContextReplacementTest'],
     ...['PostgreXmlPlanHierarchyTest', 'PostgreSavedPlanTest', 'PostgrePlanResponseTest', 'PostgrePlanTransactionTest']
         .map(name => ['org.jkiss.dbeaver.ext.postgresql.test', 'org.jkiss.dbeaver.ext.postgresql.model.plan.' + name])
