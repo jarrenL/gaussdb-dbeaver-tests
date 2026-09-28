@@ -2,6 +2,8 @@
 
 ## 当前状态摘要（优先于下方按时间保留的旧结论）
 
+2026-09-28执行计划真库重跑：新增run-live-plan-focused.mjs直接编译并选择既有递归/窗口/索引/ANALYZE四方法；编译成功，4项因原临时连接配置已不存在而在连接前失败，未运行SQL，不计通过。新增配置文件/驱动/显式DDL许可前置检查，缺配置退出2已验；完整成功运行仍待恢复隔离连接配置。证据PLAN_METRIC_BOUNDARIES_20260928.md。
+
 2026-09-28 7.1节点分类增17项，7项红测复现Hash Join/HashAggregate误归HASH、扫描/Insert缺分类；修复优先级与拼写。XML26/26通过，加入已有保存计划23项联合49/49通过，非新增49项。人工XML进入生产分类，不是真库各版本或GUI图标；见PLAN_METRIC_BOUNDARIES_20260928.md。
 
 2026-09-28 7.1–7.2执行计划新增5项：BUFFERS父子隔离/0/大计数/I-O时间、实际0行优先、缺失或空类型、区域无关分类。复现并修复缺失Node-Type分类空指针；专项9/9通过（含原4项）。构造XML进入真实解析器，不是服务器BUFFERS或GUI；见PLAN_METRIC_BOUNDARIES_20260928.md与scripts/run-plan-focused.mjs。
