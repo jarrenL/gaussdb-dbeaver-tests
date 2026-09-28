@@ -45,6 +45,53 @@ class ContentEditorFileImportTest {
     @TempDir Path directory;
 
     @ParameterizedTest
+    @ValueSource(booleans = {false, true})
+    void toolbarImportOnlyMarksEditorDirtyAndNeverPublishes(boolean cancel) throws Exception {
+        var contributor = mock(ContentEditorContributor.class);
+        var editor = mock(ContentEditor.class);
+        var controller = mock(IValueController.class);
+        var input = mock(ContentEditorInput.class);
+        var site = mock(org.eclipse.ui.IWorkbenchPartSite.class);
+        var window = mock(org.eclipse.ui.IWorkbenchWindow.class);
+        when(contributor.getEditor()).thenReturn(editor);
+        when(editor.getSite()).thenReturn(site);
+        when(editor.getEditorInput()).thenReturn(input);
+        when(editor.getValueController()).thenReturn(controller);
+        when(site.getWorkbenchWindow()).thenReturn(window);
+        doAnswer(invocation -> {
+            ((org.eclipse.jface.operation.IRunnableWithProgress) invocation.getArgument(2))
+                .run(new NullProgressMonitor());
+            return null;
+        }).when(window).run(eq(true), eq(true), any());
+        var actionType = Class.forName(ContentEditorContributor.class.getName() + "$FileImportAction");
+        var action = mock(actionType, CALLS_REAL_METHODS);
+        var outer = actionType.getDeclaredField("this$0");
+        outer.setAccessible(true);
+        outer.set(action, contributor);
+        var selected = directory.resolve("selected.bin").toFile();
+        try (var workbench = mockStatic(DBWorkbench.class)) {
+            workbench.when(DBWorkbench::getPlatform).thenReturn(mock(DBPPlatform.class, RETURNS_DEEP_STUBS));
+            try (var dialogs = mockStatic(org.jkiss.dbeaver.ui.dialogs.DialogUtils.class)) {
+                dialogs.when(() -> org.jkiss.dbeaver.ui.dialogs.DialogUtils.openFile(null))
+                    .thenReturn(cancel ? null : selected);
+                var run = actionType.getDeclaredMethod("run");
+                run.setAccessible(true);
+                run.invoke(action);
+            }
+        }
+        verify(controller, never()).updateValue(any(), anyBoolean());
+        if (cancel) {
+            verifyNoInteractions(input);
+            verify(editor, never()).setDirty(anyBoolean());
+            verify(editor, never()).fireContentChanged();
+        } else {
+            verify(input).loadFromExternalFile(eq(selected), any());
+            verify(editor).setDirty(true);
+            verify(editor).fireContentChanged();
+        }
+    }
+
+    @ParameterizedTest
     @ValueSource(ints = {1, 7, 64})
     void binaryValueReadsCompleteChunkedStreams(int chunk) throws Exception {
         var content = new JDBCContentBytes(mock(DBCExecutionContext.class), new byte[] {9});

@@ -4,7 +4,7 @@ import {spawnSync} from 'node:child_process';
 const root = process.env.DBEAVER_REPO || '/Users/lj/Documents/GaussDB/dbeaver-icbc-26.1.5';
 const java = '/Library/Java/JavaVirtualMachines/jdk-25.jdk/Contents/Home/bin/';
 const output = fs.mkdtempSync('/tmp/hex-content-test-');
-const cp = [output, '/Users/lj/Documents/GaussDB/dbeaver-common/modules/org.jkiss.utils/target/classes'];
+const cp = [output, path.resolve('fixtures/mockito-inline'), '/Users/lj/Documents/GaussDB/dbeaver-common/modules/org.jkiss.utils/target/classes'];
 for (const name of fs.readdirSync(root + '/plugins')) {
  const classes = path.join(root, 'plugins', name, 'target/classes');
  if (fs.existsSync(classes)) cp.push(classes);
@@ -29,6 +29,7 @@ const source = root + '/plugins/org.jkiss.dbeaver.ui.editors.hex/src/org/jkiss/d
 run('javac', ['--release', '21', '-cp', cp.join(':'), '-d', output,
  source + 'BinaryEditor.java', source + 'BinaryContent.java',
  root + '/plugins/org.jkiss.dbeaver.ui.editors.data/src/org/jkiss/dbeaver/ui/editors/content/ContentEditorInput.java',
+ root + '/plugins/org.jkiss.dbeaver.ui.editors.data/src/org/jkiss/dbeaver/ui/editors/content/ContentEditorContributor.java',
  root + '/plugins/org.jkiss.dbeaver.model.jdbc/src/org/jkiss/dbeaver/model/impl/jdbc/data/JDBCContentBytes.java',
  root + '/plugins/org.jkiss.dbeaver.ui.editors.data/src/org/jkiss/dbeaver/ui/data/managers/stream/TextEditorPart.java',
  root + '/plugins/org.jkiss.dbeaver.ui.editors.base/src/org/jkiss/dbeaver/ui/editors/text/FileRefDocumentProvider.java',
