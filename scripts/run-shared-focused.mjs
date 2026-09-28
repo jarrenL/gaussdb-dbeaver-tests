@@ -33,6 +33,9 @@ function run(bin, args) {
 console.log('Focused output: ' + output);
 run('javac', ['--release', '21', '-cp', cp.join(':'), '-d', output, source, savedSource,
  root + '/plugins/org.jkiss.dbeaver.registry/src/org/jkiss/dbeaver/registry/FilterSerializer.java',
+ root + '/plugins/org.jkiss.dbeaver.registry/src/org/jkiss/dbeaver/registry/FilterMapping.java',
+ root + '/plugins/org.jkiss.dbeaver.model/src/org/jkiss/dbeaver/model/struct/DBSObjectFilter.java',
+ root + '/test/org.jkiss.dbeaver.test.platform/src/org/jkiss/dbeaver/registry/UserFilterExportRoundTripTest.java',
  root + '/plugins/org.jkiss.dbeaver.registry/src/org/jkiss/dbeaver/registry/UserDBSObjectFilterUtils.java',
  root + '/test/org.jkiss.dbeaver.test.platform/src/org/jkiss/dbeaver/model/ConnectionFilterSerializationTest.java',
  root + '/plugins/org.jkiss.dbeaver.tasks.native/src/org/jkiss/dbeaver/tasks/nativetool/AbstractNativeToolHandler.java',
@@ -78,6 +81,7 @@ run('java', ['-javaagent:' + agent, '-Djava.awt.headless=true', '-cp', cp.join('
  'org.jkiss.dbeaver.ext.postgresql.model.plan.PostgrePlanTransactionTest',
  '--select-class', 'org.jkiss.dbeaver.utils.VersionUtilsTest',
  '--select-class', 'org.jkiss.dbeaver.model.ConnectionFilterSerializationTest',
+ '--select-class', 'org.jkiss.dbeaver.registry.UserFilterExportRoundTripTest',
  '--select-class', 'org.jkiss.dbeaver.utils.DatabaseExceptionContractTest',
  '--select-class', 'org.jkiss.dbeaver.utils.ProgressMonitorContractTest',
  '--select-class', 'org.jkiss.dbeaver.model.impl.data.formatters.DateTimeDataFormatterLocaleTest',

@@ -9,6 +9,7 @@ export const requiredClasses = [
         .map(name => ['org.jkiss.dbeaver.ext.gaussdb.test', 'org.jkiss.dbeaver.ext.gaussdb.model.' + name]),
     ['org.jkiss.dbeaver.test.platform', 'org.jkiss.dbeaver.utils.VersionUtilsTest'],
     ['org.jkiss.dbeaver.test.platform', 'org.jkiss.dbeaver.model.ConnectionFilterSerializationTest'],
+    ['org.jkiss.dbeaver.test.platform', 'org.jkiss.dbeaver.registry.UserFilterExportRoundTripTest'],
     ['org.jkiss.dbeaver.test.platform', 'org.jkiss.dbeaver.utils.DatabaseExceptionContractTest'],
     ['org.jkiss.dbeaver.test.platform', 'org.jkiss.dbeaver.utils.ProgressMonitorContractTest'],
     ['org.jkiss.dbeaver.test.platform', 'org.jkiss.dbeaver.model.impl.data.formatters.DateTimeDataFormatterLocaleTest'],
