@@ -2,6 +2,8 @@
 
 ## 当前状态摘要（优先于下方按时间保留的旧结论）
 
+2026-09-28 3.15恢复暂存泄漏修复：CUSTOM/DIRECTORY两项进入生产fillProcessParameters，源缺失时红测复现未登记临时路径残留；复制失败立即清理并重抛，修正源后同处理器重试成功。原生专项20/20通过（含旧18项）。暂存分支/工厂测试限定TempDir，其余实际IO；非远程中断/子进程取消/Windows，见NATIVE_COMMAND_CONTRACTS_20260928.md。
+
 2026-09-28 3.15/10文件传输补6项：实际TempDir中0/7/65537字节、中文嵌套与空目录、缺失源/父路径文件冲突，调用生产复制与清理，原文件和无关文件保留。原生命令专项18/18通过（含旧12项），无新生产修复；非远程恢复/任务级取消回收/Windows。见NATIVE_COMMAND_CONTRACTS_20260928.md后续记录。
 
 2026-09-28 3.15/10.2原生命令补7项：CR/NUL认证拒绝、管道write/flush/close失败cause保留且destroy、PLAIN/CUSTOM的中文空格特殊字符完整argv。显式编译三个生产handler，GaussDBNativePasswordTest 12/12通过（含旧5项），无新生产修复。不执行shell/备份恢复，不当作Windows验收；见NATIVE_COMMAND_CONTRACTS_20260928.md。加入正式回归必需测试类。
