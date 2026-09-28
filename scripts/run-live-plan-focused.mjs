@@ -56,6 +56,7 @@ run('java', ['-javaagent:' + agent, '-Djava.awt.headless=true', '-cp', cp.join('
  'realRecursivePlanPreservesWorkTableAndCteNodes',
  'realWindowPlanPreservesSortAndWindowNodes',
  'realIndexPlanPreservesIndexScanUnderDistributedParent',
- 'realAnalyzePlanPreservesActualRowsTimingAndLoops'
+ 'realAnalyzePlanPreservesActualRowsTimingAndLoops',
+ 'realPlanAnalysisPreservesPendingUserWrites(boolean)'
 ].flatMap(name => ['--select-method', 'org.jkiss.dbeaver.ext.gaussdb.debug.core.GaussDBHistoricalJdbcLiveTest#' + name]),
  '--details=summary', '--disable-banner']);
