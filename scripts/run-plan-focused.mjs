@@ -32,6 +32,8 @@ function run(bin, args) {
 }
 console.log('Focused output: ' + output);
 run('javac', ['--release', '21', '-cp', cp.join(':'), '-d', output, source, savedSource,
+ root + '/test/org.jkiss.dbeaver.ext.postgresql.test/src/org/jkiss/dbeaver/ext/postgresql/model/plan/PostgrePlanResponseTest.java',
+ root + '/plugins/org.jkiss.dbeaver.ext.postgresql/src/org/jkiss/dbeaver/ext/postgresql/model/plan/PostgreExecutionPlan.java',
  root + '/plugins/org.jkiss.dbeaver.ext.postgresql/src/org/jkiss/dbeaver/ext/postgresql/model/plan/PostgreQueryPlaner.java',
  root + '/plugins/org.jkiss.dbeaver.ext.postgresql/src/org/jkiss/dbeaver/ext/postgresql/model/plan/PostgrePlanNodeExternal.java',
  root + '/plugins/org.jkiss.dbeaver.ext.postgresql/src/org/jkiss/dbeaver/ext/postgresql/model/plan/PostgrePlanNodeXML.java',
@@ -39,4 +41,5 @@ run('javac', ['--release', '21', '-cp', cp.join(':'), '-d', output, source, save
 run('java', ['-javaagent:' + agent, '-Djava.awt.headless=true', '-cp', cp.join(':'),
  'org.junit.platform.console.ConsoleLauncher', 'execute', '--select-class',
  'org.jkiss.dbeaver.ext.postgresql.model.plan.PostgreXmlPlanHierarchyTest', '--select-class',
- 'org.jkiss.dbeaver.ext.postgresql.model.plan.PostgreSavedPlanTest', '--details=summary', '--disable-banner']);
+ 'org.jkiss.dbeaver.ext.postgresql.model.plan.PostgreSavedPlanTest', '--select-class',
+ 'org.jkiss.dbeaver.ext.postgresql.model.plan.PostgrePlanResponseTest', '--details=summary', '--disable-banner']);
