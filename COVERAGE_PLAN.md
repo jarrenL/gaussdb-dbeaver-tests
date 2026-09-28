@@ -2,6 +2,8 @@
 
 ## 当前状态摘要（优先于下方按时间保留的旧结论）
 
+2026-09-28CLOB文件分支新增5项全部红测失败：Reader未关、复制取消仍发布部分缓存。自动关闭Reader/Writer及复制后取消检查，异常清理临时文件、不提前free、同对象重试完整UTF8文本、释放后文件删除通过。最终共享757/757、OSGi平台18类325/325均0失败错误跳过；含取消异常类型断言。真实JUnit临时文件但Clob故障为替身，非磁盘压力/真库/GUI，详见CLOB_DISK_LIFECYCLE_20260928.md。
+
 2026-09-28CLOB内存读取新增6项，明确closed断言后红测5失败，复现降级Reader未关及实际异常被substring异常替代。自动关闭并关闭成功后缓存、包装真实原因；正常/降级/打开/读/关/双失败重试通过。共享752/752、OSGi平台18类320/320、0失败错误跳过，门控7/7。大CLOB临时文件和真库/GUI另待，见CLOB_READER_LIFECYCLE_20260928.md。
 
 2026-09-28XML Reader新增4项：生产JDBCContentXML未关闭Reader，三个错误路径复现；成功夹具JDK StringReader spy问题改真实跟踪Reader。修复自动关闭、关闭成功后再发布缓存；读/关/双失败cause和suppressed、未提前free、同对象重试和缓存复用通过。共享746/746、OSGi平台17类314/314、0失败错误跳过；门控7/7。CLOB另待，非真实驱动/GUI/整包，见XML_READER_LIFECYCLE_20260928.md。
