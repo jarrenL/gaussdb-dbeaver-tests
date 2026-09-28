@@ -2,6 +2,8 @@
 
 ## 当前状态摘要（优先于下方按时间保留的旧结论）
 
+2026-09-29不受信任handler导出补4项：SSH/PG SSL×安全标志，验证主JSON无handler用户/密码/私钥/host/保存密码开关且独立凭据表为空；实际解析后仅保留handler及启用状态，原配置不变。配置类50/50，无生产修改。完整73模块2509项：2339通过、169跳过、1项Rest网络权限错误，门控仍拒绝。非磁盘/共享权限/实际连接验收，Docker拒绝未动现场。见NETWORK_PROFILE_METADATA_20260929.md顶部及NETWORK_UNTRUSTED_EXPORT_REACTOR_20260929.json。
+
 2026-09-29实际注册SSH/PG SSL handler凭据往返补8项：handler×保存密码×安全配置/独立凭据分支，改名后再保存解析，检查稳定ID、凭据关联键、密码不保存、普通/安全属性及状态。平台测试显式依赖SSH插件，缺失不跳过；配置类46/46通过，无生产修改。完整73模块2505项：2335通过、169跳过、1项Rest网络权限错误，门控仍拒绝。内存存储无实际隧道/TLS连接，不等于磁盘加密/secret-storage/旧键清理通过。详见NETWORK_PROFILE_METADATA_20260929.md和NETWORK_HANDLER_CREDENTIAL_REACTOR_20260929.json。
 
 2026-09-29网络配置保存→独立parseProfiles→管理器按名称查询补2项（空/非空属性，各两轮）。红测复现另一解析入口名称/描述丢失、名称查询为空，以及保存器漏写普通属性；修复后配置类38/38。完整73模块2497项：2327通过、169跳过、1项Rest网络权限错误，独立门控仍拒绝。输入输出为内存JSON、无handler，不替代SSH/SSL凭据引用或GUI/磁盘导出。辅助审核日志权限失败无报告。详见NETWORK_PROFILE_METADATA_20260929.md顶部及NETWORK_PROFILE_ROUNDTRIP_REACTOR_20260929.json。
