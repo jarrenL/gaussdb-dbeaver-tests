@@ -24,6 +24,8 @@ cp.push(agent,
 function run(command, args) {
  const result = spawnSync(java + command, args, {stdio: 'inherit', timeout: 120000});
  if (result.status !== 0) process.exit(result.status ?? 1);
+ if (command === 'javac') fs.writeFileSync(path.join(output, 'compiled-sources.json'),
+  JSON.stringify({root, sources: args.filter(value => value.endsWith('.java'))}, null, 2));
 }
 console.log('Component output: ' + output);
 const source = root + '/plugins/org.jkiss.dbeaver.ui.editors.hex/src/org/jkiss/dbeaver/ui/editors/binary/';
