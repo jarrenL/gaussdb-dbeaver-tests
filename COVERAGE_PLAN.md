@@ -4,6 +4,8 @@
 
 ### 2026-09-30 后续执行顺序
 
+批量删除入口疑点已经实测排除：重建专用夹具，测试副本增加只读object-actions诊断，两包managerCanDelete/canDelete=true、只读false、导航门控false。实际左键激活导航树再右键，删除入口出现；多选后确认框准确列出两个专用包，点是后独立gs_package查询0。空schema以RESTRICT清理并确认0，本地口令副本删除。前轮程序化选中未建立活动导航上下文，不能作为生产缺陷；未放宽生产权限。辅助建议override对象isReadOnly与实际DBUtils源码不符，未采纳。证据主仓PACKAGE_DELETE_GUI_20260930.json，覆盖前轮待查结论；非重复GUI或洁净安装包证明。
+
 集中式包GUI新版复验：普通package_tester、独立dbv_pkg_gui_20260930；右键SPEC/BODY/ALL各成功，独立执行42。错误BODY在服务端相对line2，客户端诊断与含包头编辑器line4/caret一致；经普通JDBC修复后GUI重编译成功，状态Invalid→Normal、诊断清空，独立返回43/错误0。发现待诊断问题：多选两个包的右键菜单无删除项，键盘/全局删除未弹确认，不能计批量删除通过。JDBC元数据与连接只读均false，manager源码canDelete=true，尚未定位剩余权限/导航/注册门控。临时两包及schema由行政SQL清理（非GUI验收），独立schema=0；本地口令副本删除。证据主仓PACKAGE_GUI_20260930.json及原始控件/截图。辅助仅限3个源码文件审核该门控中，未预记结论。
 
 跨栈帧GUI本轮已完成限定验证：普通账号在507分布式库，子帧同名变量222、父帧111；子帧经更改值对话框改999，父帧仍111且更改值菜单明确置灰，重新选择子帧仍999。单步返回父过程line5后重新选择父帧/打开变量视图为111。工具栏终止后RESTRICT事务删除两个过程和schema，独立查询schema=0、临时调试角色member=false。主仓FRAME_VARIABLES_GUI_20260930.json及截图/原始控件记录保存证据；一轮数值局部变量测试，不扩展为所有类型/watch/最终洁净包或重复GUI通过。复用SQL见integration/gui-frame-variables.sql，实际建库夹具通过JDBC整句执行，未将该SQL文件作为整脚本另跑。
