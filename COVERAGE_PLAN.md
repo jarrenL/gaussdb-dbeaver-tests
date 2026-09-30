@@ -4,6 +4,10 @@
 
 ### 2026-09-30 后续执行顺序
 
+最新检查点：0733干净整包x86真实调试通过限定场景：配置选择过程/提交参数单元格，启动源码line4暂停；变量p_id=2/v_value=10，F8到line5并读到12；F9完成弹中文提交/回滚。首次回滚独立查询仅原记录1，重启同配置第二次提交前仍仅1，提交后独立查询1及12。关闭编辑器，活动夹具调用0，精确RESTRICT清理schema后0、临时调试角色撤销恢复原false、口令副本删除。主仓DEBUG_FINAL_X86_20260930.json及两截图。不是复杂断点/嵌套/ARM/客户桌面云验收。
+
+保存后只读属性刷新新增三条保护回归已通过并提交：disposed owner、无editor、全可编辑属性不加载；该类7/7，完整run-hOnvY3=2740总计/2722通过/18跳过/0失败错误，fresh gate通过并清理临时库对象/角色/HBA。主仓POST_SAVE_GUARDS_20260930.json。异步旧结果竞态不据此宣称覆盖。辅助任务正只读筛选三个未覆盖的客户端自动化场景，与本机GUI验收分工；尚无返回结果，不计覆盖。
+
 包GUI夹具已从临时程序整理为integration/GuiPackageFixture.java及GuiPackageFixtureTest.java，可setup/verify/cleanup。最终版本Java21目标编译通过，507集中式普通账号完整运行两次；每次含两轮重复创建42P06、无效Body目录状态、额外表导致清理2BP01并完整回滚/保留42及原包、正常清理，以及模拟包已删除后的空schema清理。独立残留schema=0，临时密码副本删除。此为夹具生命周期/保护测试，不新增GUI功能通过数。
 
 0733干净整包x86包错误定位与批量删除已补验：重建后gui_bad当前OID72071，Compile Body错误窗line4/col1，Open Source光标定位实际missing %TYPE声明行；服务端当前OID相对line2，旧同名OID70912排除。Ctrl多选两包Delete准确列两个全名，Cancel后独立count=2，重复Yes后导航消失且count=0；空schema RESTRICT清理后0，临时口令副本删除。主仓PACKAGE_FINAL_X86_ERROR_DELETE_20260930.json，非依赖冲突/并发删除/权限拒绝证明。
