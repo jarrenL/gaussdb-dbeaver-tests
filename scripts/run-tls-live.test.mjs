@@ -1,7 +1,34 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {withTlsFixture, ownedContainer} from './run-tls-live.mjs';
+import {withTlsFixture, ownedContainer, publishedEndpoint, cleanupLocal, redactDiagnostic} from './run-tls-live.mjs';
 const id = 'a'.repeat(64);
+test('bare credential values are redacted, not only SQL password lines', () => {
+    assert.equal(redactDiagnostic('DETAIL: abc123\nPASSWORD abc123\nretry abc123', ['abc123']),
+        'DETAIL: [REDACTED]\nretry [REDACTED]');
+});
+test('all local cleanup actions run and the primary failure is preserved', () => {
+    const primary = Error('original'), first = Error('unlink'), last = Error('directory');
+    const actions = [];
+    assert.throws(() => cleanupLocal(['/owned/a', '/owned/key'], '/owned', primary, {
+        existsSync: () => true,
+        unlinkSync(file) { actions.push(file); if (file.endsWith('/a')) throw first; },
+        rmdirSync(file) { actions.push(file); throw last; }
+    }), error => error instanceof AggregateError && error.errors[0] === primary
+        && error.errors[1] === first && error.errors[2] === last);
+    assert.deepEqual(actions, ['/owned/a', '/owned/key', '/owned']);
+});
+test('local cleanup refuses an unowned file before deleting anything', () => {
+    assert.throws(() => cleanupLocal(['/other/key'], '/owned', undefined, {
+        existsSync: () => assert.fail('unexpected filesystem access')
+    }));
+});
+test('runtime binding must be unique, explicit and loopback-only', () => {
+    assert.equal(publishedEndpoint({'55472/tcp': [{HostIp: '127.0.0.1', HostPort: '55472'}]}, 55472), '127.0.0.1:55472');
+    for (const entries of [null, [], [{HostIp: '0.0.0.0', HostPort: '55472'}],
+        [{HostIp: '127.0.0.1', HostPort: '1'}], [{HostIp: '127.0.0.1', HostPort: '55472'}, {}]]) {
+        assert.throws(() => publishedEndpoint({'55472/tcp': entries}, 55472));
+    }
+});
 test('successful and failed suites remove only the container they created', () => {
     for (const result of [0, 1]) {
         const removed = [];
@@ -24,6 +51,20 @@ test('cleanup failure preserves setup error and is never success', () => {
     const first = Error('setup'), last = Error('remove');
     assert.throws(() => withTlsFixture({create: () => id, prepare: () => {throw first;}, remove: () => {throw last;}}),
         error => error instanceof AggregateError && error.errors[0] === first && error.errors[1] === last);
+});
+test('a successful suite cannot hide failed container removal', () => {
+    const cleanup = Error('remove');
+    assert.throws(() => withTlsFixture({create: () => id, prepare: () => {}, run: () => 0,
+        remove: () => {throw cleanup;}}), error => error instanceof AggregateError
+        && error.errors.length === 1 && error.errors[0] === cleanup);
+});
+test('local cleanup tolerates a file never created and removes remaining files', () => {
+    const actions = [];
+    cleanupLocal(['/owned/missing', '/owned/key'], '/owned', undefined, {
+        existsSync: file => !file.endsWith('/missing'),
+        unlinkSync: file => actions.push(file), rmdirSync: file => actions.push(file)
+    });
+    assert.deepEqual(actions, ['/owned/key', '/owned']);
 });
 test('unexpected runner exception is preserved after container removal', () => {
     const failure = Error('runner'); const removed = [];

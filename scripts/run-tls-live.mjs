@@ -5,9 +5,35 @@ import {randomBytes} from 'node:crypto';
 import {spawnSync} from 'node:child_process';
 import {pathToFileURL} from 'node:url';
 
+export function redactDiagnostic(raw, secrets) {
+    let text = raw;
+    for (const secret of secrets) if (secret) text = text.split(secret).join('[REDACTED]');
+    return text.split('\n').filter(line => !/password|secret/i.test(line)).slice(-4).join('\n');
+}
+
+export function cleanupLocal(files, directory, primary, io = fs) {
+    if (files.some(file => path.dirname(file) !== directory)) throw Error('Local cleanup target is outside owned directory');
+    const errors = [];
+    for (const file of files) {
+        try { if (io.existsSync(file)) io.unlinkSync(file); } catch (error) { errors.push(error); }
+    }
+    try { io.rmdirSync(directory); } catch (error) { errors.push(error); }
+    if (errors.length) throw new AggregateError([...(primary ? [primary] : []), ...errors],
+        `Local TLS cleanup incomplete: ${directory}`);
+}
+
 export function ownedContainer(id) {
     if (!/^[a-f0-9]{64}$/.test(id)) throw Error('Invalid owned container identity');
     return id;
+}
+
+export function publishedEndpoint(bindings, port) {
+    const entries = bindings?.[String(port) + '/tcp'];
+    if (!Array.isArray(entries) || entries.length !== 1
+        || entries[0].HostIp !== '127.0.0.1' || entries[0].HostPort !== String(port)) {
+        throw Error('Missing or unexpected loopback TLS binding for port ' + port);
+    }
+    return '127.0.0.1:' + entries[0].HostPort;
 }
 
 export function withTlsFixture({create, prepare, run, remove}) {
@@ -31,16 +57,17 @@ export function withTlsFixture({create, prepare, run, remove}) {
 
 function main() {
     const repo = process.argv[2];
+    const encoding = process.argv.includes('--encoding');
     if (!repo?.startsWith('/') || process.env.GAUSSDB_HISTORY_ALLOW_DDL !== 'YES') throw Error('Explicit isolated test consent required');
     const local = fs.mkdtempSync(path.join(os.tmpdir(), 'dbv-tls-'));
     fs.chmodSync(local, 0o700);
+    const secrets = [];
     const command = (binary, args, input, timeout = 30000) => {
         const r = spawnSync(binary, args, {input, encoding: 'utf8', timeout});
         const operation = args.find(value => value.startsWith('/opt/gaussdb/ha-app/bin/')) || binary;
         if (r.status !== 0) {
-            const diagnostic = (r.stdout + '\n' + r.stderr).split('\n')
-                .filter(line => !/password|secret/i.test(line))
-                .slice(-4).join('\n');
+            const diagnostic = redactDiagnostic((r.stdout || '') + '\n' + (r.stderr || '')
+                + (r.error ? '\n' + r.error.code : ''), secrets);
             throw Error(`TLS fixture command failed (${path.basename(operation)} ${binary === 'docker' ? args[0] : ''}, exit ${r.status}): ${diagnostic}`);
         }
         return r.stdout.trim();
@@ -54,6 +81,7 @@ function main() {
         return file;
     };
     const certificates = {};
+    let primary;
     try {
         for (const [name, san] of [['trusted', 'IP:127.0.0.1'], ['wrong', 'DNS:wrong.invalid'], ['unrelated', 'IP:127.0.0.1']]) {
             const cfg = write(name + '.cnf', `[req]\nprompt=no\ndistinguished_name=dn\nx509_extensions=ext\n[dn]\nCN=${name === 'wrong' ? 'wrong.invalid' : '127.0.0.1'}\n[ext]\nbasicConstraints=critical,CA:TRUE\nkeyUsage=critical,digitalSignature,keyEncipherment,keyCertSign\nsubjectAltName=${san}\n`);
@@ -65,6 +93,7 @@ function main() {
             certificates[name] = {key, cert};
         }
         const password = 'Dbv!' + randomBytes(12).toString('hex') + '9a';
+        secrets.push(password);
         const secret = write('password', password + '\n');
         const configs = {};
         process.exitCode = withTlsFixture({
@@ -84,6 +113,7 @@ function main() {
                 docker(['exec', id, 'chown', 'gausscore:dbgrp', '/tmp/tls-acceptance']);
                 docker(['cp', secret, id + ':/tmp/tls-acceptance/password']);
                 docker(['exec', id, 'chown', 'gausscore:dbgrp', '/tmp/tls-acceptance/password']);
+                docker(['exec', id, 'chmod', '600', '/tmp/tls-acceptance/password']);
                 // GaussDB also reserves adjacent internal ports; leave a gap between instances.
                 for (const [name, port] of [['trusted', 55472], ['wrong', 55482]]) {
                     const directory = '/tmp/tls-acceptance/' + name;
@@ -95,9 +125,11 @@ function main() {
                         docker(['exec', id, 'chown', 'gausscore:dbgrp', `${directory}/server.${suffix}`]);
                         docker(['exec', id, 'chmod', '600', `${directory}/server.${suffix}`]);
                     }
-                    for (const setting of [`port=${port}`, "listen_addresses='*'", 'ssl=on', 'shared_buffers=32MB',
-                        'max_connections=30', 'enable_thread_pool=off']) tool('gs_guc', ['set', '-D', directory, '-c', setting]);
-                    tool('gs_guc', ['set', '-D', directory, '-h', 'hostssl tls_acceptance tls_client 0.0.0.0/0 sha256']);
+                    const settings = [`port=${port}`, "listen_addresses='*'", 'ssl=on', 'shared_buffers=32MB',
+                        'max_connections=30', 'enable_thread_pool=off'];
+                    tool('gs_guc', ['set', '-D', directory, ...settings.flatMap(setting => ['-c', setting])]);
+                    const databases = name === 'trusted' && encoding ? 'tls_acceptance,tls_encoding' : 'tls_acceptance';
+                    tool('gs_guc', ['set', '-D', directory, '-h', `hostssl ${databases} tls_client 0.0.0.0/0 sha256`]);
                     try {
                         tool('gs_ctl', ['start', '-D', directory, '-l', directory + '/server.log', '-w', '-t', '30'], undefined, 45000);
                     } catch (failure) {
@@ -111,9 +143,13 @@ function main() {
                     }
                     tool('gsql', ['-p', String(port), '-d', 'postgres', '-At', '-v', 'ON_ERROR_STOP=1'],
                         `CREATE ROLE tls_client LOGIN PASSWORD '${password}';\nCREATE DATABASE tls_acceptance OWNER tls_client DBCOMPATIBILITY='A';\n`);
-                    const published = docker(['port', id, String(port) + '/tcp']);
-                    if (!/^127\.0\.0\.1:\d+$/.test(published)) throw Error('Unexpected non-loopback TLS binding');
-                    configs[name] = write(name + '.properties', `url=jdbc:gaussdb://${published}/tls_acceptance\nuser=tls_client\npassword=${password}\ndriverClass=com.huawei.gauss200.jdbc.Driver\n`);
+                    if (name === 'trusted' && encoding) {
+                        tool('gsql', ['-p', String(port), '-d', 'postgres', '-At', '-v', 'ON_ERROR_STOP=1'],
+                            "CREATE DATABASE tls_encoding OWNER tls_client TEMPLATE template0 ENCODING 'GB18030' LC_COLLATE 'C' LC_CTYPE 'C' DBCOMPATIBILITY='A';\n");
+                    }
+                    const bindings = JSON.parse(docker(['inspect', id, '--format', '{{json .NetworkSettings.Ports}}']));
+                    const published = publishedEndpoint(bindings, port);
+                    configs[name] = write(name + '.properties', `url=jdbc:gaussdb://${published}/tls_acceptance\nuser=tls_client\npassword=${password}\ndriverClass=com.huawei.gauss200.jdbc.Driver\nsslmode=verify-full\nsslrootcert=${certificates[name].cert}\n`);
                 }
             },
             run() {
@@ -123,15 +159,26 @@ function main() {
                         GAUSSDB_HISTORY_TLS_WRONG_HOST_CONNECTION: configs.wrong,
                         GAUSSDB_HISTORY_TLS_CA: certificates.trusted.cert,
                         GAUSSDB_HISTORY_TLS_WRONG_HOST_CA: certificates.wrong.cert,
-                        GAUSSDB_HISTORY_TLS_UNRELATED_CA: certificates.unrelated.cert}
+                        GAUSSDB_HISTORY_TLS_UNRELATED_CA: certificates.unrelated.cert,
+                        ...(encoding ? {GAUSSDB_HISTORY_ENCODING_DATABASE: 'tls_encoding',
+                            GAUSSDB_HISTORY_ENCODING_CONNECTION: configs.trusted} : {})}
                 });
                 return r.status ?? 1;
             },
-            remove: id => { docker(['rm', '-f', ownedContainer(id)]); console.log('Owned disposable TLS container removed: ' + id); }
+            remove: id => {
+                try {
+                    console.log('TLS container state (running, OOM, exit): ' + docker(['inspect', id, '--format',
+                        '{{.State.Running}} {{.State.OOMKilled}} {{.State.ExitCode}}']));
+                } catch (ignored) { console.error('TLS container state unavailable before cleanup'); }
+                docker(['rm', '-f', ownedContainer(id)]);
+                console.log('Owned disposable TLS container removed: ' + id);
+            }
         });
+    } catch (failure) {
+        primary = failure;
+        throw failure;
     } finally {
-        for (const file of files) if (fs.existsSync(file)) fs.unlinkSync(file);
-        fs.rmdirSync(local);
+        cleanupLocal(files, local, primary);
     }
 }
 
