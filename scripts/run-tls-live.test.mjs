@@ -2,6 +2,23 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {withTlsFixture, ownedContainer, publishedEndpoint, waitForPublishedEndpoint, cleanupLocal, redactDiagnostic} from './run-tls-live.mjs';
 const id = 'a'.repeat(64);
+test('allocated runtime port is accepted only with explicit dynamic option', () => {
+    const bindings = {'55492/tcp': [{HostIp: '127.0.0.1', HostPort: '64095'}]};
+    assert.throws(() => publishedEndpoint(bindings, 55492));
+    assert.equal(publishedEndpoint(bindings, 55492, {dynamicPort: true}), '127.0.0.1:64095');
+    assert.equal(waitForPublishedEndpoint(() => bindings, 55492, () => assert.fail('no wait'), 1,
+        {dynamicPort: true}), '127.0.0.1:64095');
+});
+test('dynamic ports still reject unsafe or ambiguous runtime publication', () => {
+    for (const port of ['', '0', '65536', '-1', '1.5', ' 443', '00443', null, 443]) {
+        assert.throws(() => publishedEndpoint({'55492/tcp': [{HostIp: '127.0.0.1', HostPort: port}]},
+            55492, {dynamicPort: true}));
+    }
+    for (const entries of [[], [{HostIp: '0.0.0.0', HostPort: '64095'}],
+        [{HostIp: '127.0.0.1', HostPort: '64095'}, {HostIp: '::', HostPort: '64095'}]]) {
+        assert.throws(() => publishedEndpoint({'55492/tcp': entries}, 55492, {dynamicPort: true}));
+    }
+});
 test('runtime port publication tolerates absence then checks actual binding', () => {
     let reads = 0, waits = 0;
     assert.equal(waitForPublishedEndpoint(() => ++reads < 3 ? {'55472/tcp': []}

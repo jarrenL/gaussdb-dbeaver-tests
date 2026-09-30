@@ -27,10 +27,14 @@ export function ownedContainer(id) {
     return id;
 }
 
-export function publishedEndpoint(bindings, port) {
+export function publishedEndpoint(bindings, port, {dynamicPort = false} = {}) {
     const entries = bindings?.[String(port) + '/tcp'];
     if (!Array.isArray(entries) || entries.length !== 1
-        || entries[0].HostIp !== '127.0.0.1' || entries[0].HostPort !== String(port)) {
+        || entries[0].HostIp !== '127.0.0.1'
+        || typeof entries[0].HostPort !== 'string'
+        || !/^[1-9][0-9]{0,4}$/.test(entries[0].HostPort)
+        || Number(entries[0].HostPort) > 65535
+        || (!dynamicPort && entries[0].HostPort !== String(port))) {
         throw Error('Missing or unexpected loopback TLS binding for port ' + port
             + ': ' + JSON.stringify(entries ?? null));
     }
@@ -56,13 +60,13 @@ export function withTlsFixture({create, prepare, run, remove}) {
     return result;
 }
 
-export function waitForPublishedEndpoint(read, port, wait, attempts = 30) {
+export function waitForPublishedEndpoint(read, port, wait, attempts = 30, options = {}) {
     for (let attempt = 0; attempt < attempts; attempt++) {
         const bindings = read();
         const entries = bindings?.[String(port) + '/tcp'];
         // Docker may return empty runtime bindings shortly after start. Only
         // absence is retryable; wrong interfaces/ports remain immediate errors.
-        if (Array.isArray(entries) && entries.length > 0) return publishedEndpoint(bindings, port);
+        if (Array.isArray(entries) && entries.length > 0) return publishedEndpoint(bindings, port, options);
         if (attempt + 1 < attempts) wait();
     }
     throw Error('Timed out waiting for loopback TLS binding for port ' + port);
@@ -129,7 +133,7 @@ function main() {
         const configs = {};
         process.exitCode = withTlsFixture({
             create: () => docker(['create', '--label', 'dbeaver.acceptance=tls-disposable',
-                ...endpoints.flatMap(([, port]) => ['-p', `127.0.0.1:${port}:${port}`]),
+                ...endpoints.flatMap(([, port]) => ['-p', `127.0.0.1::${port}`]),
                 '--entrypoint', 'sleep', 'gaussdb507-arm64:507.0.0', 'infinity']),
             prepare(id) {
                 docker(['start', id]);
@@ -180,7 +184,7 @@ function main() {
                     }
                     const published = waitForPublishedEndpoint(
                         () => JSON.parse(docker(['inspect', id, '--format', '{{json .NetworkSettings.Ports}}'])), port,
-                        () => command('sleep', ['1']));
+                        () => command('sleep', ['1']), 30, {dynamicPort: true});
                     configs[name] = write(name + '.properties', `url=jdbc:gaussdb://${published}/tls_acceptance\nuser=tls_client\npassword=${password}\ndriverClass=com.huawei.gauss200.jdbc.Driver\nsslmode=verify-full\nsslrootcert=${certificates[name].cert}\n`);
                 }
             },

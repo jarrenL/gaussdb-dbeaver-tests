@@ -4,6 +4,8 @@
 
 ### 2026-09-30 后续执行顺序
 
+TLS端口阻塞有新的实证路径：独立Docker探测采用动态宿主端口，实际返回127.0.0.1:64095（内部55492），拥有容器已删除。运行器改动态loopback发布并从NetworkSettings校验读取唯一合法端口；新增自测先红后绿16/16，原固定端口默认校验不放宽。三端点+GB18030库联合实跑已启动，结果待核验；不能将端口探测算作过期证书握手通过。
+
 批量删除入口疑点已经实测排除：重建专用夹具，测试副本增加只读object-actions诊断，两包managerCanDelete/canDelete=true、只读false、导航门控false。实际左键激活导航树再右键，删除入口出现；多选后确认框准确列出两个专用包，点是后独立gs_package查询0。空schema以RESTRICT清理并确认0，本地口令副本删除。前轮程序化选中未建立活动导航上下文，不能作为生产缺陷；未放宽生产权限。辅助建议override对象isReadOnly与实际DBUtils源码不符，未采纳。证据主仓PACKAGE_DELETE_GUI_20260930.json，覆盖前轮待查结论；非重复GUI或洁净安装包证明。
 
 集中式包GUI新版复验：普通package_tester、独立dbv_pkg_gui_20260930；右键SPEC/BODY/ALL各成功，独立执行42。错误BODY在服务端相对line2，客户端诊断与含包头编辑器line4/caret一致；经普通JDBC修复后GUI重编译成功，状态Invalid→Normal、诊断清空，独立返回43/错误0。发现待诊断问题：多选两个包的右键菜单无删除项，键盘/全局删除未弹确认，不能计批量删除通过。JDBC元数据与连接只读均false，manager源码canDelete=true，尚未定位剩余权限/导航/注册门控。临时两包及schema由行政SQL清理（非GUI验收），独立schema=0；本地口令副本删除。证据主仓PACKAGE_GUI_20260930.json及原始控件/截图。辅助仅限3个源码文件审核该门控中，未预记结论。
