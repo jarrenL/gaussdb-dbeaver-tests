@@ -4,6 +4,10 @@
 
 ### 2026-09-30 后续执行顺序
 
+Linux GUI事务/重连一轮已补验：普通package_tester通过SQL编辑器创建专用schema/table，手动提交INSERT后observer=0；断开确认取消保留同一事务，选择否执行ROLLBACK并断开（原PID不存在）。原生连接菜单重连后再次创建未提交行，仅终止匹配PID/账号/夹具SQL的测试backend；GUI显示57P01，observer=0。断开/重新连接选择否后新backend可查询；编辑器插入id2并工具栏提交，独立查询仅2|after_reconnect。最后TABLE/SCHEMA RESTRICT事务清理，schema=0。主仓RECONNECT_GUI_20260930.json含截图/原始控件，复用分阶段SQL为integration/gui-reconnect.sql。只覆盖一轮受控backend失效，不覆盖网络黑洞/HA/重复GUI/最终洁净包；失效后重连的“是否提交”提示仍需审视，Yes分支未测。UI取消查询另行验证。
+
+过期证书重复轮已终止于Docker实际映射缺失，JUnit未运行，拥有容器已清理并独立确认不存在。首轮2711通过仍有效，但未满足此配置的重复通过；后续转向已有正常运行Linux GUI上的重连/事务保护场景，避免因同一局部端口阻塞反复全量准备。
+
 过期证书真库单端点已闭环一轮：run-68y8Du为2726总数/2711通过/15跳过/0失败错误，其中strictTlsRejectsExpiredLeafWithoutDowngrade通过；明确检查verify-ca/full的证书过期异常及前后TLS可达性。拥有容器独立确认不存在，嵌套夹具清理完成。报告保存主仓TLS_EXPIRED_FIRST_20260930.json。配置文件的信任锚与Java覆盖参数已统一为有效签发CA，修正后重复轮运行中；未将其预计通过。多端点动态映射仍失败在JUnit之前，不能用该单端点结果替代全TLS组合。辅助另在只读核对重连与未提交数据场景的JDBC/UI证据边界。
 
 TLS端口阻塞有新的实证路径：独立Docker探测采用动态宿主端口，实际返回127.0.0.1:64095（内部55492），拥有容器已删除。运行器改动态loopback发布并从NetworkSettings校验读取唯一合法端口；新增自测先红后绿16/16，原固定端口默认校验不放宽。三端点+GB18030库联合实跑已启动，结果待核验；不能将端口探测算作过期证书握手通过。
