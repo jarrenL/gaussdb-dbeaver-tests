@@ -4,6 +4,8 @@
 
 ### 2026-09-30 后续执行顺序
 
+已验证主仓快照已推送jarrenL/dbeaver的codex/icbc-gaussdb-26.1.5分支，HEAD cff9f01eeb（含run-myTchS 2727通过/18跳过证据）。推送前官方Gitleaks8.30.1下载包摘要核对成功，待推送485提交约119.81MB历史扫描0发现；主仓PREPUSH_SCAN_20260930.json保留边界。非最终发布/非全部历史场景完成，未上传新二进制包；独立测试工具仓暂仍本地，后续需整合交付。两处原有SWTBot工作区改动未混入推送。
+
 连接配置损坏JSON边界已补生产解析器验证：4种输入（根截断、合法folder前缀后截断、connection缺值、有效对象后尾随垃圾）各跑明文/加密两分支，JsonParseException、流只关闭一次、解析结果无部分应用、修复内容后同解析器可重试并加载folder全部通过。run-myTchS=2745总计/2727通过/18跳过/0失败错误，fresh gate与临时夹具/角色/HBA恢复通过。主仓CONFIG_MALFORMED_20260930.json；初轮测试桩嵌套spy调用错误修正后通过，不计产品缺陷。不是导入向导GUI或合法JSON的字段类型校验。
 
 0733干净整包ARM原生麒麟GUI基础调试事务也已通过：用GuiDebugFixture setup后刷新模式树/打开过程，创建配置选择目标并确认p_id=2，line4变量10，F8至line5变量12；F9中文事务窗，独立连接提交前仅1，第一次回滚仍1，重启同配置第二次提交后1+12。关闭编辑器后活动夹具调用0，普通账号夹具cleanup成功且schema残留0，临时调试成员资格从false授予后恢复false，口令副本删除。主仓DEBUG_FINAL_ARM_20260930.json及三截图。不算客户桌面云认证或完整复杂调试全覆盖。
