@@ -71,6 +71,10 @@ export function waitForPublishedEndpoint(read, port, wait, attempts = 30) {
 function main() {
     const repo = process.argv[2];
     const encoding = process.argv.includes('--encoding');
+    const expiryOnly = process.argv.includes('--expiry-only');
+    if (encoding && expiryOnly) throw Error('Encoding requires the normal trusted endpoint');
+    const endpoints = expiryOnly ? [['expired', 55492]]
+        : [['trusted', 55472], ['wrong', 55482], ['expired', 55492]];
     if (!repo?.startsWith('/') || process.env.GAUSSDB_HISTORY_ALLOW_DDL !== 'YES') throw Error('Explicit isolated test consent required');
     const local = fs.mkdtempSync(path.join(os.tmpdir(), 'dbv-tls-'));
     fs.chmodSync(local, 0o700);
@@ -125,7 +129,7 @@ function main() {
         const configs = {};
         process.exitCode = withTlsFixture({
             create: () => docker(['create', '--label', 'dbeaver.acceptance=tls-disposable',
-                '-p', '127.0.0.1:55472:55472', '-p', '127.0.0.1:55482:55482', '-p', '127.0.0.1:55492:55492',
+                ...endpoints.flatMap(([, port]) => ['-p', `127.0.0.1:${port}:${port}`]),
                 '--entrypoint', 'sleep', 'gaussdb507-arm64:507.0.0', 'infinity']),
             prepare(id) {
                 docker(['start', id]);
@@ -142,7 +146,7 @@ function main() {
                 docker(['exec', id, 'chown', 'gausscore:dbgrp', '/tmp/tls-acceptance/password']);
                 docker(['exec', id, 'chmod', '600', '/tmp/tls-acceptance/password']);
                 // GaussDB also reserves adjacent internal ports; leave a gap between instances.
-                for (const [name, port] of [['trusted', 55472], ['wrong', 55482], ['expired', 55492]]) {
+                for (const [name, port] of endpoints) {
                     const directory = '/tmp/tls-acceptance/' + name;
                     tool('gs_initdb', ['-D', directory, '--nodename=tls_' + name, '-U', 'gausscore',
                         '--auth-local=trust', '--auth-host=sha256', '--locale=C', '-E', 'UTF8',
@@ -185,9 +189,9 @@ function main() {
                     stdio: 'inherit', env: {...process.env,
                         GAUSSDB_HISTORY_TLS_CONNECTION: configs.trusted,
                         GAUSSDB_HISTORY_TLS_WRONG_HOST_CONNECTION: configs.wrong,
-                        GAUSSDB_HISTORY_TLS_CA: certificates.trusted.cert,
-                        GAUSSDB_HISTORY_TLS_WRONG_HOST_CA: certificates.wrong.cert,
-                        GAUSSDB_HISTORY_TLS_UNRELATED_CA: certificates.unrelated.cert,
+                        GAUSSDB_HISTORY_TLS_CA: configs.trusted ? certificates.trusted.cert : undefined,
+                        GAUSSDB_HISTORY_TLS_WRONG_HOST_CA: configs.wrong ? certificates.wrong.cert : undefined,
+                        GAUSSDB_HISTORY_TLS_UNRELATED_CA: configs.trusted ? certificates.unrelated.cert : undefined,
                         GAUSSDB_HISTORY_TLS_EXPIRED_CONNECTION: configs.expired,
                         GAUSSDB_HISTORY_TLS_EXPIRED_CA: certificates.trusted.cert,
                         ...(encoding ? {GAUSSDB_HISTORY_ENCODING_DATABASE: 'tls_encoding',

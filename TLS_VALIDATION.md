@@ -2,6 +2,10 @@
 
 ## 独立端点入口（2026-09-30两轮通过）
 
+当前扩展入口另有过期叶证书端点55492，尚在验证中：由当前有效CA签发、SAN为127.0.0.1、叶证书有效期固定为2020-01-01至2020-01-02。不能用过期的自签名信任锚替代这一场景。OpenSSL须支持`x509 -not_before/-not_after`（本机3.6.3）；不支持时准备失败，不计跳过或通过。运行时端口映射为空时最多等待30次，间隔1秒；错误接口/端口立即失败。
+
+`--expiry-only`只准备过期证书端点，不能与`--encoding`同时使用。用于多端点准备失败时单独验证过期拒绝；其他TLS正向/主机名场景本轮缺少配置会跳过，不得算通过。当前Docker诊断可复现多端口配置的首端口无实际映射，即使有界等待仍失败；未放松loopback校验，也未重启已有服务。
+
 新增 `node scripts/run-tls-live.mjs /absolute/path/to/dbeaver`，沿用历史运行器的JDK、Maven、厂商JDBC、分布式配置和显式DDL同意环境变量。入口创建专用容器，复制本地集中式507程序目录（不复制数据），初始化两个仅含合成测试账号的实例。宿主机仅绑定127.0.0.1的55472、55482端口；两个实例需避开相邻内部端口，端口被占用则失败，不接管已有服务。证书、私钥和随机口令配置均存放私有临时目录，证书有效期2天。结束删除本轮容器及本地临时文件；强杀中断仍需核对遗留资源，不能直接用于业务环境。
 
 `GAUSSDB_HISTORY_TLS_CONNECTION` 指向匹配地址的TLS端点；`GAUSSDB_HISTORY_TLS_WRONG_HOST_CONNECTION` 指向可信但地址不匹配的另一端点。未配置新变量时兼容旧的历史连接文件入口。三项TLS测试的外层连接也执行相应verify-full/verify-ca校验，不用明文建测试schema。SSL-off场景继续连接原SSL-off端点，因此不需要重启原数据库，也不需要将互斥场景分批。
@@ -35,7 +39,8 @@ bash scripts/run-dbeaver-tests.sh /absolute/path/to/dbeaver
 1. `strictTlsConnectsWithTrustedCertificateAndRejectsMissingTrustFile`：SHOW ssl=on，verify-full连接后查询中文/数值；不存在的信任文件必须报08类连接异常，不得明文回退；原连接仍能查询。
 2. `strictTlsRejectsExistingUnrelatedCertificateWithoutDowngrade`：正确证书先连接成功；有效但无关的证书必须报08类错误且异常链包含SSLHandshakeException；再次使用正确证书查询成功。双向正向对照排除服务器不可用造成的假拒绝。
 3. `requiredSslDoesNotSilentlyDowngradeWhenServerSslIsDisabled`：另在ssl=off时运行，require报08004；prefer允许明文回退。该结果绝不作为加密连接证据。
-4. `strictTlsRejectsTrustedCertificateWithWrongHostname`：服务端另装SAN仅wrong-host.invalid的有效测试证书，客户端通过GAUSSDB_HISTORY_TLS_WRONG_HOST_CA信任它，不同时设置前两项TLS变量。verify-ca前后查询1/2成功，verify-full必须报08类且明确hostname错误，证明证书受信任仍执行主机名校验。此批次不能同时执行要求正确SAN的正向测试。
+4. `strictTlsRejectsTrustedCertificateWithWrongHostname`：独立端点使用SAN仅wrong.invalid的有效测试证书，通过GAUSSDB_HISTORY_TLS_WRONG_HOST_CA信任它。verify-ca前后查询1/2成功，verify-full必须报08类且明确hostname错误。当前运行器使用不同端点，能够与正确SAN正向测试同轮执行；旧的单端点手动方法才需要分批。
+5. `strictTlsRejectsExpiredLeafWithoutDowngrade`：GAUSSDB_HISTORY_TLS_EXPIRED_CONNECTION和GAUSSDB_HISTORY_TLS_EXPIRED_CA指向专用端点及有效签发CA。verify-ca/verify-full必须报08类且异常链包含CertificateExpiredException或CertPathValidatorException的EXPIRED原因；前后通过非验证TLS查询证明端点可达。这一非验证设置仅是隔离测试对照，不能作为客户推荐配置。缺少独立配置时明确跳过，真库通过结果待登记。
 
 ## 已验证与待验证
 
