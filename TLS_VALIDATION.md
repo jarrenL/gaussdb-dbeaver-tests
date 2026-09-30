@@ -1,6 +1,6 @@
 # TLS 测试方法与边界
 
-## 独立端点入口（2026-09-30首轮通过，重复验收中）
+## 独立端点入口（2026-09-30两轮通过）
 
 新增 `node scripts/run-tls-live.mjs /absolute/path/to/dbeaver`，沿用历史运行器的JDK、Maven、厂商JDBC、分布式配置和显式DDL同意环境变量。入口创建专用容器，复制本地集中式507程序目录（不复制数据），初始化两个仅含合成测试账号的实例。宿主机仅绑定127.0.0.1的55472、55482端口；两个实例需避开相邻内部端口，端口被占用则失败，不接管已有服务。证书、私钥和随机口令配置均存放私有临时目录，证书有效期2天。结束删除本轮容器及本地临时文件；强杀中断仍需核对遗留资源，不能直接用于业务环境。
 
@@ -38,6 +38,12 @@ bash scripts/run-dbeaver-tests.sh /absolute/path/to/dbeaver
 4. `strictTlsRejectsTrustedCertificateWithWrongHostname`：服务端另装SAN仅wrong-host.invalid的有效测试证书，客户端通过GAUSSDB_HISTORY_TLS_WRONG_HOST_CA信任它，不同时设置前两项TLS变量。verify-ca前后查询1/2成功，verify-full必须报08类且明确hostname错误，证明证书受信任仍执行主机名校验。此批次不能同时执行要求正确SAN的正向测试。
 
 ## 已验证与待验证
+
+重复验证run-JTZMwP完成：2724项中2712通过、12跳过、零失败/错误，与run-PQPfG3经过测试身份、结果及报告时间校验逐项一致；TLS容器、临时原生工具实例及专用角色/数据库均清理。中间端口查询失败尝试不计成功轮次。GB18030扩展已开始实跑，待结果。
+
+独立入口重复运行时曾在`docker port`查询阶段失败（未进入JUnit），容器已清理，未算一次通过。入口现直接检查运行时NetworkSettings.Ports，必须恰有一个127.0.0.1及预期端口的映射，缺失/错误/非本机映射均拒绝；生命周期及映射自测共6项通过，重复真库回归仍在执行。
+
+可选`--encoding`正在补充验证：只在新建的正确证书实例内创建`tls_encoding`（GB18030），使用`GAUSSDB_HISTORY_ENCODING_CONNECTION`指定独立连接文件。未指定该变量时仍兼容旧历史连接入口；这项扩展未完成实跑前不算编码验收通过。
 
 2026-09-23，GaussDB507分布式CN、厂商JDBC、上述1/2通过；第3在此前SSL-off批次通过。TLS-on批次第3跳过，两种互斥环境分开报告。
 
