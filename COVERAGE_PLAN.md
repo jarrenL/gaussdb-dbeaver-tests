@@ -4,6 +4,8 @@
 
 ### 2026-09-30 后续执行顺序
 
+包GUI夹具已从临时程序整理为integration/GuiPackageFixture.java及GuiPackageFixtureTest.java，可setup/verify/cleanup。最终版本Java21目标编译通过，507集中式普通账号完整运行两次；每次含两轮重复创建42P06、无效Body目录状态、额外表导致清理2BP01并完整回滚/保留42及原包、正常清理，以及模拟包已删除后的空schema清理。独立残留schema=0，临时密码副本删除。此为夹具生命周期/保护测试，不新增GUI功能通过数。
+
 0733干净整包x86包错误定位与批量删除已补验：重建后gui_bad当前OID72071，Compile Body错误窗line4/col1，Open Source光标定位实际missing %TYPE声明行；服务端当前OID相对line2，旧同名OID70912排除。Ctrl多选两包Delete准确列两个全名，Cancel后独立count=2，重复Yes后导航消失且count=0；空schema RESTRICT清理后0，临时口令副本删除。主仓PACKAGE_FINAL_X86_ERROR_DELETE_20260930.json，非依赖冲突/并发删除/权限拒绝证明。
 
 0733干净整包x86包保存/状态限定验收通过：普通账号gui_bad当前OID72066初始Invalid，经Body源码保存预览仅OR REPLACE BODY，保存后无需Refresh/Compile自动Normal，独立调用46；BODY/SPEC工具栏以及右键ALL均成功，独立S/B valid=true。源码tooltip显示中文。关闭编辑器后仅两夹具包+schema RESTRICT事务清理，schema=0，临时口令副本删除。主仓PACKAGE_FINAL_X86_20260930.json及八截图；错误定位/批量删除/调试仍未在该整包补跑，不把行政清理算UI删除。

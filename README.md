@@ -12,6 +12,38 @@ DBeaver 源码：https://github.com/jarrenL/dbeaver 。测试扩充已分批本�
 
 ## 运行
 
+### 包界面测试的可重复夹具
+
+仅用于支持 Package 的集中式 O/A 专用测试库。`integration/GuiPackageFixture.java`
+使用固定 schema `dbv_pkg_gui_repeatable`，创建正常包 `gui_valid` 和故意含无效类型引用的
+`gui_bad`。它不替代 DBeaver 界面测试：先 setup，再在客户端刷新模式树并执行编译、
+错误跳转、保存或批量删除。verify 只检查两包存在及正常包返回 42；修复后的错误包不要求仍 Invalid。
+
+```sh
+export GAUSSDB_HISTORY_ALLOW_DDL=YES
+export GAUSSDB_PACKAGE_URL=jdbc:gaussdb://test-host:port/test_database
+export GAUSSDB_PACKAGE_USER=test_owner
+export GAUSSDB_PACKAGE_DRIVER=com.huawei.gauss200.jdbc.Driver
+export GAUSSDB_PACKAGE_PASSWORD_FILE=/absolute/private/password.txt
+export GAUSSDB_HISTORY_JDBC=/absolute/private/version-matched-jdbc.jar
+fixture_classes=$(mktemp -d)
+javac --release 21 -d "$fixture_classes" integration/GuiPackageFixture.java integration/GuiPackageFixtureTest.java
+java -cp "$fixture_classes:$GAUSSDB_HISTORY_JDBC" GuiPackageFixture setup
+# 完成界面测试后清理；界面已经删掉两个包时也可以执行：
+java -cp "$fixture_classes:$GAUSSDB_HISTORY_JDBC" GuiPackageFixture cleanup
+# 独立验证夹具保护与重复执行能力（先确保上面的清理成功）：
+java -cp "$fixture_classes:$GAUSSDB_HISTORY_JDBC" GuiPackageFixtureTest
+```
+
+密码文件只包含密码，限制文件访问权限；不得提交该文件或原始驱动连接日志。
+上述 classpath 分隔符适用于 Linux/macOS，Windows 使用分号。驱动类必须与外部 JDBC 匹配。
+setup 不接管已存在的 schema；cleanup 要求当前用户拥有 schema，只删除两个固定测试包，
+最后用 `DROP SCHEMA ... RESTRICT`，全程处于同一事务。若存在额外对象，清理失败并回滚，
+不得改成 CASCADE 绕过保护。测试程序自身创建的保护表会自行移除；其他额外对象须人工核对。
+界面外部建包后要刷新模式树，不要依赖旧对象 OID；编译错误核验按当前 OID 而非仅按包名。
+
+### DBeaver 模型和真库回归
+
 先准备 DBeaver 26.1.5 GaussDB 适配源码及并列的 dbeaver-common 依赖，按其说明准备构建 JDK、Maven 和离线缓存。测试执行的是 Maven/Tycho 中的实际生产代码，不复制一套简化实现来验证自己。
 
 ```sh
