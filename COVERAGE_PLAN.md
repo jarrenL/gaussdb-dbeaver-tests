@@ -4,6 +4,8 @@
 
 ### 2026-09-30 后续执行顺序
 
+新整包26.1.5.202609300733已由生产提交e52a9c4cc5构建，双架构组装/1202项manifest/9个native字节对照通过；源码集合与对应版本归档已准备。两端正常关闭旧产品后启动新整包，About确认同一版本；ARM界面查询507/package_lab/package_tester并独立服务端确认。x86仅启动和连接向导，后续连接/调试/包回归仍待。路径linux-state-refresh-20260930-9ym0tr，主仓LINUX_STATE_REFRESH_BUILD_20260930.json。未上传或替换远端；部分上游提示和菜单仍英文，不宣称全汉化。旧状态刷新方案起草任务因修复已落地而终止，改为独立辅助仅审e52a9c4cc5提交，目前尚无结论。
+
 包保存后状态刷新已修复并限定验收：EntityEditor已有状态读取，ObjectPropertiesEditor新增仅只读属性重载，不编译/不重置源码；后台应用值时再次排除可编辑属性。新增4项通过，run-0H8BeK=2737/2719通过/18跳过/0失败错误。ARM麒麟隔离产品仅替换同SHA navigator插件后，gui_bad实际Body保存由Invalid自动Normal，独立44；不完整源码保存拒绝且dirty保留/服务器仍44，修正重试45；两包/schema与临时口令副本清理。主仓PACKAGE_STATE_REFRESH_20260930.json，仍需最终整包与x86回归。同时过期leaf重复专项通过(run-QYxaE1，2721通过/16跳过)，主仓TLS_EXPIRY_REPEAT_20260930.json。
 
 双向TLS已两轮真库通过：run-RzHDIY及run-QzrbgW均2733项/2717通过/16跳过/0失败错误，新增mutualTlsRequiresTrustedClientCertificate实际执行，使用不同临时证书/容器/动态端口，严格verify-full下合法证书成功、无证书/不受信客户端材料拒绝且前后正向对照成功。当前运行器166/166辅助测试通过。临时中央库/角色和标记容器独立检查0残留；主仓MTLS_JDBC_20260930.json。不等于SSL GUI、加密客户端私钥或客户目标版本验收。包状态刷新审查仍进行中。
