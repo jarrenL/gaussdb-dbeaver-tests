@@ -31,7 +31,8 @@ export function publishedEndpoint(bindings, port) {
     const entries = bindings?.[String(port) + '/tcp'];
     if (!Array.isArray(entries) || entries.length !== 1
         || entries[0].HostIp !== '127.0.0.1' || entries[0].HostPort !== String(port)) {
-        throw Error('Missing or unexpected loopback TLS binding for port ' + port);
+        throw Error('Missing or unexpected loopback TLS binding for port ' + port
+            + ': ' + JSON.stringify(entries ?? null));
     }
     return '127.0.0.1:' + entries[0].HostPort;
 }
@@ -53,6 +54,18 @@ export function withTlsFixture({create, prepare, run, remove}) {
     }
     if (failure) throw failure;
     return result;
+}
+
+export function waitForPublishedEndpoint(read, port, wait, attempts = 30) {
+    for (let attempt = 0; attempt < attempts; attempt++) {
+        const bindings = read();
+        const entries = bindings?.[String(port) + '/tcp'];
+        // Docker may return empty runtime bindings shortly after start. Only
+        // absence is retryable; wrong interfaces/ports remain immediate errors.
+        if (Array.isArray(entries) && entries.length > 0) return publishedEndpoint(bindings, port);
+        if (attempt + 1 < attempts) wait();
+    }
+    throw Error('Timed out waiting for loopback TLS binding for port ' + port);
 }
 
 function main() {
@@ -92,13 +105,27 @@ function main() {
             fs.chmodSync(key, 0o600); fs.chmodSync(cert, 0o600);
             certificates[name] = {key, cert};
         }
+        // Expired leaf signed by a CURRENT trusted CA. An expired self-signed
+        // trust anchor does not reliably exercise certificate validity checks.
+        const expiredKey = path.join(local, 'expired.key');
+        const expiredCsr = path.join(local, 'expired.csr');
+        const expiredCert = path.join(local, 'expired.crt');
+        files.push(expiredKey, expiredCsr, expiredCert);
+        const expiredExtensions = write('expired-ext.cnf', '[server]\nbasicConstraints=critical,CA:FALSE\nkeyUsage=critical,digitalSignature,keyEncipherment\nextendedKeyUsage=serverAuth\nsubjectAltName=IP:127.0.0.1\n');
+        command('openssl', ['req', '-new', '-nodes', '-newkey', 'rsa:2048', '-subj', '/CN=expired-leaf',
+            '-keyout', expiredKey, '-out', expiredCsr]);
+        command('openssl', ['x509', '-req', '-in', expiredCsr, '-CA', certificates.trusted.cert,
+            '-CAkey', certificates.trusted.key, '-set_serial', '20260930', '-not_before', '20200101000000Z',
+            '-not_after', '20200102000000Z', '-extfile', expiredExtensions, '-extensions', 'server', '-out', expiredCert]);
+        for (const file of [expiredKey, expiredCsr, expiredCert]) fs.chmodSync(file, 0o600);
+        certificates.expired = {key: expiredKey, cert: expiredCert};
         const password = 'Dbv!' + randomBytes(12).toString('hex') + '9a';
         secrets.push(password);
         const secret = write('password', password + '\n');
         const configs = {};
         process.exitCode = withTlsFixture({
             create: () => docker(['create', '--label', 'dbeaver.acceptance=tls-disposable',
-                '-p', '127.0.0.1:55472:55472', '-p', '127.0.0.1:55482:55482',
+                '-p', '127.0.0.1:55472:55472', '-p', '127.0.0.1:55482:55482', '-p', '127.0.0.1:55492:55492',
                 '--entrypoint', 'sleep', 'gaussdb507-arm64:507.0.0', 'infinity']),
             prepare(id) {
                 docker(['start', id]);
@@ -115,7 +142,7 @@ function main() {
                 docker(['exec', id, 'chown', 'gausscore:dbgrp', '/tmp/tls-acceptance/password']);
                 docker(['exec', id, 'chmod', '600', '/tmp/tls-acceptance/password']);
                 // GaussDB also reserves adjacent internal ports; leave a gap between instances.
-                for (const [name, port] of [['trusted', 55472], ['wrong', 55482]]) {
+                for (const [name, port] of [['trusted', 55472], ['wrong', 55482], ['expired', 55492]]) {
                     const directory = '/tmp/tls-acceptance/' + name;
                     tool('gs_initdb', ['-D', directory, '--nodename=tls_' + name, '-U', 'gausscore',
                         '--auth-local=trust', '--auth-host=sha256', '--locale=C', '-E', 'UTF8',
@@ -147,8 +174,9 @@ function main() {
                         tool('gsql', ['-p', String(port), '-d', 'postgres', '-At', '-v', 'ON_ERROR_STOP=1'],
                             "CREATE DATABASE tls_encoding OWNER tls_client TEMPLATE template0 ENCODING 'GB18030' LC_COLLATE 'C' LC_CTYPE 'C' DBCOMPATIBILITY='A';\n");
                     }
-                    const bindings = JSON.parse(docker(['inspect', id, '--format', '{{json .NetworkSettings.Ports}}']));
-                    const published = publishedEndpoint(bindings, port);
+                    const published = waitForPublishedEndpoint(
+                        () => JSON.parse(docker(['inspect', id, '--format', '{{json .NetworkSettings.Ports}}'])), port,
+                        () => command('sleep', ['1']));
                     configs[name] = write(name + '.properties', `url=jdbc:gaussdb://${published}/tls_acceptance\nuser=tls_client\npassword=${password}\ndriverClass=com.huawei.gauss200.jdbc.Driver\nsslmode=verify-full\nsslrootcert=${certificates[name].cert}\n`);
                 }
             },
@@ -160,6 +188,8 @@ function main() {
                         GAUSSDB_HISTORY_TLS_CA: certificates.trusted.cert,
                         GAUSSDB_HISTORY_TLS_WRONG_HOST_CA: certificates.wrong.cert,
                         GAUSSDB_HISTORY_TLS_UNRELATED_CA: certificates.unrelated.cert,
+                        GAUSSDB_HISTORY_TLS_EXPIRED_CONNECTION: configs.expired,
+                        GAUSSDB_HISTORY_TLS_EXPIRED_CA: certificates.trusted.cert,
                         ...(encoding ? {GAUSSDB_HISTORY_ENCODING_DATABASE: 'tls_encoding',
                             GAUSSDB_HISTORY_ENCODING_CONNECTION: configs.trusted} : {})}
                 });

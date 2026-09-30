@@ -1,7 +1,22 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {withTlsFixture, ownedContainer, publishedEndpoint, cleanupLocal, redactDiagnostic} from './run-tls-live.mjs';
+import {withTlsFixture, ownedContainer, publishedEndpoint, waitForPublishedEndpoint, cleanupLocal, redactDiagnostic} from './run-tls-live.mjs';
 const id = 'a'.repeat(64);
+test('runtime port publication tolerates absence then checks actual binding', () => {
+    let reads = 0, waits = 0;
+    assert.equal(waitForPublishedEndpoint(() => ++reads < 3 ? {'55472/tcp': []}
+        : {'55472/tcp': [{HostIp: '127.0.0.1', HostPort: '55472'}]}, 55472, () => waits++, 3), '127.0.0.1:55472');
+    assert.equal(reads, 3); assert.equal(waits, 2);
+});
+test('runtime binding wait is bounded and never accepts configured-only ports', () => {
+    let waits = 0;
+    assert.throws(() => waitForPublishedEndpoint(() => ({}), 55472, () => waits++, 3), /Timed out/);
+    assert.equal(waits, 2);
+});
+test('unexpected runtime interface is never retried into a passing result', () => {
+    assert.throws(() => waitForPublishedEndpoint(() => ({'55472/tcp': [{HostIp: '0.0.0.0', HostPort: '55472'}]}),
+        55472, () => assert.fail('must not wait')), /unexpected/);
+});
 test('bare credential values are redacted, not only SQL password lines', () => {
     assert.equal(redactDiagnostic('DETAIL: abc123\nPASSWORD abc123\nretry abc123', ['abc123']),
         'DETAIL: [REDACTED]\nretry [REDACTED]');
