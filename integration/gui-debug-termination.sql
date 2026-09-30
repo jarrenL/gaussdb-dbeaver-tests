@@ -19,6 +19,6 @@ COMMIT;
 -- Independent observer must see only id=1 while target CALL is actively waiting.
 -- Click debugger Terminate, then assert only id=1 and no matching active CALL.
 -- Restart same configuration and repeat before cleanup.
--- After verifying no active target, explicitly run:
--- DROP SCHEMA dbv_gui_f10_fixture CASCADE;
+-- Use GuiDebugTerminationFixture cleanup for transactional RESTRICT cleanup.
+-- Do not use DROP SCHEMA CASCADE: unrelated objects must prevent cleanup.
 -- Confirm schema absence and restore the debugger-role membership baseline.

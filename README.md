@@ -39,6 +39,26 @@ bash scripts/run-dbeaver-tests.sh /absolute/path/to/dbeaver
 
 ## 结果与发布原则
 
+### 调试终止夹具的重复执行
+
+`integration/gui-debug-termination.sql` 使用专用固定 schema `dbv_gui_f10_fixture`，用于在调试器中先写入、再进入长等待，检查终止是否保留已提交基线并撤销未提交写入。只能用于隔离测试库；存在同名 schema 时拒绝覆盖。调试权限由管理员单独临时授权并恢复，不由夹具自动扩大权限。
+
+使用 Java 21 或更高版本，先将 `integration/GuiDebugTerminationFixture.java` 和 `integration/GuiDebugTerminationFixtureTest.java` 编译到临时目录。运行时 classpath 包含该目录及供应商 JDBC jar，设置 `GAUSSDB_HISTORY_ALLOW_DDL=YES`。不要把连接文件或驱动放入仓库。
+
+```sh
+java -cp "$FIXTURE_CLASSES:$GAUSSDB_HISTORY_JDBC" GuiDebugTerminationFixture \
+  "$GAUSSDB_HISTORY_CONNECTION" setup integration/gui-debug-termination.sql
+# 完成 GUI 调试后，分别核验和清理：
+java -cp "$FIXTURE_CLASSES:$GAUSSDB_HISTORY_JDBC" GuiDebugTerminationFixture \
+  "$GAUSSDB_HISTORY_CONNECTION" verify integration/gui-debug-termination.sql
+java -cp "$FIXTURE_CLASSES:$GAUSSDB_HISTORY_JDBC" GuiDebugTerminationFixture \
+  "$GAUSSDB_HISTORY_CONNECTION" cleanup integration/gui-debug-termination.sql
+```
+
+清理前核对所有者、仅保留基线 id=1、无目标 CALL。清理使用同一事务内的 `DROP ... RESTRICT`，额外对象或依赖会阻止操作，失败回滚保留夹具；不能改成 `CASCADE` 强行清理。此固定 schema 不支持并行测试，运行期间不得让其他人修改其中对象。
+
+`GuiDebugTerminationFixtureTest` 接收连接文件、SQL 文件两个参数，验证重复创建拒绝、额外表及其数据保留、清理失败恢复原过程、两轮生命周期和最终无残留；它不是 GUI 自动化，也不证明断点或终止动作已执行。测试异常时应检查残留并人工确认，不自动接管已有 schema。
+
 GB18030数据库场景另需管理员在隔离实例预建专用数据库：存储编码GB18030，兼容模式ORA，所有者为测试账号；保持JDBC默认UTF8，不设置客户端编码初始化SQL。配置 `GAUSSDB_HISTORY_ENCODING_DATABASE` 为该库名称（仅小写字母、数字、下划线）。连接主机/端口/认证沿用私有连接文件，测试只替换URL中的数据库路径，并创建、清理该库内随机schema，不自行建删数据库。管理员应按已有密码认证方式仅放行测试账号/该库/测试客户端地址，结束后移除临时访问规则。缺少变量时此项跳过，不算通过。创建库的DBCOMPATIBILITY标记需以目标版本为准，本地507使用ORA而非A。
 
 本地日志、结果写入被忽略的 `results/`。脚本拒绝将旧 JUnit 报告当作当前结果。公开结果仅包含测试 ID、状态和汇总，不包含环境属性、连接信息或标准输出。
