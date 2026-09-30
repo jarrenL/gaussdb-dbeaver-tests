@@ -185,7 +185,10 @@ function main() {
                     const published = waitForPublishedEndpoint(
                         () => JSON.parse(docker(['inspect', id, '--format', '{{json .NetworkSettings.Ports}}'])), port,
                         () => command('sleep', ['1']), 30, {dynamicPort: true});
-                    configs[name] = write(name + '.properties', `url=jdbc:gaussdb://${published}/tls_acceptance\nuser=tls_client\npassword=${password}\ndriverClass=com.huawei.gauss200.jdbc.Driver\nsslmode=verify-full\nsslrootcert=${certificates[name].cert}\n`);
+                    // The expired leaf is signed by the current trusted CA;
+                    // it must never itself become the configured trust anchor.
+                    const rootCertificate = certificates[name === 'expired' ? 'trusted' : name].cert;
+                    configs[name] = write(name + '.properties', `url=jdbc:gaussdb://${published}/tls_acceptance\nuser=tls_client\npassword=${password}\ndriverClass=com.huawei.gauss200.jdbc.Driver\nsslmode=verify-full\nsslrootcert=${rootCertificate}\n`);
                 }
             },
             run() {
