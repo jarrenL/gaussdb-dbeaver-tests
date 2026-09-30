@@ -42,6 +42,41 @@ setup 不接管已存在的 schema；cleanup 要求当前用户拥有 schema，�
 不得改成 CASCADE 绕过保护。测试程序自身创建的保护表会自行移除；其他额外对象须人工核对。
 界面外部建包后要刷新模式树，不要依赖旧对象 OID；编译错误核验按当前 OID 而非仅按包名。
 
+### 调试事务 GUI 复测夹具
+
+复用上节的 JDBC、账号、私有口令文件环境变量（变量名保留 `GAUSSDB_PACKAGE_*`）。
+本夹具只适用于专用 O/A 测试库，固定 schema 为 `dbv_debug_gui_repeatable`。
+不会自动授予调试权限；GUI 调试账号须由管理员按服务器版本配置所需权限，
+若临时授权，验收后恢复原状态。不要使用业务账号或生产库。
+
+```sh
+fixture_classes=$(mktemp -d)
+javac --release 21 -d "$fixture_classes" integration/GuiPackageFixture.java integration/GuiDebugFixture.java integration/GuiDebugFixtureTest.java
+java -cp "$fixture_classes:$GAUSSDB_HISTORY_JDBC" GuiDebugFixture setup
+java -cp "$fixture_classes:$GAUSSDB_HISTORY_JDBC" GuiDebugFixture baseline
+```
+
+在 DBeaver 中刷新模式树，进入调试配置，选择 `write_row(integer)`，将 `p_id` 填为 `2`，
+按 Enter 确认参数单元格后启动。切换调试透视图，选择栈帧及变量页，应显示 `p_id=2`、
+`v_value=10`；F8 后应显示 `12`，F9 继续至完成。事务选择框出现时，另开终端执行
+`GuiDebugFixture baseline`，应仍只看到原记录 `1`。
+
+第一次选择“回滚”，再次执行 baseline 应通过。重新启动同一配置，F9 完成后选择“提交”，
+执行下列 committed 应通过（恰好两行 `1` 和 `12`）。若额外调试并提交过，应先核对数据，
+不要修改断言掩盖多次提交。
+
+```sh
+java -cp "$fixture_classes:$GAUSSDB_HISTORY_JDBC" GuiDebugFixture committed
+# 结束全部调试会话并关闭对象编辑器后：
+java -cp "$fixture_classes:$GAUSSDB_HISTORY_JDBC" GuiDebugFixture cleanup
+# 单独验证夹具及其独立连接断言（不是 GUI 调试验证）：
+java -cp "$fixture_classes:$GAUSSDB_HISTORY_JDBC" GuiDebugFixtureTest
+```
+
+setup 拒绝已有 schema；cleanup 仅删除固定过程和表，再以 RESTRICT 删除 schema，
+遇到额外对象整体回滚，不用 CASCADE。测试程序每次执行两轮生命周期，包含重复创建拒绝、
+提交前不可见、回滚与提交断言、额外对象阻止清理并恢复过程和数据。清理失败须调查，不能当作通过。
+
 ### DBeaver 模型和真库回归
 
 先准备 DBeaver 26.1.5 GaussDB 适配源码及并列的 dbeaver-common 依赖，按其说明准备构建 JDK、Maven 和离线缓存。测试执行的是 Maven/Tycho 中的实际生产代码，不复制一套简化实现来验证自己。
