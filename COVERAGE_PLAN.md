@@ -4,6 +4,8 @@
 
 ### 2026-09-30 后续执行顺序
 
+0733干净整包x86包错误定位与批量删除已补验：重建后gui_bad当前OID72071，Compile Body错误窗line4/col1，Open Source光标定位实际missing %TYPE声明行；服务端当前OID相对line2，旧同名OID70912排除。Ctrl多选两包Delete准确列两个全名，Cancel后独立count=2，重复Yes后导航消失且count=0；空schema RESTRICT清理后0，临时口令副本删除。主仓PACKAGE_FINAL_X86_ERROR_DELETE_20260930.json，非依赖冲突/并发删除/权限拒绝证明。
+
 0733干净整包x86包保存/状态限定验收通过：普通账号gui_bad当前OID72066初始Invalid，经Body源码保存预览仅OR REPLACE BODY，保存后无需Refresh/Compile自动Normal，独立调用46；BODY/SPEC工具栏以及右键ALL均成功，独立S/B valid=true。源码tooltip显示中文。关闭编辑器后仅两夹具包+schema RESTRICT事务清理，schema=0，临时口令副本删除。主仓PACKAGE_FINAL_X86_20260930.json及八截图；错误定位/批量删除/调试仍未在该整包补跑，不把行政清理算UI删除。
 
 执行检查点更新：新整包x86麒麟（本地架构仿真）从空工作区完成原生驱动入口、添加外部JDBC、测试连接成功、保存连接、SQL编辑器查询507/package_lab/package_tester；独立服务端确认release_0733_x86_marker查询的账号/库/idle状态。证据补入LINUX_STATE_REFRESH_BUILD_20260930.json。不是调试、包编译或客户桌面云认证。
