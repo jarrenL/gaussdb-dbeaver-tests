@@ -4,6 +4,8 @@
 
 ### 2026-09-30 后续执行顺序
 
+GUI查询取消已连续两轮限定通过：Auto commit、普通账号、120秒pg_sleep，分别在8.668/8.763秒独立确认active；界面Cancel后37.896/30.458秒观察同PID idle（早于自然结束），同一编辑器后续SELECT42均在同PID成功执行。未用服务端取消或terminate替代UI按钮，最终活动夹具查询0，无DDL。主仓QUERY_CANCEL_GUI_20260930.json及控件/截图、integration/gui-query-cancel.sql可复用步骤。取消耗时为观察上界非精确延迟；非手动事务取消/慢网络/最终洁净包证明。发现ProgressLoaderVisualizer三个英文硬编码，已改为中英NLS，构建回归启动中，尚未计改后GUI通过。
+
 Linux GUI事务/重连一轮已补验：普通package_tester通过SQL编辑器创建专用schema/table，手动提交INSERT后observer=0；断开确认取消保留同一事务，选择否执行ROLLBACK并断开（原PID不存在）。原生连接菜单重连后再次创建未提交行，仅终止匹配PID/账号/夹具SQL的测试backend；GUI显示57P01，observer=0。断开/重新连接选择否后新backend可查询；编辑器插入id2并工具栏提交，独立查询仅2|after_reconnect。最后TABLE/SCHEMA RESTRICT事务清理，schema=0。主仓RECONNECT_GUI_20260930.json含截图/原始控件，复用分阶段SQL为integration/gui-reconnect.sql。只覆盖一轮受控backend失效，不覆盖网络黑洞/HA/重复GUI/最终洁净包；失效后重连的“是否提交”提示仍需审视，Yes分支未测。UI取消查询另行验证。
 
 过期证书重复轮已终止于Docker实际映射缺失，JUnit未运行，拥有容器已清理并独立确认不存在。首轮2711通过仍有效，但未满足此配置的重复通过；后续转向已有正常运行Linux GUI上的重连/事务保护场景，避免因同一局部端口阻塞反复全量准备。
