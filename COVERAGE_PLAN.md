@@ -4,6 +4,8 @@
 
 ### 2026-09-30 后续执行顺序
 
+连接配置损坏JSON边界已补生产解析器验证：4种输入（根截断、合法folder前缀后截断、connection缺值、有效对象后尾随垃圾）各跑明文/加密两分支，JsonParseException、流只关闭一次、解析结果无部分应用、修复内容后同解析器可重试并加载folder全部通过。run-myTchS=2745总计/2727通过/18跳过/0失败错误，fresh gate与临时夹具/角色/HBA恢复通过。主仓CONFIG_MALFORMED_20260930.json；初轮测试桩嵌套spy调用错误修正后通过，不计产品缺陷。不是导入向导GUI或合法JSON的字段类型校验。
+
 0733干净整包ARM原生麒麟GUI基础调试事务也已通过：用GuiDebugFixture setup后刷新模式树/打开过程，创建配置选择目标并确认p_id=2，line4变量10，F8至line5变量12；F9中文事务窗，独立连接提交前仅1，第一次回滚仍1，重启同配置第二次提交后1+12。关闭编辑器后活动夹具调用0，普通账号夹具cleanup成功且schema残留0，临时调试成员资格从false授予后恢复false，口令副本删除。主仓DEBUG_FINAL_ARM_20260930.json及三截图。不算客户桌面云认证或完整复杂调试全覆盖。
 
 调试GUI事务夹具现已可重复：integration/GuiDebugFixture.java及GuiDebugFixtureTest.java，固定dbv_debug_gui_repeatable，不自动授予调试权限。Java21目标编译通过，507集中式普通账号连续两次运行成功，每次两轮setup/重复42P06/独立观察者提交前baseline/rollback基线/commit后1+12/额外表导致cleanup 2BP01且恢复过程和数据/正常cleanup。独立schema残留0，账号调试角色仍false，临时口令副本删除。README列完整GUI动作与独立验证命令；这只是夹具/JDBC事务断言的可重复性，不把直接CALL算GUI调试。
