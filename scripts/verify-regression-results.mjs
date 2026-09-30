@@ -19,6 +19,7 @@ export const requiredClasses = [
     ['org.jkiss.dbeaver.ext.gaussdb.debug.test', 'org.jkiss.dbeaver.ext.gaussdb.debug.core.DebugTransactionCompletionTest'],
     ['org.jkiss.dbeaver.test.platform', 'org.jkiss.dbeaver.model.ConfigurationNIOPersistenceTest'],
     ['org.jkiss.dbeaver.test.platform', 'org.jkiss.dbeaver.model.ConfigurationReadFailureTest'],
+    ['org.jkiss.dbeaver.test.platform', 'org.jkiss.dbeaver.model.qm.meta.QueryHistoryCursorTest'],
     ['org.jkiss.dbeaver.test.platform', 'org.jkiss.dbeaver.model.impl.jdbc.data.JDBCCollectionCloneTest'],
     ['org.jkiss.dbeaver.ext.gaussdb.test', 'org.jkiss.dbeaver.ext.gaussdb.model.data.GaussDBCompositeBindingTest'],
     ['org.jkiss.dbeaver.ext.postgresql.test', 'org.jkiss.dbeaver.ext.postgresql.PostgreCompositeArrayRoundTripTest'],
