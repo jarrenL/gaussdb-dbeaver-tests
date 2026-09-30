@@ -39,6 +39,19 @@ bash scripts/run-dbeaver-tests.sh /absolute/path/to/dbeaver
 
 ## 结果与发布原则
 
+### 本地隔离双向 TLS 回归
+
+在已准备好的 507 实验环境中，保留上文私有 JDBC/连接文件和显式 DDL 开关，然后运行：
+
+```sh
+node --test scripts/run-tls-live.test.mjs
+node scripts/run-tls-live.mjs /absolute/path/to/dbeaver --mtls-only
+```
+
+此入口依赖现有 `gaussdb-507-ha-lab`、`gaussdb-507-cn-lab` 和 `gaussdb507-arm64:507.0.0` 镜像，不是通用客户环境安装脚本。它新建短期证书和隔离容器，只向主机回环地址动态发布端口；覆盖基础镜像的旧 Docker Desktop 端口标签，拒绝非预期发布。随后运行完整客户端回归，结束时删除自身容器、证书、临时库和角色并恢复临时访问规则。不与其他使用同一固定实验夹具的回归并行运行。
+
+新增用例 `mutualTlsRequiresTrustedClientCertificate` 使用供应商 JDBC，保持 `verify-full` 服务端认证，验证合法客户端证书成功、显式不提供证书被拒绝、不受信任客户端证书被拒绝，并在每个拒绝场景前后验证正常连接。测试私钥使用 PKCS#8 DER，限临时目录内 0600；不把证书、私钥或原始报告发布。账号即使因服务端策略设置了随机密码，mTLS 连接配置也不提供该密码，目标访问规则采用 `cert`，不以密码连接冒充证书验证。未配置专用 mTLS 变量时该 JUnit 用例跳过，不算通过。本测试不替代 DBeaver SSL 设置页面的 GUI 验收。
+
 ### 调试终止夹具的重复执行
 
 `integration/gui-debug-termination.sql` 使用专用固定 schema `dbv_gui_f10_fixture`，用于在调试器中先写入、再进入长等待，检查终止是否保留已提交基线并撤销未提交写入。只能用于隔离测试库；存在同名 schema 时拒绝覆盖。调试权限由管理员单独临时授权并恢复，不由夹具自动扩大权限。

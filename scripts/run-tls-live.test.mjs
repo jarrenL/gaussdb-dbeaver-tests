@@ -1,7 +1,24 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {withTlsFixture, ownedContainer, publishedEndpoint, waitForPublishedEndpoint, cleanupLocal, redactDiagnostic} from './run-tls-live.mjs';
+import {withTlsFixture, ownedContainer, publishedEndpoint, waitForPublishedEndpoint, cleanupLocal, redactDiagnostic, endpointModes, rejectUnexpectedPublications} from './run-tls-live.mjs';
 const id = 'a'.repeat(64);
+test('inherited or reconciled unrelated publications fail closed', () => {
+    assert.throws(() => rejectUnexpectedPublications({'5432/tcp': [{HostIp: '', HostPort: '5432'}]}, [55502]),
+        /Unexpected published port/);
+    const bindings = {'5432/tcp': [], '55502/tcp': [{HostIp: '127.0.0.1', HostPort: '62000'}]};
+    assert.equal(rejectUnexpectedPublications(bindings, [55502]), bindings);
+});
+test('mTLS-only creates one isolated endpoint without changing normal TLS modes', () => {
+    assert.deepEqual(endpointModes(['--mtls-only']), {encoding: false, mtlsOnly: true, endpoints: [['mtls', 55502]]});
+    assert.equal(endpointModes([]).endpoints.length, 3);
+    assert.deepEqual(endpointModes(['--expiry-only']).endpoints, [['expired', 55492]]);
+    assert.equal(endpointModes(['--encoding']).encoding, true);
+});
+test('incompatible TLS fixture modes fail before allocating resources', () => {
+    for (const modes of [['--mtls-only', '--encoding'], ['--mtls-only', '--expiry-only'], ['--encoding', '--expiry-only']]) {
+        assert.throws(() => endpointModes(modes));
+    }
+});
 test('allocated runtime port is accepted only with explicit dynamic option', () => {
     const bindings = {'55492/tcp': [{HostIp: '127.0.0.1', HostPort: '64095'}]};
     assert.throws(() => publishedEndpoint(bindings, 55492));

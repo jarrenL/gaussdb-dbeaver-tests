@@ -41,6 +41,15 @@ export function publishedEndpoint(bindings, port, {dynamicPort = false} = {}) {
     return '127.0.0.1:' + entries[0].HostPort;
 }
 
+export function rejectUnexpectedPublications(bindings, ports) {
+    for (const [key, entries] of Object.entries(bindings || {})) {
+        if (Array.isArray(entries) && entries.length && !ports.some(port => key === `${port}/tcp`)) {
+            throw Error('Unexpected published port in disposable TLS container: ' + key);
+        }
+    }
+    return bindings;
+}
+
 export function withTlsFixture({create, prepare, run, remove}) {
     let id;
     let failure;
@@ -72,13 +81,20 @@ export function waitForPublishedEndpoint(read, port, wait, attempts = 30, option
     throw Error('Timed out waiting for loopback TLS binding for port ' + port);
 }
 
+export function endpointModes(args) {
+    const encoding = args.includes('--encoding');
+    const expiryOnly = args.includes('--expiry-only');
+    const mtlsOnly = args.includes('--mtls-only');
+    if (mtlsOnly && (encoding || expiryOnly)) throw Error('mTLS-only cannot be combined with other endpoint modes');
+    if (encoding && expiryOnly) throw Error('Encoding requires the normal trusted endpoint');
+    const endpoints = mtlsOnly ? [['mtls', 55502]] : expiryOnly ? [['expired', 55492]]
+        : [['trusted', 55472], ['wrong', 55482], ['expired', 55492]];
+    return {encoding, mtlsOnly, endpoints};
+}
+
 function main() {
     const repo = process.argv[2];
-    const encoding = process.argv.includes('--encoding');
-    const expiryOnly = process.argv.includes('--expiry-only');
-    if (encoding && expiryOnly) throw Error('Encoding requires the normal trusted endpoint');
-    const endpoints = expiryOnly ? [['expired', 55492]]
-        : [['trusted', 55472], ['wrong', 55482], ['expired', 55492]];
+    const {encoding, mtlsOnly, endpoints} = endpointModes(process.argv.slice(3));
     if (!repo?.startsWith('/') || process.env.GAUSSDB_HISTORY_ALLOW_DDL !== 'YES') throw Error('Explicit isolated test consent required');
     const local = fs.mkdtempSync(path.join(os.tmpdir(), 'dbv-tls-'));
     fs.chmodSync(local, 0o700);
@@ -127,12 +143,35 @@ function main() {
             '-not_after', '20200102000000Z', '-extfile', expiredExtensions, '-extensions', 'server', '-out', expiredCert]);
         for (const file of [expiredKey, expiredCsr, expiredCert]) fs.chmodSync(file, 0o600);
         certificates.expired = {key: expiredKey, cert: expiredCert};
+        if (mtlsOnly) {
+            const extensions = write('client-ext.cnf', 'basicConstraints=critical,CA:FALSE\nkeyUsage=critical,digitalSignature,keyEncipherment\nextendedKeyUsage=clientAuth\n');
+            for (const [name, issuer] of [['client', 'trusted'], ['untrusted-client', 'unrelated']]) {
+                const key = path.join(local, name + '.key');
+                const csr = path.join(local, name + '.csr');
+                const cert = path.join(local, name + '.crt');
+                const pk8 = path.join(local, name + '.pk8');
+                files.push(key, csr, cert, pk8);
+                command('openssl', ['req', '-new', '-nodes', '-newkey', 'rsa:2048', '-subj', '/CN=tls_client',
+                    '-keyout', key, '-out', csr]);
+                command('openssl', ['x509', '-req', '-in', csr, '-CA', certificates[issuer].cert,
+                    '-CAkey', certificates[issuer].key, '-set_serial', '2026093001', '-days', '2',
+                    '-extfile', extensions, '-out', cert]);
+                command('openssl', ['pkcs8', '-topk8', '-nocrypt', '-outform', 'DER', '-in', key, '-out', pk8]);
+                for (const file of [key, csr, cert, pk8]) fs.chmodSync(file, 0o600);
+                certificates[name] = {cert, key: pk8};
+            }
+            certificates.mtls = certificates.trusted;
+        }
         const password = 'Dbv!' + randomBytes(12).toString('hex') + '9a';
         secrets.push(password);
         const secret = write('password', password + '\n');
         const configs = {};
         process.exitCode = withTlsFixture({
             create: () => docker(['create', '--label', 'dbeaver.acceptance=tls-disposable',
+                // The saved lab image carries Docker Desktop port-reconciliation
+                // labels for 5432. Do not inherit that unrelated publication policy.
+                '--label', 'desktop.docker.io/ports.scheme=',
+                '--label', 'desktop.docker.io/ports/5432/tcp=',
                 ...endpoints.flatMap(([, port]) => ['-p', `127.0.0.1::${port}`]),
                 '--entrypoint', 'sleep', 'gaussdb507-arm64:507.0.0', 'infinity']),
             prepare(id) {
@@ -162,9 +201,15 @@ function main() {
                     }
                     const settings = [`port=${port}`, "listen_addresses='*'", 'ssl=on', 'shared_buffers=32MB',
                         'max_connections=30', 'enable_thread_pool=off'];
+                    if (name === 'mtls') {
+                        docker(['cp', certificates.trusted.cert, `${id}:${directory}/client-ca.crt`]);
+                        docker(['exec', id, 'chown', 'gausscore:dbgrp', `${directory}/client-ca.crt`]);
+                        docker(['exec', id, 'chmod', '600', `${directory}/client-ca.crt`]);
+                        settings.push("ssl_ca_file='client-ca.crt'");
+                    }
                     tool('gs_guc', ['set', '-D', directory, ...settings.flatMap(setting => ['-c', setting])]);
                     const databases = name === 'trusted' && encoding ? 'tls_acceptance,tls_encoding' : 'tls_acceptance';
-                    tool('gs_guc', ['set', '-D', directory, '-h', `hostssl ${databases} tls_client 0.0.0.0/0 sha256`]);
+                    tool('gs_guc', ['set', '-D', directory, '-h', `hostssl ${databases} tls_client 0.0.0.0/0 ${name === 'mtls' ? 'cert' : 'sha256'}`]);
                     try {
                         tool('gs_ctl', ['start', '-D', directory, '-l', directory + '/server.log', '-w', '-t', '30'], undefined, 45000);
                     } catch (failure) {
@@ -183,12 +228,15 @@ function main() {
                             "CREATE DATABASE tls_encoding OWNER tls_client TEMPLATE template0 ENCODING 'GB18030' LC_COLLATE 'C' LC_CTYPE 'C' DBCOMPATIBILITY='A';\n");
                     }
                     const published = waitForPublishedEndpoint(
-                        () => JSON.parse(docker(['inspect', id, '--format', '{{json .NetworkSettings.Ports}}'])), port,
+                        () => rejectUnexpectedPublications(
+                            JSON.parse(docker(['inspect', id, '--format', '{{json .NetworkSettings.Ports}}'])),
+                            endpoints.map(([, endpointPort]) => endpointPort)), port,
                         () => command('sleep', ['1']), 30, {dynamicPort: true});
                     // The expired leaf is signed by the current trusted CA;
                     // it must never itself become the configured trust anchor.
                     const rootCertificate = certificates[name === 'expired' ? 'trusted' : name].cert;
-                    configs[name] = write(name + '.properties', `url=jdbc:gaussdb://${published}/tls_acceptance\nuser=tls_client\npassword=${password}\ndriverClass=com.huawei.gauss200.jdbc.Driver\nsslmode=verify-full\nsslrootcert=${rootCertificate}\n`);
+                    configs[name] = write(name + '.properties', `url=jdbc:gaussdb://${published}/tls_acceptance\nuser=tls_client\ndriverClass=com.huawei.gauss200.jdbc.Driver\n`
+                        + (name === 'mtls' ? '' : `password=${password}\nsslmode=verify-full\nsslrootcert=${rootCertificate}\n`));
                 }
             },
             run() {
@@ -201,6 +249,14 @@ function main() {
                         GAUSSDB_HISTORY_TLS_UNRELATED_CA: configs.trusted ? certificates.unrelated.cert : undefined,
                         GAUSSDB_HISTORY_TLS_EXPIRED_CONNECTION: configs.expired,
                         GAUSSDB_HISTORY_TLS_EXPIRED_CA: certificates.trusted.cert,
+                        ...(mtlsOnly ? {
+                            GAUSSDB_HISTORY_MTLS_CONNECTION: configs.mtls,
+                            GAUSSDB_HISTORY_MTLS_CA: certificates.trusted.cert,
+                            GAUSSDB_HISTORY_MTLS_CLIENT_CERT: certificates.client.cert,
+                            GAUSSDB_HISTORY_MTLS_CLIENT_KEY: certificates.client.key,
+                            GAUSSDB_HISTORY_MTLS_UNTRUSTED_CLIENT_CERT: certificates['untrusted-client'].cert,
+                            GAUSSDB_HISTORY_MTLS_UNTRUSTED_CLIENT_KEY: certificates['untrusted-client'].key
+                        } : {}),
                         ...(encoding ? {GAUSSDB_HISTORY_ENCODING_DATABASE: 'tls_encoding',
                             GAUSSDB_HISTORY_ENCODING_CONNECTION: configs.trusted} : {})}
                 });
