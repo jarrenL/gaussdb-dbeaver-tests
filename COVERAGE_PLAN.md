@@ -2,6 +2,8 @@
 
 ## 当前状态摘要（优先于下方按时间保留的旧结论）
 
+2026-09-30关闭顺序GUI复验通过：隔离副本换debug.core 202609300359，SHA匹配642d3ee1…；60秒与300秒等待各一轮，均先INSERT未提交再进入实际pg_sleep，随后点调试器终止。第二轮从提交操作到独立查询1714ms已无目标CALL、表仅基线id=1，界面已终止；排除自然等待结束。两轮新日志无Connection close timeout，仍有异步断开期间statement-not-closed/预期CALL中断诊断，不声称零告警。专用schema和临时权限已清理。辅助报告混用了修改后源码解释旧日志，该结论不采纳；采纳其长等待判别建议并已执行。复用SQL夹具已整理integration/gui-debug-termination.sql（通用名版本未另执行），原始GUI结果保存主仓f10-write-20260930/fixed-*。非物理F10键、非洁净包；后续产品需重建。
+
 2026-09-30关闭顺序完整回归完成：run-UFGm22共2725项2709通过/16跳过/0失败错误，集中式review/native+分布式已启用；TLS/编码/独立dumpall未启用，不与前轮跳过数直接比较。临时库/角色删除，原HBA恢复，独立查专用日期库/角色0残留。原始脱敏逐项报告已保存F10_CLOSE_ORDER_REACTOR_20260930.json；GUI关闭时延复验、新包及辅助审核仍未完成。
 
 2026-09-30终止关闭顺序修正进行中：源码确认目标context关闭先rollback，而忙控制连接原先最后关闭；新增另一线程持controllerLock的顺序断言，OSGi142项中1项红测失败。忙控制连接改为先关闭，目标仍受transactionLock保护并finally清理、控制锁finally释放；142/142通过。此为模拟context顺序证据，不是socket及时中断证明。73模块集中式review/native真库回归run-UFGm22已启动，GUI相同场景和新包仍待复验，独立辅助审查仍运行。见主仓F10_CLOSE_ORDER_20260930.json。
