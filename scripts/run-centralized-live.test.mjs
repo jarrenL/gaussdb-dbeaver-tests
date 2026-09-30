@@ -50,3 +50,26 @@ test('unsafe identifiers fail before SQL', () => {
     assert.throws(() => withCentralFixture(f.options), /Invalid isolated/);
     assert.equal(f.events.length, 0);
 });
+
+const review = {role: 'dbv_debug_0123456789abcdef', password: 'Dbv!' + 'b'.repeat(24) + '9a'};
+test('review uses independent admin identity, removed after its database, ordinary identity never elevated', () => {
+    const f = fixture({review});
+    assert.equal(withCentralFixture(f.options), 0);
+    const adminCreates = f.events.filter(s => s.includes('SYSADMIN'));
+    assert.equal(adminCreates.length, 1);
+    assert(adminCreates[0].startsWith(`CREATE ROLE ${review.role} `));
+    assert(f.events.indexOf(`DROP ROLE ${review.role};`) > f.events.indexOf(`DROP DATABASE ${base.database};`));
+    assert(!f.events.some(s => s.startsWith('ALTER ROLE')));
+});
+test('review role creation failure never drops an unowned role and cleans its database', () => {
+    const calls = [];
+    const f = fixture({review, sql(s) { calls.push(s); if (s.includes('SYSADMIN')) throw Error('exists'); return '0'; }});
+    assert.throws(() => withCentralFixture(f.options), /exists/);
+    assert(!calls.includes(`DROP ROLE ${review.role};`));
+    assert(calls.includes(`DROP DATABASE ${base.database};`));
+});
+test('invalid privileged identity is rejected before any effect', () => {
+    const f = fixture({review: {...review, role: 'gausscore'}});
+    assert.throws(() => withCentralFixture(f.options), /Invalid review/);
+    assert.equal(f.events.length, 0);
+});

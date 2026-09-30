@@ -6,6 +6,10 @@
 
 执行结束恢复原HBA内容、所有者和权限并reload，校验内容哈希，删除本轮创建的数据库和角色，再删除临时凭据。若检测到HBA被其他任务修改则拒绝覆盖并返回失败，需要人工核对，不应直接重复执行。该入口同时调用受限角色入口，运行现有Maven验收门禁。运行器自测：`node --test scripts/run-centralized-live.test.mjs`。
 
+可选 `--review --native`：前者创建独立随机 `dbv_debug_` SYSADMIN测试账号，用于真实调试器、提交响应故障及包编译验证，不提升普通账号；后者使用普通专用账号验证gs_dump/gsql/gs_restore。管理员账号只允许从原精确网关访问本轮专用库，结束随夹具删除。不会启用需要另建空集群的gs_dumpall测试。连续两轮 `run-f9ppjt`、`run-XeWWGy` 各2723项中2707通过、16跳过、零失败错误；独立查询专用库/普通及调试账号/HBA均0残留。
+
+重复性门禁：`node scripts/verify-repeatability.mjs FIRST.json SECOND.json FIRST_START_MS SECOND_START_MS`。开始时间必须取各轮实际启动记录，不能为了通过校验回填成旧时间；校验每份底层报告时间、唯一测试身份、结果一致及失败为零，单独列出跳过项，不将其计为通过。该校验器24项自测，联合生命周期与其他门禁共59项自测通过。
+
 该流程只适用于这里的隔离容器，不允许替换为业务环境执行。进程强杀、主机故障和SQL结果不确定仍需事后核查，不能声称这些情况下自动清理有保证。连续验证 `run-CCiTDy` 和 `run-MXUHCq`：各2723项中2700通过、23跳过、零失败错误，全部测试身份与结果逐项一致，专用数据库/角色和HBA恢复完成并独立查询0残留；跳过不计通过，两轮不累加。
 
 `scripts/run-role-access.mjs` 仅面向本地隔离环境：容器 `gaussdb-507-cn-lab`、库 `distributed_acceptance`、测试账号 `distributed_lab`、节点组 `dual_group`。不应直接改成生产环境运行。

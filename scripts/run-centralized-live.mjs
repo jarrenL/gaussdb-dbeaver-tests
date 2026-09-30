@@ -6,11 +6,14 @@ import {spawnSync} from 'node:child_process';
 import {pathToFileURL} from 'node:url';
 
 // Only a newly created, local disposable database is owned by this runner.
-export function withCentralFixture({database, password, sql, installAccess, removeAccess, run}) {
+export function withCentralFixture({database, password, review, sql, installAccess, removeAccess, run}) {
     if (!/^dbv_hist_central_[0-9]{8}$/.test(database)
         || !/^Dbv![a-f0-9]{24}9a$/.test(password)) throw Error('Invalid isolated fixture');
+    if (review && (!/^dbv_debug_[a-f0-9]{16}$/.test(review.role)
+        || !/^Dbv![a-f0-9]{24}9a$/.test(review.password))) throw Error('Invalid review fixture');
     let roleCreated = false;
     let databaseCreated = false;
+    let reviewCreated = false;
     let accessAttempted = false;
     let failure;
     let result;
@@ -23,6 +26,11 @@ export function withCentralFixture({database, password, sql, installAccess, remo
         roleCreated = true;
         sql(`CREATE DATABASE ${database} OWNER ${database} DBCOMPATIBILITY = 'A';`);
         databaseCreated = true;
+        if (review) {
+            // Never elevate the ordinary account used by the historical scenarios.
+            sql(`CREATE ROLE ${review.role} LOGIN SYSADMIN PASSWORD '${review.password}';`);
+            reviewCreated = true;
+        }
         accessAttempted = true;
         installAccess();
         result = run();
@@ -32,6 +40,7 @@ export function withCentralFixture({database, password, sql, installAccess, remo
         const cleanup = action => { try { action(); } catch (error) { errors.push(error); } };
         if (accessAttempted) cleanup(removeAccess);
         if (databaseCreated) cleanup(() => sql(`DROP DATABASE ${database};`));
+        if (reviewCreated) cleanup(() => sql(`DROP ROLE ${review.role};`));
         if (roleCreated) cleanup(() => sql(`DROP ROLE ${database};`));
         if (errors.length) throw new AggregateError([...(failure ? [failure] : []), ...errors],
             `Fixture cleanup incomplete: ${database}`);
@@ -52,9 +61,15 @@ function main() {
     const hba = '/opt/gaussdb/ha-data/gs_hba.conf';
     const database = 'dbv_hist_central_' + new Date().toISOString().slice(0, 10).replaceAll('-', '');
     const password = 'Dbv!' + randomBytes(12).toString('hex') + '9a';
+    const review = process.argv.includes('--review') ? {
+        role: 'dbv_debug_' + randomBytes(8).toString('hex'),
+        password: 'Dbv!' + randomBytes(12).toString('hex') + '9a'
+    } : undefined;
+    const native = process.argv.includes('--native');
     const temporary = fs.mkdtempSync(path.join(os.tmpdir(), 'dbv-central-live-'));
     fs.chmodSync(temporary, 0o700);
     const properties = path.join(temporary, 'connection.properties');
+    const reviewProperties = path.join(temporary, 'review.properties');
     const staging = path.join(temporary, 'hba');
     const docker = (args, input) => {
         const result = spawnSync('docker', args, {input, encoding: 'utf8', timeout: 30000});
@@ -68,7 +83,8 @@ function main() {
     const original = exec(['cat', hba]);
     const ownerMode = exec(['stat', '-c', '%u:%g %a', hba]).trim().split(' ');
     if (!/^\d+:\d+$/.test(ownerMode[0]) || !/^[0-7]{3,4}$/.test(ownerMode[1])) throw Error('Invalid HBA metadata');
-    const addition = `\n# isolated acceptance ${database}\nhost ${database} ${database} 172.17.0.1/32 sha256\n`;
+    const addition = `\n# isolated acceptance ${database}\nhost ${database} ${database} 172.17.0.1/32 sha256\n`
+        + (review ? `host ${database} ${review.role} 172.17.0.1/32 sha256\n` : '');
     const installed = original + addition;
     const hash = value => createHash('sha256').update(value).digest('hex');
     const writeHba = value => {
@@ -82,8 +98,11 @@ function main() {
     fs.writeFileSync(properties,
         `url=jdbc:gaussdb://127.0.0.1:55452/${database}\nuser=${database}\npassword=${password}\ndriverClass=com.huawei.gauss200.jdbc.Driver\n`,
         {mode: 0o600});
+    if (review) fs.writeFileSync(reviewProperties,
+        `url=jdbc:gaussdb://127.0.0.1:55452/${database}\nuser=${review.role}\npassword=${review.password}\ndriverClass=com.huawei.gauss200.jdbc.Driver\n`,
+        {mode: 0o600});
     try {
-        process.exitCode = withCentralFixture({database, password, sql,
+        process.exitCode = withCentralFixture({database, password, review, sql,
             installAccess() {
                 if (exec(['cat', hba]) !== original) throw Error('HBA changed before setup');
                 writeHba(installed);
@@ -96,13 +115,18 @@ function main() {
             },
             run() {
                 const result = spawnSync('node', [new URL('./run-role-access.mjs', import.meta.url).pathname, repo], {
-                    stdio: 'inherit', env: {...process.env, GAUSSDB_HISTORY_CENTRAL_CONNECTION: properties}
+                    stdio: 'inherit', env: {...process.env, GAUSSDB_HISTORY_CENTRAL_CONNECTION: properties,
+                        ...(review ? {GAUSSDB_REVIEW_CONNECTION: reviewProperties,
+                            GAUSSDB_REVIEW_JDBC: process.env.GAUSSDB_HISTORY_JDBC} : {}),
+                        ...(native ? {GAUSSDB_NATIVE_CONNECTION: properties,
+                            GAUSSDB_NATIVE_JDBC: process.env.GAUSSDB_HISTORY_JDBC, GAUSSDB_REVIEW_NATIVE: 'true'} : {})}
                 });
                 return result.status ?? 1;
             }});
         console.log(`Central fixture removed and original HBA restored: ${database}`);
+        if (review) console.log(`Independent review role removed: ${review.role}`);
     } finally {
-        for (const file of [properties, staging]) if (fs.existsSync(file)) fs.unlinkSync(file);
+        for (const file of [properties, reviewProperties, staging]) if (fs.existsSync(file)) fs.unlinkSync(file);
         fs.rmdirSync(temporary);
     }
 }
