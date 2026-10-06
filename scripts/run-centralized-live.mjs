@@ -96,10 +96,10 @@ function main() {
             '/opt/gaussdb/ha-app/bin/gs_ctl', 'reload', '-D', '/opt/gaussdb/ha-data']);
     };
     fs.writeFileSync(properties,
-        `url=jdbc:gaussdb://127.0.0.1:55452/${database}\nuser=${database}\npassword=${password}\ndriverClass=com.huawei.gauss200.jdbc.Driver\n`,
+        `url=jdbc:gaussdb://127.0.0.1:55452/${database}\nuser=${database}\npassword=${password}\ndriverClass=com.huawei.gaussdb.jdbc.Driver\n`,
         {mode: 0o600});
     if (review) fs.writeFileSync(reviewProperties,
-        `url=jdbc:gaussdb://127.0.0.1:55452/${database}\nuser=${review.role}\npassword=${review.password}\ndriverClass=com.huawei.gauss200.jdbc.Driver\n`,
+        `url=jdbc:gaussdb://127.0.0.1:55452/${database}\nuser=${review.role}\npassword=${review.password}\ndriverClass=com.huawei.gaussdb.jdbc.Driver\n`,
         {mode: 0o600});
     try {
         process.exitCode = withCentralFixture({database, password, review, sql,

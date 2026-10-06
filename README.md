@@ -23,7 +23,7 @@ DBeaver 源码：https://github.com/jarrenL/dbeaver 。测试扩充已分批本�
 export GAUSSDB_HISTORY_ALLOW_DDL=YES
 export GAUSSDB_PACKAGE_URL=jdbc:gaussdb://test-host:port/test_database
 export GAUSSDB_PACKAGE_USER=test_owner
-export GAUSSDB_PACKAGE_DRIVER=com.huawei.gauss200.jdbc.Driver
+export GAUSSDB_PACKAGE_DRIVER=com.huawei.gaussdb.jdbc.Driver
 export GAUSSDB_PACKAGE_PASSWORD_FILE=/absolute/private/password.txt
 export GAUSSDB_HISTORY_JDBC=/absolute/private/version-matched-jdbc.jar
 fixture_classes=$(mktemp -d)
@@ -99,6 +99,8 @@ bash scripts/run-dbeaver-tests.sh /absolute/path/to/dbeaver
 复合外键和序列重启分别执行集中式场景；间隔分区优先在该实例验证，未配置时沿用默认实例并明确记录能力限制。
 默认实例的分布式场景不会因此全部切换到集中式。关闭连接后的清理也使用原用例选择的连接配置。
 请只给专用普通用户在测试库内建删对象的权限，访问规则限定实际测试来源地址，不开放公共匿名访问。
+
+分布式 `EXECUTE DIRECT` 同时验证权限边界和管理员正向路径。默认连接必须保持普通账号；另准备仅用于测试的 monitor/system admin 账号，将同格式的私有连接文件路径设置为 `GAUSSDB_HISTORY_MONITOR_CONNECTION`。正向用例使用管理员连接在自身随机 schema 建表，并逐个访问表实际所在 DN；负向用例仍用默认普通账号断言 SQLSTATE `42501`。不要临时提升默认账号，否则负向场景会失真。未配置管理员连接时正向项跳过，不计为通过。
 
 连接文件需权限 0600，包含 `url`、`driverClass`、`user`、`password`。必须与供应商 JDBC jar 匹配，不提供真实凭据示例。新用例创建随机 `dbv_hist_` schema，仅清理自身成功创建的 schema；不要连接生产库。
 

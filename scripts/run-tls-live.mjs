@@ -235,7 +235,7 @@ function main() {
                     // The expired leaf is signed by the current trusted CA;
                     // it must never itself become the configured trust anchor.
                     const rootCertificate = certificates[name === 'expired' ? 'trusted' : name].cert;
-                    configs[name] = write(name + '.properties', `url=jdbc:gaussdb://${published}/tls_acceptance\nuser=tls_client\ndriverClass=com.huawei.gauss200.jdbc.Driver\n`
+                    configs[name] = write(name + '.properties', `url=jdbc:gaussdb://${published}/tls_acceptance\nuser=tls_client\ndriverClass=com.huawei.gaussdb.jdbc.Driver\n`
                         + (name === 'mtls' ? '' : `password=${password}\nsslmode=verify-full\nsslrootcert=${rootCertificate}\n`));
                 }
             },
