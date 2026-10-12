@@ -10,7 +10,7 @@
 
 DBeaver 源码：https://github.com/jarrenL/dbeaver 。本仓库与 DBeaver 源码仓分别维护，执行或复现结果时必须记录两边实际使用的分支和提交号，不能只凭仓库默认分支推断测试代码与生产代码相互匹配。
 
-本次交付配套的 DBeaver 源码基线为分支 `codex/icbc-gaussdb-26.1.5`、提交 `c963ab84b094d36d9a307e0a13fb428f4620583f`。
+本次交付配套的 DBeaver 源码基线提交为 `aaf2c8ed8309bf11d6ef3fd88e50118266f8de40`。
 
 ## 运行
 
