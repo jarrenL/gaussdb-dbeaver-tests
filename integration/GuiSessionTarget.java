@@ -11,8 +11,8 @@ public class GuiSessionTarget {
         }
         Properties properties = new Properties();
         try (var input = Files.newInputStream(Path.of(args[0]))) { properties.load(input); }
-        Class.forName(properties.getProperty("driverClass", "com.huawei.gauss200.jdbc.Driver"));
-        String url = properties.getProperty("url");
+        Class.forName(required(properties, "driverClass"));
+        String url = required(properties, "url");
         properties.setProperty("ApplicationName", args[2]);
         properties.setProperty("socketTimeout", "150");
         properties.setProperty("connectTimeout", "10");
@@ -47,5 +47,12 @@ public class GuiSessionTarget {
                 }
             }
         }
+    }
+    private static String required(Properties properties, String key) {
+        String value = properties.getProperty(key);
+        if (value == null || value.isBlank()) {
+            throw new IllegalArgumentException("Missing required connection property: " + key);
+        }
+        return value.strip();
     }
 }

@@ -10,7 +10,7 @@ public class GuiDebugTerminationFixtureTest {
         }
         Properties p = new Properties();
         try (var in = Files.newInputStream(Path.of(args[0]))) { p.load(in); }
-        Class.forName(p.getProperty("driverClass", "com.huawei.gauss200.jdbc.Driver"));
+        Class.forName(required(p, "driverClass"));
         p.setProperty("connectTimeout", "10");
         p.setProperty("socketTimeout", "20");
         try (Connection c = DriverManager.getConnection(p.getProperty("url"), p)) {
@@ -61,5 +61,12 @@ public class GuiDebugTerminationFixtureTest {
                 if (!r.next() || r.getInt(1) != expected) throw new IllegalStateException("Fixture preservation assertion failed");
             }
         }
+    }
+    private static String required(Properties properties, String key) {
+        String value = properties.getProperty(key);
+        if (value == null || value.isBlank()) {
+            throw new IllegalArgumentException("Missing required connection property: " + key);
+        }
+        return value.strip();
     }
 }

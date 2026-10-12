@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {withTemporaryRole} from './run-role-access.mjs';
+import {readConnectionAccount, withTemporaryRole} from './run-role-access.mjs';
 
 const fixture = {role: 'dbv_hist_grantee_abcdef', password: 'Dbv!0123456789abcdef01239a',
     account: 'distributed_lab', group: 'dual_group'};
@@ -38,4 +38,12 @@ test('runner exception still cleans and cleanup failures are not hidden', () => 
 });
 test('unsafe identifiers are rejected before any SQL', () => {
     assert.throws(() => withTemporaryRole({...fixture, account: 'name;drop', sql: () => assert.fail(), run: () => 0}), /Unsafe/);
+});
+
+test('role grant target comes from the explicit connection account', () => {
+    assert.equal(readConnectionAccount('url=jdbc:postgresql://host/db\nuser=dbv_hist_account_1234\n'),
+        'dbv_hist_account_1234');
+    for (const source of ['url=jdbc:postgresql://host/db\n', 'user=name;drop\n', 'user=MixedCase\n']) {
+        assert.throws(() => readConnectionAccount(source), /safe explicit user/);
+    }
 });

@@ -8,7 +8,9 @@
 - DBeaver 仓库：依赖 Eclipse/OSGi 及内部模型的 JUnit 测试、生产修复。
 - 内网连接信息、密码、原始 JDBC 日志及本地运行结果不得上传。
 
-DBeaver 源码：https://github.com/jarrenL/dbeaver 。测试扩充已分批本地提交，但尚未推送发布；使用时应核对后续记录的源码提交，不直接假定远端已有新用例。
+DBeaver 源码：https://github.com/jarrenL/dbeaver 。本仓库与 DBeaver 源码仓分别维护，执行或复现结果时必须记录两边实际使用的分支和提交号，不能只凭仓库默认分支推断测试代码与生产代码相互匹配。
+
+本次交付配套的 DBeaver 源码基线为分支 `codex/icbc-gaussdb-26.1.5`、提交 `b09ba1a0409e05d483fd600031b0f71c72430781`。
 
 ## 运行
 
@@ -77,6 +79,101 @@ setup 拒绝已有 schema；cleanup 仅删除固定过程和表，再以 RESTRIC
 遇到额外对象整体回滚，不用 CASCADE。测试程序每次执行两轮生命周期，包含重复创建拒绝、
 提交前不可见、回滚与提交断言、额外对象阻止清理并恢复过程和数据。清理失败须调查，不能当作通过。
 
+### 调试 E2E 夹具与工作流证据
+
+`integration/GuiDebugE2EFixture.java` 在两个不同的专用测试数据库中创建同名 schema 和过程，
+用于验证 A→B→A 数据库切换、同名对象隔离、大源码、64 个局部变量、运行中终止及重新启动。
+两个连接文件均须为 0600，且必须指向不同数据库；夹具使用固定 schema
+`dbv_debug_e2e_repeatable`，因此不能并行运行，也不能连接业务库。
+
+```sh
+export GAUSSDB_HISTORY_ALLOW_DDL=YES
+export GAUSSDB_HISTORY_JDBC=/absolute/private/version-matched-jdbc.jar
+export GAUSSDB_DEBUG_DATABASE_A=/absolute/private/database-a.properties
+export GAUSSDB_DEBUG_DATABASE_B=/absolute/private/database-b.properties
+
+fixture_classes=$(mktemp -d)
+javac --release 11 -d "$fixture_classes" \
+  integration/GuiDebugE2EFixture.java integration/GuiDebugE2EFixtureTest.java
+
+java -cp "$fixture_classes:$GAUSSDB_HISTORY_JDBC" GuiDebugE2EFixture \
+  setup "$GAUSSDB_DEBUG_DATABASE_A" "$GAUSSDB_DEBUG_DATABASE_B"
+java -cp "$fixture_classes:$GAUSSDB_HISTORY_JDBC" GuiDebugE2EFixture \
+  verify "$GAUSSDB_DEBUG_DATABASE_A" "$GAUSSDB_DEBUG_DATABASE_B"
+
+# 在夹具仍存在时执行 DBeaver GUI 调试；完成后必须清理：
+java -cp "$fixture_classes:$GAUSSDB_HISTORY_JDBC" GuiDebugE2EFixture \
+  cleanup "$GAUSSDB_DEBUG_DATABASE_A" "$GAUSSDB_DEBUG_DATABASE_B"
+
+# 离线保护契约；追加两个连接文件参数后会执行两轮真实生命周期：
+java -cp "$fixture_classes:$GAUSSDB_HISTORY_JDBC" GuiDebugE2EFixtureTest
+java -cp "$fixture_classes:$GAUSSDB_HISTORY_JDBC" GuiDebugE2EFixtureTest \
+  "$GAUSSDB_DEBUG_DATABASE_A" "$GAUSSDB_DEBUG_DATABASE_B"
+```
+
+setup 拒绝接管已有 schema；verify 检查数据库专属源码标记、基线数据、源码规模和过程集合；
+cleanup 先核对所有权及对象白名单，再逐项 `DROP ... RESTRICT`。任一数据库预检失败时不会先删除另一个数据库的夹具。
+
+`scripts/debug-workflows.mjs` 是 DBeaver GUI 操作证据的语义编排和校验器，不会自己点击界面，
+也不能把人工构造的 JSON 当成 GUI 通过证据。先查看支持的工作流：
+
+```sh
+node scripts/debug-workflows.mjs --list
+node scripts/debug-workflows.mjs breakpoint-step-continue-relaunch \
+  --trace /absolute/private/gui-trace.json
+node scripts/debug-workflows.mjs terminate-relaunch \
+  --adapter /absolute/private/dbeaver-ui-adapter.mjs
+```
+
+`--trace` 校验已有的脱敏事件记录；`--adapter` 模块必须导出
+`executeDebugStep(step, context)`，逐步驱动真实 DBeaver 并返回带目标身份、会话、断点、变量、
+调用状态和清理结果的事件。三个内置工作流分别验证断点/变量/单步/继续/重启、运行中终止/回滚/连接复用，
+以及 A→B→A 同名大过程隔离。脚本只输出脱敏汇总；原始截图、连接文件和日志不得提交。
+
+### 调试能力矩阵
+
+`integration/DebugCapabilityProbe.java` 读取私有连接文件，核对实际 JDBC 驱动是否接受 URL，
+并从服务端读取版本、兼容模式、`DBE_PLDEBUGGER` 精确签名及当前用户执行权限。
+它只输出这些脱敏能力维度，不输出 URL、用户名或密码。通常通过
+`scripts/run-debug-matrix.mjs` 使用；该脚本会自动以 Java 11 编译探针并逐个串行执行矩阵单元。
+
+矩阵文件放在 `private/` 或仓库外，不能提交。最小格式如下，版本字段为正则表达式，
+`signatureFingerprint` 可选，用于固定精确服务端调试协议：
+
+```json
+{
+  "entries": [
+    {
+      "id": "central-a-native",
+      "connection": "/absolute/private/central-a.properties",
+      "jdbc": "/absolute/private/gaussdb-jdbc.jar",
+      "expect": {
+        "driverClass": "com.huawei.gaussdb.jdbc.Driver",
+        "driverVersionPattern": "^9\\.",
+        "serverVersionPattern": "^GaussDB",
+        "compatibility": "A",
+        "debugSupported": true
+      }
+    }
+  ]
+}
+```
+
+```sh
+# 只探测并核对声明的能力：
+node scripts/run-debug-matrix.mjs /absolute/private/debug-matrix.json --probe-only
+
+# 每个能力单元探测通过后，再执行同一条真实回归命令：
+node scripts/run-debug-matrix.mjs /absolute/private/debug-matrix.json -- \
+  bash scripts/run-dbeaver-tests.sh /absolute/path/to/dbeaver
+
+# 编排器、矩阵和夹具的离线自测：
+node --test scripts/debug-workflows.test.mjs scripts/run-debug-matrix.test.mjs
+```
+
+连接文件在非 Windows 系统必须为 0600。M 模式作为明确的调试不支持单元仍会执行其负向回归；
+缺签名、签名无执行权限、驱动/版本/兼容模式偏移或重复能力单元都会在运行回归前失败关闭。
+
 ### DBeaver 模型和真库回归
 
 先准备 DBeaver 26.1.5 GaussDB 适配源码及并列的 dbeaver-common 依赖，按其说明准备构建 JDK、Maven 和离线缓存。测试执行的是 Maven/Tycho 中的实际生产代码，不复制一套简化实现来验证自己。
@@ -99,6 +196,23 @@ bash scripts/run-dbeaver-tests.sh /absolute/path/to/dbeaver
 复合外键和序列重启分别执行集中式场景；间隔分区优先在该实例验证，未配置时沿用默认实例并明确记录能力限制。
 默认实例的分布式场景不会因此全部切换到集中式。关闭连接后的清理也使用原用例选择的连接配置。
 请只给专用普通用户在测试库内建删对象的权限，访问规则限定实际测试来源地址，不开放公共匿名访问。
+
+本地 507 隔离容器还可使用集中式临时库入口：
+
+```sh
+export GAUSSDB_HISTORY_CONNECTION=/absolute/private/source.properties
+export GAUSSDB_HISTORY_JDBC=/absolute/private/version-matched-jdbc.jar
+export GAUSSDB_HISTORY_ALLOW_DDL=YES
+node scripts/run-centralized-live.mjs /absolute/path/to/dbeaver --review --central-only
+```
+
+`--central-only` 只执行集中式及独立 review 账号可启用的门禁，不串接受限分布式角色入口，
+不能据此声明分布式场景通过。运行器优先读取源连接文件中的 `driverClass`，缺失时才使用
+`GAUSSDB_HISTORY_DRIVER_CLASS`；`org.postgresql.Driver` 自动使用 `jdbc:postgresql:`，
+`com.huawei.gaussdb.jdbc.Driver` 自动使用 `jdbc:gaussdb:`。其他驱动保留源连接 URL 的 scheme，
+必要时可用 `GAUSSDB_HISTORY_JDBC_SCHEME` 显式指定仅含小写字母和数字的 scheme。
+驱动类、URL scheme 和实际 JDBC jar 必须相互匹配，否则在创建测试凭据或执行回归前失败。
+该入口依赖固定的本地 `gaussdb-507-ha-lab` 容器、端口和容器内目录，不是通用客户部署脚本。
 
 分布式 `EXECUTE DIRECT` 同时验证权限边界和管理员正向路径。默认连接必须保持普通账号；另准备仅用于测试的 monitor/system admin 账号，将同格式的私有连接文件路径设置为 `GAUSSDB_HISTORY_MONITOR_CONNECTION`。正向用例使用管理员连接在自身随机 schema 建表，并逐个访问表实际所在 DN；负向用例仍用默认普通账号断言 SQLSTATE `42501`。不要临时提升默认账号，否则负向场景会失真。未配置管理员连接时正向项跳过，不计为通过。
 

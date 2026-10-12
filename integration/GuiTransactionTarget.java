@@ -23,8 +23,8 @@ public class GuiTransactionTarget {
         }
         Properties p = new Properties();
         try (var in = Files.newInputStream(Path.of(args[0]))) { p.load(in); }
-        Class.forName(p.getProperty("driverClass", "com.huawei.gauss200.jdbc.Driver"));
-        String url = p.getProperty("url");
+        Class.forName(required(p, "driverClass"));
+        String url = required(p, "url");
         p.setProperty("socketTimeout", "150"); p.setProperty("connectTimeout", "10");
         p.setProperty("ApplicationName", args[1] + "_observer");
         String schema = "dbv_gui_tx_" + UUID.randomUUID().toString().replace("-", "");
@@ -78,5 +78,12 @@ public class GuiTransactionTarget {
                 }
             }
         }
+    }
+    private static String required(Properties properties, String key) {
+        String value = properties.getProperty(key);
+        if (value == null || value.isBlank()) {
+            throw new IllegalArgumentException("Missing required connection property: " + key);
+        }
+        return value.strip();
     }
 }

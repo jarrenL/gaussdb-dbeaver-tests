@@ -11,7 +11,7 @@ public class GuiDebugTerminationFixture {
         }
         Properties p = new Properties();
         try (var input = Files.newInputStream(Path.of(args[0]))) { p.load(input); }
-        Class.forName(p.getProperty("driverClass", "com.huawei.gauss200.jdbc.Driver"));
+        Class.forName(required(p, "driverClass"));
         p.setProperty("connectTimeout", "10");
         p.setProperty("socketTimeout", "20");
         try (var connection = DriverManager.getConnection(p.getProperty("url"), p)) {
@@ -78,5 +78,12 @@ public class GuiDebugTerminationFixture {
     }
     private static void execute(Connection c, String sql) throws SQLException {
         try (var s = c.createStatement()) { s.setQueryTimeout(10); s.execute(sql); }
+    }
+    private static String required(Properties properties, String key) {
+        String value = properties.getProperty(key);
+        if (value == null || value.isBlank()) {
+            throw new IllegalArgumentException("Missing required connection property: " + key);
+        }
+        return value.strip();
     }
 }

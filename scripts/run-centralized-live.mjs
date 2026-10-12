@@ -49,6 +49,38 @@ export function withCentralFixture({database, password, review, sql, installAcce
     return result;
 }
 
+export function resolveDriverClass(propertiesText, fallback) {
+    const match = propertiesText.match(/^\s*driverClass\s*[:=]\s*([^\s#!]+)\s*$/m);
+    const driverClass = match?.[1] || fallback;
+    if (!driverClass || !/^[A-Za-z_$][A-Za-z0-9_$]*(?:\.[A-Za-z_$][A-Za-z0-9_$]*)+$/.test(driverClass)) {
+        throw Error('A valid driverClass is required in the source connection or GAUSSDB_HISTORY_DRIVER_CLASS');
+    }
+    return driverClass;
+}
+
+export function resolveJdbcScheme(propertiesText, driverClass, override) {
+    if (override) {
+        if (!/^[a-z][a-z0-9]*$/.test(override)) throw Error('Invalid GAUSSDB_HISTORY_JDBC_SCHEME');
+        return override;
+    }
+    if (driverClass === 'org.postgresql.Driver') return 'postgresql';
+    if (driverClass === 'com.huawei.gaussdb.jdbc.Driver') return 'gaussdb';
+    const match = propertiesText.match(/^\s*url\s*[:=]\s*jdbc:([a-z][a-z0-9]*):/m);
+    if (!match) throw Error('Cannot determine JDBC scheme from the source connection');
+    return match[1];
+}
+
+export function normalizeConnectionProperties(propertiesText, driverClass, jdbcScheme) {
+    const url = /^(\s*url\s*[:=]\s*)jdbc:[a-z][a-z0-9]*:(\/\/.*)$/m;
+    if (!url.test(propertiesText)) throw Error('Source connection must contain an absolute JDBC URL');
+    let normalized = propertiesText.replace(url, `$1jdbc:${jdbcScheme}:$2`);
+    const driver = /^\s*driverClass\s*[:=].*$/m;
+    normalized = driver.test(normalized)
+        ? normalized.replace(driver, `driverClass=${driverClass}`)
+        : normalized.replace(/\s*$/, '') + `\ndriverClass=${driverClass}\n`;
+    return normalized;
+}
+
 function main() {
     const repo = process.argv[2];
     if (!repo?.startsWith('/') || process.env.GAUSSDB_HISTORY_ALLOW_DDL !== 'YES') {
@@ -66,10 +98,15 @@ function main() {
         password: 'Dbv!' + randomBytes(12).toString('hex') + '9a'
     } : undefined;
     const native = process.argv.includes('--native');
+    const centralOnly = process.argv.includes('--central-only');
+    const sourceProperties = fs.readFileSync(process.env.GAUSSDB_HISTORY_CONNECTION, 'utf8');
+    const driverClass = resolveDriverClass(sourceProperties, process.env.GAUSSDB_HISTORY_DRIVER_CLASS);
+    const jdbcScheme = resolveJdbcScheme(sourceProperties, driverClass, process.env.GAUSSDB_HISTORY_JDBC_SCHEME);
     const temporary = fs.mkdtempSync(path.join(os.tmpdir(), 'dbv-central-live-'));
     fs.chmodSync(temporary, 0o700);
     const properties = path.join(temporary, 'connection.properties');
     const reviewProperties = path.join(temporary, 'review.properties');
+    const historyProperties = path.join(temporary, 'history.properties');
     const staging = path.join(temporary, 'hba');
     const docker = (args, input) => {
         const result = spawnSync('docker', args, {input, encoding: 'utf8', timeout: 30000});
@@ -96,11 +133,13 @@ function main() {
             '/opt/gaussdb/ha-app/bin/gs_ctl', 'reload', '-D', '/opt/gaussdb/ha-data']);
     };
     fs.writeFileSync(properties,
-        `url=jdbc:gaussdb://127.0.0.1:55452/${database}\nuser=${database}\npassword=${password}\ndriverClass=com.huawei.gaussdb.jdbc.Driver\n`,
+        `url=jdbc:${jdbcScheme}://127.0.0.1:55452/${database}\nuser=${database}\npassword=${password}\ndriverClass=${driverClass}\n`,
         {mode: 0o600});
     if (review) fs.writeFileSync(reviewProperties,
-        `url=jdbc:gaussdb://127.0.0.1:55452/${database}\nuser=${review.role}\npassword=${review.password}\ndriverClass=com.huawei.gaussdb.jdbc.Driver\n`,
+        `url=jdbc:${jdbcScheme}://127.0.0.1:55452/${database}\nuser=${review.role}\npassword=${review.password}\ndriverClass=${driverClass}\n`,
         {mode: 0o600});
+    fs.writeFileSync(historyProperties,
+        normalizeConnectionProperties(sourceProperties, driverClass, jdbcScheme), {mode: 0o600});
     try {
         process.exitCode = withCentralFixture({database, password, review, sql,
             installAccess() {
@@ -114,19 +153,29 @@ function main() {
                 if (hash(exec(['cat', hba])) !== hash(original)) throw Error('HBA restore mismatch');
             },
             run() {
-                const result = spawnSync('node', [new URL('./run-role-access.mjs', import.meta.url).pathname, repo], {
-                    stdio: 'inherit', env: {...process.env, GAUSSDB_HISTORY_CENTRAL_CONNECTION: properties,
-                        ...(review ? {GAUSSDB_REVIEW_CONNECTION: reviewProperties,
-                            GAUSSDB_REVIEW_JDBC: process.env.GAUSSDB_HISTORY_JDBC} : {}),
-                        ...(native ? {GAUSSDB_NATIVE_CONNECTION: properties,
-                            GAUSSDB_NATIVE_JDBC: process.env.GAUSSDB_HISTORY_JDBC, GAUSSDB_REVIEW_NATIVE: 'true'} : {})}
-                });
+                const environment = {...process.env, GAUSSDB_HISTORY_CONNECTION: historyProperties,
+                    GAUSSDB_HISTORY_CENTRAL_CONNECTION: properties,
+                    ...(review ? {GAUSSDB_REVIEW_CONNECTION: reviewProperties,
+                        GAUSSDB_REVIEW_JDBC: process.env.GAUSSDB_HISTORY_JDBC} : {}),
+                    ...(native ? {GAUSSDB_NATIVE_CONNECTION: properties,
+                        GAUSSDB_NATIVE_JDBC: process.env.GAUSSDB_HISTORY_JDBC, GAUSSDB_REVIEW_NATIVE: 'true'} : {})};
+                let command;
+                let args;
+                if (centralOnly) {
+                    delete environment.GAUSSDB_HISTORY_CONNECTION;
+                    command = 'bash';
+                    args = [new URL('./run-dbeaver-tests.sh', import.meta.url).pathname, repo];
+                } else {
+                    command = 'node';
+                    args = [new URL('./run-role-access.mjs', import.meta.url).pathname, repo];
+                }
+                const result = spawnSync(command, args, {stdio: 'inherit', env: environment});
                 return result.status ?? 1;
             }});
         console.log(`Central fixture removed and original HBA restored: ${database}`);
         if (review) console.log(`Independent review role removed: ${review.role}`);
     } finally {
-        for (const file of [properties, reviewProperties, staging]) if (fs.existsSync(file)) fs.unlinkSync(file);
+        for (const file of [properties, reviewProperties, historyProperties, staging]) if (fs.existsSync(file)) fs.unlinkSync(file);
         fs.rmdirSync(temporary);
     }
 }
