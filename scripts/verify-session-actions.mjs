@@ -1,9 +1,13 @@
 import fs from 'node:fs';
 import {pathToFileURL} from 'node:url';
 
-export function verifySessionAction({mode, targetLog, targetSnapshot, confirmation, refreshed}) {
+export function verifySessionAction({mode, targetLog, targetExitCode, targetSnapshot, confirmation, refreshed}) {
     const reject = message => { throw Error(message); };
     if (!['cancel', 'terminate'].includes(mode)) reject('Unknown action');
+    if (!Number.isInteger(targetExitCode) || targetExitCode !== 0) reject('Target process did not exit successfully');
+    if (/^FAIL(?:\s|$)/m.test(targetLog) || /^(?:Exception in thread|Caused by:)\s/m.test(targetLog)) {
+        reject('Target log contains a failure');
+    }
     const matches = [...targetLog.matchAll(/^TARGET (dbv_gui_[a-z0-9_]+) PID=([1-9][0-9]*) USER=(\S+)$/gm)];
     if (matches.length !== 1) reject('Expected exactly one target identity');
     const [, marker, pid, user] = matches[0];
@@ -22,7 +26,10 @@ export function verifySessionAction({mode, targetLog, targetSnapshot, confirmati
     const state = mode === 'cancel' ? '57014' : '57P01';
     const result = mode === 'cancel' ? 'PASS cancel: same connection still queries'
         : 'PASS terminate: old invalid, fresh connection queries';
-    if (!targetLog.includes('INTERRUPTED SQLSTATE=' + state) || !targetLog.includes(result)) reject('Missing independent JDBC outcome');
+    const exactLines = line => targetLog.split(/\r?\n/).filter(candidate => candidate === line).length;
+    if (exactLines('INTERRUPTED SQLSTATE=' + state) !== 1 || exactLines(result) !== 1) {
+        reject('Missing or duplicated independent JDBC outcome');
+    }
     for (const snapshot of [targetSnapshot, confirmation, refreshed]) {
         if (!snapshot.trimEnd().endsWith('OK')) reject('Incomplete UI evidence');
     }
@@ -33,10 +40,11 @@ export function verifySessionAction({mode, targetLog, targetSnapshot, confirmati
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-    const [mode, log, target, confirm, after] = process.argv.slice(2);
+    const [mode, log, target, confirm, after, exitCode] = process.argv.slice(2);
     try {
         const read = file => fs.readFileSync(file, 'utf8');
-        console.log(JSON.stringify(verifySessionAction({mode, targetLog: read(log), targetSnapshot: read(target),
+        console.log(JSON.stringify(verifySessionAction({mode, targetLog: read(log), targetExitCode: Number(exitCode),
+            targetSnapshot: read(target),
             confirmation: read(confirm), refreshed: read(after)})));
     } catch (error) { console.error(error.message); process.exitCode = 1; }
 }

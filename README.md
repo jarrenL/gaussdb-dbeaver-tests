@@ -28,8 +28,12 @@ export GAUSSDB_PACKAGE_USER=test_owner
 export GAUSSDB_PACKAGE_DRIVER=com.huawei.gaussdb.jdbc.Driver
 export GAUSSDB_PACKAGE_PASSWORD_FILE=/absolute/private/password.txt
 export GAUSSDB_HISTORY_JDBC=/absolute/private/version-matched-jdbc.jar
+export GAUSSDB_PACKAGE_ALLOW_SESSION_SETTINGS=YES
 fixture_classes=$(mktemp -d)
-javac --release 21 -d "$fixture_classes" integration/GuiPackageFixture.java integration/GuiPackageFixtureTest.java
+javac --release 21 -d "$fixture_classes" integration/GuiPackageFixture.java \
+  integration/GuiPackageFixtureTest.java integration/GuiPackageCapabilityContractTest.java
+java -cp "$fixture_classes" GuiPackageCapabilityContractTest
+java -cp "$fixture_classes:$GAUSSDB_HISTORY_JDBC" GuiPackageFixture probe
 java -cp "$fixture_classes:$GAUSSDB_HISTORY_JDBC" GuiPackageFixture setup
 # 完成界面测试后清理；界面已经删掉两个包时也可以执行：
 java -cp "$fixture_classes:$GAUSSDB_HISTORY_JDBC" GuiPackageFixture cleanup
@@ -38,6 +42,17 @@ java -cp "$fixture_classes:$GAUSSDB_HISTORY_JDBC" GuiPackageFixtureTest
 ```
 
 密码文件只包含密码，限制文件访问权限；不得提交该文件或原始驱动连接日志。
+`probe` 会在执行任何 DDL 前输出部署形态、兼容模式、包目录、两个会话参数和
+`DBE_PLDEVELOPER.GS_ERRORS/GS_SOURCE` 的能力结果。只有集中式 O/A 环境且这些能力完整时，
+无效包体和错误定位夹具才适用；分布式 505 会明确输出 `RESULT UNSUPPORTED ...`，
+不得记作通过，也不应继续创建 `gui_bad`。若该环境本身被列为 Package 必须支持的验收项，
+应在矩阵汇总层报告需求未满足，而不是把不适用夹具的异常当作产品测试结果。
+
+`GAUSSDB_PACKAGE_ALLOW_SESSION_SETTINGS=YES` 是显式授权。未设置时 setup 输出 SKIP，
+不会悄悄修改会话。获得授权后，程序会先打印即将设置的
+`enable_force_create_obj=on` 和 `plsql_show_all_error=off`；两项均使用 `SET LOCAL`，
+仅在 setup 事务内有效，不修改数据库全局配置。
+
 上述 classpath 分隔符适用于 Linux/macOS，Windows 使用分号。驱动类必须与外部 JDBC 匹配。
 setup 不接管已存在的 schema；cleanup 要求当前用户拥有 schema，只删除两个固定测试包，
 最后用 `DROP SCHEMA ... RESTRICT`，全程处于同一事务。若存在额外对象，清理失败并回滚，
@@ -254,6 +269,29 @@ java -cp "$FIXTURE_CLASSES:$GAUSSDB_HISTORY_JDBC" GuiDebugTerminationFixture \
 清理前核对所有者、仅保留基线 id=1、无目标 CALL。清理使用同一事务内的 `DROP ... RESTRICT`，额外对象或依赖会阻止操作，失败回滚保留夹具；不能改成 `CASCADE` 强行清理。此固定 schema 不支持并行测试，运行期间不得让其他人修改其中对象。
 
 `GuiDebugTerminationFixtureTest` 接收连接文件、SQL 文件两个参数，验证重复创建拒绝、额外表及其数据保留、清理失败恢复原过程、两轮生命周期和最终无残留；它不是 GUI 自动化，也不证明断点或终止动作已执行。测试异常时应检查残留并人工确认，不自动接管已有 schema。
+
+### 会话取消、终止目标程序的结果门禁
+
+`GuiSessionTarget` 和 `GuiTransactionTarget` 是等待 DBeaver 界面操作的后台目标，日志中的
+`TARGET` 或 `BEFORE` 只表示目标已准备好，不能作为成功依据。外层执行器必须等待 Java
+进程自然结束并取得退出码；只在退出码为 0 且完整终态日志存在时才允许通过。
+
+普通取消/终止证据使用：
+
+```sh
+node scripts/verify-session-actions.mjs cancel target.log target-ui.txt confirm-ui.txt refreshed-ui.txt 0
+```
+
+最后一个参数是目标 Java 进程的真实退出码，不能填写预期值代替。事务终止证据使用：
+
+```sh
+node scripts/verify-transaction-target.mjs transaction-target.log 0
+```
+
+事务门禁要求同一轮日志同时包含唯一 `TARGET`、`BEFORE`、终止 SQLSTATE、最终 `PASS` 和
+相同随机 schema 的 `CLEANED`。两个门禁都会拒绝非零退出、缺少终态、重复终态、
+`FAIL` 行和未捕获异常。内网 GRT 若采用 `TOTAL CHECKS`，还必须校验
+`total = pass + fail + skip/unsupported`，任何 `FAIL` 行均不能与 `FAIL 0` 同时被判成功。
 
 GB18030数据库场景另需管理员在隔离实例预建专用数据库：存储编码GB18030，兼容模式ORA，所有者为测试账号；保持JDBC默认UTF8，不设置客户端编码初始化SQL。配置 `GAUSSDB_HISTORY_ENCODING_DATABASE` 为该库名称（仅小写字母、数字、下划线）。连接主机/端口/认证沿用私有连接文件，测试只替换URL中的数据库路径，并创建、清理该库内随机schema，不自行建删数据库。管理员应按已有密码认证方式仅放行测试账号/该库/测试客户端地址，结束后移除临时访问规则。缺少变量时此项跳过，不算通过。创建库的DBCOMPATIBILITY标记需以目标版本为准，本地507使用ORA而非A。
 

@@ -5,6 +5,7 @@ import java.sql.SQLException;
 public class GuiPackageFixtureTest {
     public static void main(String[] args) throws Exception {
         try (Connection c = GuiPackageFixture.connect()) {
+            if (!GuiPackageFixture.prepareAction(c, "setup")) return;
             for (int round = 0; round < 2; round++) {
                 // No cleanup ownership until this exact setup succeeds.
                 GuiPackageFixture.run(c, "setup");

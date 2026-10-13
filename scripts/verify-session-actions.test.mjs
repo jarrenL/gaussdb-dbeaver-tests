@@ -2,7 +2,7 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {verifySessionAction} from './verify-session-actions.mjs';
 function fixture(mode = 'cancel') {
-    return {mode,
+    return {mode, targetExitCode: 0,
         targetLog: 'TARGET dbv_gui_one PID=281469332076864 USER=lab\nINTERRUPTED SQLSTATE=' + (mode === 'cancel' ? '57014' : '57P01')
             + '\n' + (mode === 'cancel' ? 'PASS cancel: same connection still queries' : 'PASS terminate: old invalid, fresh connection queries'),
         targetSnapshot: '0 Shell DBeaver\n 250 TreeItem 281,469,332,076,864\n column1=lab\n column3=dbv_gui_one\n column4=active\n column6=SELECT pg_sleep(120)\nOK\n',
@@ -19,6 +19,11 @@ for (const [name, change] of [
     ['wrong user', f => { f.targetSnapshot = f.targetSnapshot.replace('column1=lab', 'column1=other'); }],
     ['idle target', f => { f.targetSnapshot = f.targetSnapshot.replace('active', 'idle'); }],
     ['missing JDBC proof', f => { f.targetLog = f.targetLog.replace('PASS cancel', 'NOT PASSED'); }],
+    ['nonzero target exit', f => { f.targetExitCode = 1; }],
+    ['missing target exit', f => { delete f.targetExitCode; }],
+    ['explicit failure line', f => { f.targetLog += '\nFAIL stale internal assertion'; }],
+    ['uncaught exception', f => { f.targetLog += '\nException in thread "main" java.lang.AssertionError'; }],
+    ['duplicated final result', f => { f.targetLog += '\nPASS cancel: same connection still queries'; }],
     ['stale final row', f => { f.refreshed += '\ndbv_gui_one\nOK'; }],
     ['error dialog', f => { f.refreshed += '\n20 Shell Error\nOK'; }],
     ['truncated dump', f => { f.confirmation = f.confirmation.replace('OK\n', ''); }],
