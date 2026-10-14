@@ -1,41 +1,31 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import {spawnSync} from 'node:child_process';
-const root = process.env.DBEAVER_REPO || '/Users/lj/Documents/GaussDB/dbeaver-icbc-26.1.5';
-const java = '/Library/Java/JavaVirtualMachines/jdk-25.jdk/Contents/Home/bin/';
-const output = fs.mkdtempSync('/tmp/hex-content-test-');
+import {focusedRunnerPaths, resolvedBundleEntries, temporaryPrefix} from './focused-runner-paths.mjs';
+const {root, commonClasses, javaCommand, mockitoJar, byteBuddyJar,
+ byteBuddyAgentJar, objenesisJar, junitConsoleJar} = focusedRunnerPaths();
+const output = fs.mkdtempSync(temporaryPrefix('hex-content-test-'));
 const editorTests = root + '/test/org.jkiss.dbeaver.ui.editors.data.test/src/';
-const cp = [output, editorTests, '/Users/lj/Documents/GaussDB/dbeaver-common/modules/org.jkiss.utils/target/classes'];
+const cp = [output, editorTests, commonClasses];
 for (const name of fs.readdirSync(root + '/plugins')) {
  const classes = path.join(root, 'plugins', name, 'target/classes');
  if (fs.existsSync(classes)) cp.push(classes);
 }
-const config = fs.readFileSync(path.join(root,
- 'test/org.jkiss.dbeaver.ext.gaussdb.debug.test/target/work/configuration/config.ini'), 'utf8');
-const framework = config.split(/\r?\n/).find(line => line.startsWith('osgi.framework='));
-const bundles = config.split(/\r?\n/).find(line => line.startsWith('osgi.bundles='));
-if (!framework || !bundles) throw new Error('Resolved OSGi framework or bundle list is missing');
-for (const entry of [framework.slice('osgi.framework='.length), ...bundles.slice('osgi.bundles='.length).split(',')]) {
- const file = entry.replaceAll('\\:', ':').replace(/^(?:reference:)?file:/, '').replace(/@\d+(?::start)?$/, '');
- if (!path.isAbsolute(file) || !fs.existsSync(file)) throw new Error('Missing resolved bundle: ' + file);
- if (!/\.source-|junit|mockito|byte.buddy|opentest4j/i.test(path.basename(file))) cp.push(file);
+for (const file of resolvedBundleEntries(root, process.env, ['org.jkiss.dbeaver.ext.gaussdb.debug.test'])) {
+ if (!/\.source-|junit|mockito|byte.buddy|opentest4j/i.test(path.basename(file)) && !cp.includes(file)) cp.push(file);
 }
-const m2 = '/Users/lj/.m2/repository/';
-const agent = m2 + 'p2/osgi/bundle/net.bytebuddy.byte-buddy-agent/1.18.8/net.bytebuddy.byte-buddy-agent-1.18.8.jar';
+const agent = byteBuddyAgentJar;
 cp.push(agent,
- m2 + 'p2/osgi/bundle/net.bytebuddy.byte-buddy/1.18.8/net.bytebuddy.byte-buddy-1.18.8.jar',
- m2 + 'p2/osgi/bundle/org.mockito.mockito-core/4.8.1/org.mockito.mockito-core-4.8.1.jar',
- m2 + 'p2/osgi/bundle/org.objenesis/3.2.0/org.objenesis-3.2.0.jar',
- m2 + 'org/junit/platform/junit-platform-console-standalone/1.13.1/junit-platform-console-standalone-1.13.1.jar');
+ byteBuddyJar, mockitoJar, objenesisJar, junitConsoleJar);
 function run(command, args) {
- const result = spawnSync(java + command, args, {stdio: 'inherit', timeout: 120000});
+ const result = spawnSync(javaCommand(command), args, {stdio: 'inherit', timeout: 120000});
  if (result.status !== 0) process.exit(result.status ?? 1);
  if (command === 'javac') fs.writeFileSync(path.join(output, 'compiled-sources.json'),
   JSON.stringify({root, sources: args.filter(value => value.endsWith('.java'))}, null, 2));
 }
 console.log('Component output: ' + output);
 const source = root + '/plugins/org.jkiss.dbeaver.ui.editors.hex/src/org/jkiss/dbeaver/ui/editors/binary/';
-run('javac', ['--release', '21', '-cp', cp.join(':'), '-d', output,
+run('javac', ['--release', '21', '-cp', cp.join(path.delimiter), '-d', output,
  source + 'BinaryEditor.java', source + 'BinaryContent.java',
  root + '/plugins/org.jkiss.dbeaver.ui.editors.data/src/org/jkiss/dbeaver/ui/editors/content/ContentEditorInput.java',
  root + '/plugins/org.jkiss.dbeaver.ui.editors.data/src/org/jkiss/dbeaver/ui/editors/content/ContentEditorContributor.java',
@@ -50,7 +40,7 @@ run('javac', ['--release', '21', '-cp', cp.join(':'), '-d', output,
  root + '/test/org.jkiss.dbeaver.test.platform/src/org/jkiss/dbeaver/model/impl/jdbc/data/JDBCContentBytesReadTest.java',
  editorTests + 'org/jkiss/dbeaver/acceptance/TextEditorContentReloadTest.java',
  editorTests + 'org/jkiss/dbeaver/ui/editors/content/ContentEditorFileImportTest.java']);
-run('java', ['-javaagent:' + agent, '-Djava.awt.headless=true', '-cp', cp.join(':'),
+run('java', ['-javaagent:' + agent, '-Djava.awt.headless=true', '-cp', cp.join(path.delimiter),
  'org.junit.platform.console.ConsoleLauncher', 'execute', '--select-class',
  'org.jkiss.dbeaver.acceptance.BinaryEditorContentReloadTest', '--fail-if-no-tests',
  '--select-class', 'org.jkiss.dbeaver.ui.editors.content.ContentEditorFileImportTest',

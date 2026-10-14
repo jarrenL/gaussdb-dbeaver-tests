@@ -1,30 +1,21 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
-const root = process.env.DBEAVER_REPO || '/Users/lj/Documents/GaussDB/dbeaver-icbc-26.1.5';
-const java = '/Library/Java/JavaVirtualMachines/jdk-25.jdk/Contents/Home/bin/';
-const output = fs.mkdtempSync('/tmp/shared-focused-');
+import {focusedRunnerPaths, javaTestClassName, resolvedBundleEntries,
+ temporaryPrefix} from './focused-runner-paths.mjs';
+const {root, commonClasses, javaCommand, mockitoJar, byteBuddyJar,
+ byteBuddyAgentJar, objenesisJar, junitConsoleJar} = focusedRunnerPaths();
+const output = fs.mkdtempSync(temporaryPrefix('shared-focused-'));
 const cp = [output];
 for (const name of fs.readdirSync(root + '/plugins')) {
     const classes = root + '/plugins/' + name + '/target/classes';
     if (fs.existsSync(classes)) cp.push(classes);
 }
-cp.push('/Users/lj/Documents/GaussDB/dbeaver-common/modules/org.jkiss.utils/target/classes');
+cp.push(commonClasses);
 // Use the resolved platform, not a disposable GUI installation in /tmp.
-for (const module of ['org.jkiss.dbeaver.test.platform', 'org.jkiss.dbeaver.ext.gaussdb.debug.test']) {
-const resolvedConfig = fs.readFileSync(path.join(root,
- 'test', module, 'target/work/configuration/config.ini'), 'utf8');
-const bundlesLine = resolvedConfig.split(/\r?\n/).find(line => line.startsWith('osgi.bundles='));
-if (!bundlesLine) throw new Error('Resolved OSGi bundle list is missing');
-const frameworkLine = resolvedConfig.split(/\r?\n/).find(line => line.startsWith('osgi.framework='));
-if (!frameworkLine) throw new Error('Resolved OSGi framework is missing');
-const resolvedEntries = [frameworkLine.slice('osgi.framework='.length),
- ...bundlesLine.slice('osgi.bundles='.length).split(',')];
-for (const entry of resolvedEntries) {
- const file = entry.replaceAll('\\:', ':').replace(/^(?:reference:)?file:/, '').replace(/@\d+(?::start)?$/, '');
- if (!path.isAbsolute(file) || !fs.existsSync(file)) throw new Error('Missing resolved bundle: ' + file);
+for (const file of resolvedBundleEntries(root, process.env,
+ ['org.jkiss.dbeaver.test.platform', 'org.jkiss.dbeaver.ext.gaussdb.debug.test'])) {
  if (!/\.source-|junit|mockito|byte.buddy|opentest4j/i.test(path.basename(file)) && !cp.includes(file)) cp.push(file);
-}
 }
 const dirs = [
  root + '/test/org.jkiss.dbeaver.ext.gaussdb.test/target/work/plugins/org.jkiss.bundle.apache.poi_5.4.2/lib'
@@ -32,12 +23,12 @@ const dirs = [
 for (const dir of dirs) for (const name of fs.readdirSync(dir)) {
  if (name.endsWith('.jar') && !/junit|mockito|byte.buddy|opentest4j/i.test(name)) cp.push(path.join(dir, name));
 }
-cp.push('/Users/lj/.m2/repository/p2/osgi/bundle/org.mockito.mockito-core/4.8.1/org.mockito.mockito-core-4.8.1.jar');
-cp.push('/Users/lj/.m2/repository/p2/osgi/bundle/net.bytebuddy.byte-buddy/1.18.8/net.bytebuddy.byte-buddy-1.18.8.jar');
-const agent = '/Users/lj/.m2/repository/p2/osgi/bundle/net.bytebuddy.byte-buddy-agent/1.18.8/net.bytebuddy.byte-buddy-agent-1.18.8.jar';
+cp.push(mockitoJar);
+cp.push(byteBuddyJar);
+const agent = byteBuddyAgentJar;
 cp.push(agent);
-cp.push('/Users/lj/.m2/repository/p2/osgi/bundle/org.objenesis/3.2.0/org.objenesis-3.2.0.jar');
-const consoleJar = '/Users/lj/.m2/repository/org/junit/platform/junit-platform-console-standalone/1.13.1/junit-platform-console-standalone-1.13.1.jar';
+cp.push(objenesisJar);
+const consoleJar = junitConsoleJar;
 cp.push(consoleJar);
 const source = root + '/test/org.jkiss.dbeaver.ext.postgresql.test/src/org/jkiss/dbeaver/ext/postgresql/model/plan/PostgreXmlPlanHierarchyTest.java';
 const savedSource = root + '/test/org.jkiss.dbeaver.ext.postgresql.test/src/org/jkiss/dbeaver/ext/postgresql/model/plan/PostgreSavedPlanTest.java';
@@ -62,20 +53,19 @@ const additionalSources = [
   ...javaSources(root + '/plugins/org.jkiss.dbeaver.debug.core/src')
  ] : [])
 ];
-const additionalClasses = additionalSources.filter(file => file.startsWith(root + '/test/') && file.endsWith('Test.java'))
- .map(file => file.slice(file.indexOf('/src/') + 5).replace(/\.java$/, '').split(path.sep).join('.'));
+const additionalClasses = additionalSources.map(file => javaTestClassName(root, file)).filter(Boolean);
 if (additionalSources.length) {
  console.log('Additional GaussDB test classes selected: ' + additionalClasses.length);
  console.log('Live-only classes not executed in this mode: ' + [...liveOnly].join(', '));
 }
 function run(bin, args) {
- const result = spawnSync(java + bin, args, {stdio: 'inherit'});
+ const result = spawnSync(javaCommand(bin), args, {stdio: 'inherit'});
  if (result.status !== 0) process.exit(result.status ?? 1);
  if (bin === 'javac') fs.writeFileSync(path.join(output, 'compiled-sources.json'),
   JSON.stringify({root, sources: [...new Set(args.filter(value => value.endsWith('.java')))]}, null, 2));
 }
 console.log('Focused output: ' + output);
-run('javac', ['--release', '21', '-cp', cp.join(':'), '-d', output, source, savedSource,
+run('javac', ['--release', '21', '-cp', cp.join(path.delimiter), '-d', output, source, savedSource,
  root + '/plugins/org.jkiss.dbeaver.model.jdbc/src/org/jkiss/dbeaver/model/impl/jdbc/data/JDBCCollection.java',
  root + '/plugins/org.jkiss.dbeaver.model.jdbc/src/org/jkiss/dbeaver/model/impl/jdbc/data/JDBCContentLOB.java',
  root + '/test/org.jkiss.dbeaver.test.platform/src/org/jkiss/dbeaver/model/impl/jdbc/data/JDBCCollectionCloneTest.java',
@@ -176,7 +166,7 @@ if (process.argv.includes('--compile-only')) {
  console.log('Compilation only; no tests executed. Use compiled-sources.json with the OSGi runner.');
  process.exit(0);
 }
-run('java', ['-javaagent:' + agent, '-Djava.awt.headless=true', '-cp', cp.join(':'),
+run('java', ['-javaagent:' + agent, '-Djava.awt.headless=true', '-cp', cp.join(path.delimiter),
  'org.junit.platform.console.ConsoleLauncher', 'execute', '--select-class',
  'org.jkiss.dbeaver.ext.postgresql.model.plan.PostgreXmlPlanHierarchyTest', '--select-class',
  'org.jkiss.dbeaver.ext.postgresql.model.plan.PostgreSavedPlanTest', '--select-class',

@@ -246,6 +246,12 @@ SQL折叠GUI补充：隔离Linux客户端已更新1.0.185.202609231515，489–5
 
 最新表达式/部分索引批次：**925项，909通过、16跳过、零失败/错误**，`results/run-Y3bY3v`。productionTableDdlPreservesExpressionAndPartialIndexAfterRename在507分布式真库创建lower(label) WHERE active非唯一索引，重命名为含空格中文的Index 中文，通过生产readTableDDL读取、删除本轮表、原样DDL重建。目录独立核对索引名、表达式lower(label)、predicate=active；插入三行，过滤查询只返回匹配的active行；JDBC元数据新名存在/旧名不存在且NON_UNIQUE=true。删除该索引后JDBC元数据不再列出、表三行仍保留。不是证明优化器选择该索引，也不是索引编辑器/批量删除UI。报告`test-results-20260923-expression-index.json`；临时grantee已删除。
 
+2026-10-14补充无界面会话终止夹具：`HeadlessTransactionTerminationTest` 为内网GRT提供独立controller，不依赖人工点击。controller只在完整PID、随机application_name、数据库、用户、active状态和准确等待SQL全部匹配后，以参数绑定调用`pg_terminate_backend`；失败清理仍须重新精确核对同一目标，禁止LIKE或批量终止；继续验证57P01/08类断连、未提交行回滚、新连接写入和随机schema清理。严格门禁要求9/9及`scope=server-jdbc gui=false`，24项专项自测覆盖非零退出、目标半截日志、错marker/PID、false响应、取消状态、缺失/错清理、计数矛盾、异常、重复或冲突终态，以及源码不得模糊/批量终止。本机507分布式真库9/9通过。GaussDB 505.2.1.SPC0800分布式ORA（1CN、1分片×3DN）Java 8真库同样9/9及严格verifier通过：完整64位PID精确匹配、SQLSTATE 57P01、未提交事务回滚、新连接提交、随机schema清理全部成立。该夹具不操作DBeaver UI，证据范围仅为服务器/JDBC和可重复headless夹具；不把结果记为会话管理菜单、确认框、刷新或GUI验收。原`GuiTransactionTarget`保持不变，headless矩阵应将GUI项标为`SKIP/UNSUPPORTED: headless-no-swt`，不能只凭TARGET启动判通过。
+
+2026-10-14补充分布式 Package 降级诊断夹具：O/A/ORA 且具备 `gs_package`、`GS_SOURCE` 时进入 `source-replay`，不再因缺少集中式 `GS_ERRORS` 和私有参数而整体跳过。本机507分布式真库验证正常包返回42、无效Body直接报错、无效源码留存并可重放、唯一错误token推断到提交源码第3行。GaussDB 505.2.1.SPC0800分布式ORA（1CN、1分片×3DN）能力探测同样为`source-replay`：有`gs_package`和`GS_SOURCE`，无`GS_ERRORS`及两个私有参数；`ALTER PACKAGE ... COMPILE`返回42809/vendor 10531。两轮保护生命周期和严格verifier通过，正常包返回42，非法Body create/replay均返回42601/vendor 11019，`GS_SOURCE`保留invalid，唯一token推断第3行，最终唯一PASS并清理。重放与产品使用同一契约，把实际声明开头的 `CREATE PACKAGE [BODY]` 安全改为 `CREATE OR REPLACE`，跳过前置行/块/嵌套块注释，不触碰字符串、近似关键字或既有完整子句。推断位置明确标为客户端近似值，错误token不是恰好一次时必须显示未知行。离线脚本261/261、能力合同9/9和降级合同19/19通过。上述均为服务器/JDBC及可重复夹具证据，不冒充DBeaver Package GUI验收。
+
+2026-10-14新增分布式 Package 权威源码/并发安全夹具：`PackageCatalogConcurrencyFixture` 使用两个 JDBC 连接和固定隔离 schema。A 按包 OID 缓存返回42的旧 `GS_SOURCE`，B 对同一包执行 `CREATE OR REPLACE PACKAGE BODY` 改为84；A 必须按原 OID 重新读取目录并只重放新源码，最终仍返回84，不能让旧 Java 缓存把结果恢复为42。同时记录并断言 schema/package owner、包 OID及 `pg_object` S/B 对象OID和valid状态保持；所有权不符或RESTRICT清理失败即失败，禁止CASCADE，不猜测GRANT或依赖语法。Java 21离线编译和严格verifier 30/30通过，门禁拒绝旧/新摘要相同、OID漂移、旧源码重放、状态失效、缺清理、重复/冲突终态及GUI/OSGi越界声明。GaussDB 505.2.1.SPC0800分布式ORA真库13/13及严格verifier通过：A旧42→B改84→A按原OID重读新`GS_SOURCE`→重放后仍84；schema/package owner、package OID、S/B object OID及valid均稳定，RESTRICT清理完成。证据范围仅为`server/JDBC/catalog`、`gui=false`、`osgi=false`，不冒充DBeaver GUI或OSGi调用验收。本轮离线脚本合计337/337；新增台账包含PackageReplay协作锁/重放序列化合同31/31、集中式连接准备合同6/6、定向脚本路径可移植性合同8/8。
+
 最新会话终止真库批次：**924项，908通过、16跳过、零失败/错误**，`results/run-TYJMOB`。terminatedOwnSessionRollsBackAndFreshConnectionCanWrite在507上创建随机schema/表及独立同账号writer，writer未提交插入1行且自身可见、controller不可见；controller仅对刚从writer获取的pg_backend_pid调用pg_terminate_backend并断言true。writer后续SELECT必须报57P01或08类连接SQLSTATE。再以独立观察连接确认0行，创建新连接写入id=2/reconnected，原controller也读取相同值。原连接终止、未提交数据不残留、重新连接读写通过，耗时0.188秒；不是整个服务停机/主备切换/网络断连，也不证明DBeaver自动重连弹窗或SQL重试策略。报告`test-results-20260923-session-termination.json`；临时grantee已删除。无产品代码修改。
 
 最新异常关闭批次：**923项，907通过、16跳过、零失败/错误**，`results/run-rdF7uo`。新增红测直接准备待执行batch后调用生产close，旧实现未关闭batch，run-w8XGN7报Wanted but not invoked。closeExporter补充在会话关闭前释放残留batch并清空引用；batch.close异常记录日志但继续事务回滚和会话/独立连接清理。两个新测试验证正常关闭顺序/重复close仅一次，以及batch.close异常不阻断其余资源释放、不提交。反射只准备运行态，未声称GUI泄漏测量或所有JDBC资源已穷尽覆盖。报告`test-results-20260923-consumer-abort-cleanup.json`；临时grantee已删除。此共享组件补丁尚未装入GUI副本，后续集成验收需使用更新bundle。
@@ -294,7 +300,7 @@ SQL折叠GUI补充：隔离Linux客户端已更新1.0.185.202609231515，489–5
 | 范围 | 实际入口 | 本轮状态 |
 |---|---|---|
 | 参数模式、绑定、安全文本、默认值及 OUT 位置 | GaussDBDebugArgumentsTest | 单元测试已通过 |
-| 包批次 ALL/SPEC/BODY、失败停止、取消、诊断保留 | GaussDBPackageCompileBatchTest / GaussDBPackageCompilerTest | 单元测试已通过；本轮未重跑集中式包真库 |
+| 包批次 ALL/SPEC/BODY、失败停止、取消、诊断保留 | GaussDBPackageCompileBatchTest / GaussDBPackageCompilerTest / GuiPackageFixtureTest | 单元测试已通过；507分布式源码重放降级真库通过；505.2.1.SPC0800分布式ORA两轮保护生命周期、create/replay诊断和严格verifier通过；本轮未重跑集中式包真库；GUI仍需独立验收 |
 | 注释、字符串、CASE、嵌套查询、分布式 SQL 拆分 | GaussDBDialectTest | 单元测试已通过；不代表每种语法在服务端可执行 |
 | IN/OUT/INOUT、OUT 首中尾、NULL、带引号名称、函数 | GaussDBHistoricalJdbcLiveTest | 507 分布式 ORA 真库通过 |
 | 同名重载过程 | GaussDBHistoricalJdbcLiveTest.overloadedProceduresResolveByExplicitInputType | 当前服务端拒绝创建，明确跳过，不算通过 |

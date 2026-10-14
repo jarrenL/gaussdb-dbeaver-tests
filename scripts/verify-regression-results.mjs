@@ -15,6 +15,8 @@ export const requiredClasses = [
     ['org.jkiss.dbeaver.ext.gaussdb.test', 'org.jkiss.dbeaver.ext.gaussdb.model.GaussDBPackageSourceLinesTest'],
     ['org.jkiss.dbeaver.ext.gaussdb.test', 'org.jkiss.dbeaver.ext.gaussdb.model.GaussDBPackageStateRefreshTest'],
     ['org.jkiss.dbeaver.ext.gaussdb.test', 'org.jkiss.dbeaver.ext.gaussdb.model.GaussDBPackageCompileBatchTest'],
+    ['org.jkiss.dbeaver.ext.gaussdb.test', 'org.jkiss.dbeaver.ext.gaussdb.model.GaussDBPackageLockTest'],
+    ['org.jkiss.dbeaver.ext.gaussdb.test', 'org.jkiss.dbeaver.ext.gaussdb.edit.GaussDBPackageManagerTest'],
     ['org.jkiss.dbeaver.ext.gaussdb.debug.test', 'org.jkiss.dbeaver.ext.gaussdb.debug.core.internal.GaussDBDebugSessionTest'],
     ['org.jkiss.dbeaver.ext.gaussdb.debug.test', 'org.jkiss.dbeaver.ext.gaussdb.debug.core.DebugTransactionCompletionTest'],
     ['org.jkiss.dbeaver.test.platform', 'org.jkiss.dbeaver.model.ConfigurationNIOPersistenceTest'],

@@ -153,7 +153,7 @@ test('invalid matrix declarations and malformed probes fail closed', async () =>
 test('all property-file fixtures require an explicit driver class with no legacy fallback', () => {
     const repository = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
     const files = ['GuiDebugTerminationFixture.java', 'GuiDebugTerminationFixtureTest.java',
-        'GuiSessionTarget.java', 'GuiTransactionTarget.java'];
+        'GuiSessionTarget.java', 'GuiTransactionTarget.java', 'HeadlessTransactionTerminationTest.java'];
     for (const file of files) {
         const source = fs.readFileSync(path.join(repository, 'integration', file), 'utf8');
         assert.match(source, /required\([^\n]*"driverClass"\)/);

@@ -20,7 +20,7 @@ da39ce5467新整包26.1.5.202609300906完整聚合构建成功，x86/ARM组装�
 
 继续优先补功能证据而非重复计数：异步属性刷新多请求回调顺序（runService目前schedule新任务但不取消旧任务，尚需可执行用例确认影响）、SSL配置GUI及连接中断保护；之后逐组核对适用场景和整合本地测试工具交付。辅助只读缺口任务仍存活未返回，不能算已完成审查或阻塞本地推进。
 
-已验证主仓快照已推送jarrenL/dbeaver的codex/icbc-gaussdb-26.1.5分支，HEAD cff9f01eeb（含run-myTchS 2727通过/18跳过证据）。推送前官方Gitleaks8.30.1下载包摘要核对成功，待推送485提交约119.81MB历史扫描0发现；主仓PREPUSH_SCAN_20260930.json保留边界。非最终发布/非全部历史场景完成，未上传新二进制包；独立测试工具仓暂仍本地，后续需整合交付。两处原有SWTBot工作区改动未混入推送。
+已验证主仓交付分支快照已推送 jarrenL/dbeaver，HEAD cff9f01eeb（含run-myTchS 2727通过/18跳过证据）。推送前官方Gitleaks8.30.1下载包摘要核对成功，待推送485提交约119.81MB历史扫描0发现；主仓PREPUSH_SCAN_20260930.json保留边界。非最终发布/非全部历史场景完成，未上传新二进制包；独立测试工具仓暂仍本地，后续需整合交付。两处原有SWTBot工作区改动未混入推送。
 
 连接配置损坏JSON边界已补生产解析器验证：4种输入（根截断、合法folder前缀后截断、connection缺值、有效对象后尾随垃圾）各跑明文/加密两分支，JsonParseException、流只关闭一次、解析结果无部分应用、修复内容后同解析器可重试并加载folder全部通过。run-myTchS=2745总计/2727通过/18跳过/0失败错误，fresh gate与临时夹具/角色/HBA恢复通过。主仓CONFIG_MALFORMED_20260930.json；初轮测试桩嵌套spy调用错误修正后通过，不计产品缺陷。不是导入向导GUI或合法JSON的字段类型校验。
 
@@ -36,13 +36,17 @@ da39ce5467新整包26.1.5.202609300906完整聚合构建成功，x86/ARM组装�
 
 包GUI夹具已从临时程序整理为integration/GuiPackageFixture.java及GuiPackageFixtureTest.java，可setup/verify/cleanup。最终版本Java21目标编译通过，507集中式普通账号完整运行两次；每次含两轮重复创建42P06、无效Body目录状态、额外表导致清理2BP01并完整回滚/保留42及原包、正常清理，以及模拟包已删除后的空schema清理。独立残留schema=0，临时密码副本删除。此为夹具生命周期/保护测试，不新增GUI功能通过数。
 
+2026-10-14补充分布式 Package 降级诊断：能力探测分为 `structured`、`source-replay`、`unsupported`。本机507分布式 ORA 在缺少 `GS_ERRORS` 和两个集中式会话参数时，正常包创建及调用返回42；故意无效的Body两次执行都返回直接编译错误，`GS_SOURCE`保留无效源码，唯一错误token可在提交源码中推断为第3行。GaussDB 505.2.1.SPC0800分布式ORA（1CN、1分片×3DN）能力探测进入`source-replay`：存在`gs_package`和`GS_SOURCE`，缺少`GS_ERRORS`及两个私有参数，原生ALTER返回42809/vendor 10531。两轮保护生命周期及严格verifier通过；正常包42，非法Body create/replay均为42601/vendor 11019，`GS_SOURCE`保留invalid，唯一token推断第3行，最终唯一PASS且清理完成。离线脚本261/261、能力合同9/9、降级合同19/19通过，覆盖与产品一致的 `CREATE` 到 `CREATE OR REPLACE` 安全重写、前置及嵌套注释、既有子句、字符串/近似关键字不改写和错误token非唯一时拒绝定位。该路径不设置 `enable_force_create_obj` 或 `plsql_show_all_error`，也不把推断行冒充服务器精确行。上述仅证明服务器/JDBC和可重复夹具，不替代DBeaver Package GUI验收；集中式结构化诊断的既有证据继续保留。
+
+2026-10-14增加 Package 目录并发刷新专项：Java 21 `PackageCatalogConcurrencyFixture` 在固定隔离 schema 中建立包，连接A按OID读取并保留返回42的旧 `GS_SOURCE`，连接B将同一Body替换为84，随后A必须再次按原OID读取并仅重放刷新源码。成功门禁还要求包/模式owner与OID不变、`pg_object`的S/B对象OID与valid状态不变、最终调用仍为84、精确RESTRICT清理和唯一终态；拒绝摘要未变、OID漂移、旧缓存重放、状态失效、CASCADE声明及GUI/OSGi越界。源码不加入目标版本不稳定的GRANT/依赖假设。离线Java 21编译及verifier正负合同30/30通过；连同后续门禁，当前离线脚本总数为337/337。新增台账包含PackageReplay协作锁/重放序列化合同31/31、集中式连接准备合同6/6、定向脚本路径可移植性合同8/8。GaussDB 505.2.1.SPC0800分布式ORA真库13/13及严格verifier通过：A读取旧42，B更新同包Body为84，A按原OID重读新`GS_SOURCE`并重放后仍为84；schema/package owner、package OID、S/B object OID和valid状态均稳定，RESTRICT清理通过。该项证据范围是`server/JDBC/catalog`、`gui=false`、`osgi=false`，不覆盖DBeaver编辑器、菜单、OSGi服务调用或并发UI刷新。
+
 0733干净整包x86包错误定位与批量删除已补验：重建后gui_bad当前OID72071，Compile Body错误窗line4/col1，Open Source光标定位实际missing %TYPE声明行；服务端当前OID相对line2，旧同名OID70912排除。Ctrl多选两包Delete准确列两个全名，Cancel后独立count=2，重复Yes后导航消失且count=0；空schema RESTRICT清理后0，临时口令副本删除。主仓PACKAGE_FINAL_X86_ERROR_DELETE_20260930.json，非依赖冲突/并发删除/权限拒绝证明。
 
 0733干净整包x86包保存/状态限定验收通过：普通账号gui_bad当前OID72066初始Invalid，经Body源码保存预览仅OR REPLACE BODY，保存后无需Refresh/Compile自动Normal，独立调用46；BODY/SPEC工具栏以及右键ALL均成功，独立S/B valid=true。源码tooltip显示中文。关闭编辑器后仅两夹具包+schema RESTRICT事务清理，schema=0，临时口令副本删除。主仓PACKAGE_FINAL_X86_20260930.json及八截图；错误定位/批量删除/调试仍未在该整包补跑，不把行政清理算UI删除。
 
 执行检查点更新：新整包x86麒麟（本地架构仿真）从空工作区完成原生驱动入口、添加外部JDBC、测试连接成功、保存连接、SQL编辑器查询507/package_lab/package_tester；独立服务端确认release_0733_x86_marker查询的账号/库/idle状态。证据补入LINUX_STATE_REFRESH_BUILD_20260930.json。不是调试、包编译或客户桌面云认证。
 
-重新收敛后续顺序：①0733干净整包双架构的包保存/状态/调试/事务操作；②异步刷新并发测试、SSL GUI与连接中断保护；③逐组适用清单对照到具体测试及证据，明确不适用与环境阻塞；④归档校验、客户说明和已验证内容推送。每项须有执行结果，不能用反复全量回归替代GUI与场景缺口。辅助提交审查已返回，无确认缺陷；空值及时序建议经实际源码核对，竞态与测试分支不足仍待补，不把静态审查计作测试通过。
+重新收敛后续顺序：①0733干净整包双架构的包保存/状态/调试/事务操作；②异步刷新并发测试、SSL GUI与连接中断保护；③逐组适用清单对照到具体测试及证据，明确不适用与环境阻塞；④归档校验、客户说明和已验证内容推送。每项须有执行结果，不能用反复全量回归替代GUI与场景缺口。辅助提交审查已返回，无确认缺陷；空值及时序建议经实际源码核对，竞态与相关测试覆盖不足仍待补，不把静态审查计作测试通过。
 
 新整包26.1.5.202609300733已由生产提交e52a9c4cc5构建，双架构组装/1202项manifest/9个native字节对照通过；源码集合与对应版本归档已准备。两端正常关闭旧产品后启动新整包，About确认同一版本；ARM界面查询507/package_lab/package_tester并独立服务端确认。x86仅启动和连接向导，后续连接/调试/包回归仍待。路径linux-state-refresh-20260930-9ym0tr，主仓LINUX_STATE_REFRESH_BUILD_20260930.json。未上传或替换远端；部分上游提示和菜单仍英文，不宣称全汉化。旧状态刷新方案起草任务因修复已落地而终止，改为独立辅助仅审e52a9c4cc5提交，目前尚无结论。
 
@@ -173,6 +177,8 @@ TLS过期叶证书场景正在补验：使用当前有效CA签名过期叶证书
 2026-09-29会话PID读取失败新增4项：第二行08006/42501/22003/NULL均红测复现伪造0编号。PostgreSession改直接getLong+wasNull，SQLException传播/NULL拒绝，显式刷新恢复断言通过。Gauss会话10/10、64位身份6/6；73模块clean verify共2685项：2511通过173跳过1Rest权限错误，独立门禁拒绝、自测7/7。非真库连接恢复/GUI或整包，见主仓SESSION_PID_READ_FAILURE_20260929.md。
 
 2026-09-29会话大PID补6项：5种编号的模型/取消终止SQL保真及低32位相同对象身份，红测4失败；共享PostgreSession改long读取/存储/getter。首次增量5个旧签名NoSuchMethodError，73模块clean verify后6/6及Gauss会话6/6通过。总2681：2507通过173跳过1Rest权限错误，门禁拒绝、自测7/7。返回类型二进制不兼容需统一重打包；未发真实取消/终止请求、Docker拒绝，无真库/GUI新增。见主仓SESSION_PID_WIDTH_20260929.md。
+
+2026-10-14无界面终止测试边界：新增独立`HeadlessTransactionTerminationTest`及严格日志门禁，不修改等待真实DBeaver操作的`GuiTransactionTarget`。新夹具使用随机marker/schema、完整long PID、独立controller和参数绑定；终止前必须同时确认application_name、数据库、用户、active状态及准确等待SQL，失败清理也只允许在这些身份仍精确匹配时由独立连接终止同一PID；终止后验证服务器true响应、57P01/08类断连、目标失效、未提交事务回滚、新连接写入和RESTRICT清理。日志及源码安全门禁24/24，Java 8编译通过。本机507分布式真库9/9通过。GaussDB 505.2.1.SPC0800分布式ORA（1CN、1分片×3DN）Java 8真库9/9及严格verifier也通过：完整64位PID精确匹配，SQLSTATE 57P01，未提交事务回滚，新连接提交，随机schema清理完成。离线脚本总计261/261通过。此路径只关闭9.9中“服务端/JDBC无界面终止及事务后果”的自动化缺口；它不覆盖会话管理页面选行、Terminate菜单、确认框和刷新，GUI项在无SWT的GRT中必须SKIP/UNSUPPORTED而非以TARGET启动替代。
 
 2026-09-29核对9.9会话监控实际继承adapter入口，新增6项生产会话manager测试：空闲过滤、模型映射/IPv6回退及prepare/execute/next/close异常传播和资源所有权，6/6；非DN运维面板，无生产修改。73模块2675项：2501通过173跳过1Rest权限错误，门禁拒绝、自测7/7。真实权限/GUI及大于32位PID另验，见主仓SESSION_MANAGER_COVERAGE_20260929.md。
 
@@ -749,7 +755,7 @@ SQL Unicode范围缺陷修复：新增6项严格原文范围断言，run-Z87Dnj�
 | 1.5 | 查询首行、结果集、CSV、超时 | 首行/结果集、queryTimeout及Statement.cancel后连接复用已真库验证；CSV导入导出向导与单行导入取消已实测；SQL终端运行中取消pg_sleep及后续中文查询成功已实测；网络阻塞/批量模式仍待补 | 部分 |
 | 1.6 | 执行器资源、批量、OUT、警告 | OUT/INOUT、预编译批量计数及回滚、唯一键失败批次SQLSTATE/失败计数/回滚无残留/同一语句清空后复用，Statement关闭关联ResultSet但不关闭连接、关闭对象拒绝使用、警告读取和清除已真库验证；DBeaver执行器各异常路径和任务UI待补 | 部分 |
 | 2.1 | 关键字与语法分类 | 生产 configureDialect 的 GaussDB 关键字大小写、类型/函数分类、YEAR 关键字优先及类型枚举副本已验证；模式差异和编辑器高亮另验，不把拆分当语义检查 | 部分 |
-| 3.1 | 数据库、schema、包、状态 | 既有 DatabaseManager、PackageCompiler；新增建库参数与错误读取场景 | 部分 |
+| 3.1 | 数据库、schema、包、状态 | 既有 DatabaseManager、PackageCompiler；新增建库参数、原生 ALTER 到源码重放降级、无 GS_ERRORS 时的状态/直接错误、明确标注的近似行和未知行号场景 | 部分 |
 | 3.2 | 表、DDL、对象刷新 | GaussDBTable 模型、真实 JDBC 元数据；表编辑、DDL 导出、搜索缓存待补 | 部分 |
 | 3.3 | 索引、批量删除 | 真库创建/删除及 JDBC 列、非唯一标记已验证；生产表 DDL 重建后复合唯一索引实际拒绝重复、复合索引列序/升降序元数据已验。lower(label) WHERE active表达式/部分索引重命名中文空格名→生产DDL重建→目录/元数据→删除保留表数据已验；索引DDL预览和批量操作 UI 仍待补 | 部分 |
 | 3.4 | 视图 | 真库重命名保留中文数据及过滤条件、生产搜索新旧名、RESTRICT依赖保护/CASCADE精确删除、无效替换后保存点恢复已验。改名/删除后的JDBC列枚举、中文别名、列顺序、长度/精度已验。修复生成器误将字符串/注释中的create视为DDL，生产生成SQL经真库创建及查询通过；编辑器、懒加载、批量删除UI和补全待补 | 部分 |

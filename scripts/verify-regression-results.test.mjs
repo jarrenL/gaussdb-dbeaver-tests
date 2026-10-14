@@ -26,6 +26,19 @@ test('rejects missing required class even with fresh passing totals', () => {
     const report = fixture(); report.cases.shift();
     assert.throws(() => verifyRegressionResults(recount(report), 1000), /class missing/);
 });
+test('requires package lock and package manager regression classes', () => {
+    const packageClasses = [
+        'org.jkiss.dbeaver.ext.gaussdb.model.GaussDBPackageLockTest',
+        'org.jkiss.dbeaver.ext.gaussdb.edit.GaussDBPackageManagerTest'
+    ];
+    for (const name of packageClasses) {
+        assert(requiredClasses.some(([module, className]) =>
+            module === 'org.jkiss.dbeaver.ext.gaussdb.test' && className === name));
+        const report = fixture();
+        report.cases = report.cases.filter(item => item.class !== name);
+        assert.throws(() => verifyRegressionResults(recount(report), 1000), new RegExp(`Required test class missing: ${name}`));
+    }
+});
 test('rejects missing module', () => {
     const report = fixture(); report.cases = report.cases.filter(item => item.module !== requiredModules[1]);
     assert.throws(() => verifyRegressionResults(recount(report), 1000), /Module did not/);
